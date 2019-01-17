@@ -63,7 +63,7 @@ class IntroScreenState extends State<IntroScreen> {
                   Text("Прокси", style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text("Есть вероятность, что в вашей стране не работает сайт 'flibusta.is', в таком случае рекомендуется использовать proxy. В данном приложении насроена автоматическая подборка работающего прокси с сайта 'ip-adress.com/proxy-list', желаете ли вы его использовать или сами разберётесь?"),
+                    child: Text("Есть вероятность, что в вашей стране не работает сайт 'flibusta.is', в таком случае рекомендуется использовать proxy. В данном приложении настроена автоматическая подборка работающего прокси с сайта 'ip-adress.com/proxy-list', желаете ли вы его использовать или сами разберётесь?"),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -91,6 +91,7 @@ class IntroScreenState extends State<IntroScreen> {
                             });
                             _scaffoldKey.currentState.showSnackBar(SnackBar(
                               content: Text("Поиск работающего прокси"),
+                              duration: Duration(seconds: 10),
                             ));
                             await LocalStore().setUseFreeProxy(true);
                             var ipPort = await ProxyHttpClient().getWorkingProxyHost();

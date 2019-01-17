@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Help extends StatefulWidget {
   @override
@@ -15,19 +16,39 @@ class HelpState extends State<Help> {
         centerTitle: false,
         title: new Text("О приложении"),
       ),
-      body: new Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
-            child: ListTile(
-              title: Text("Разработчик"),
-              subtitle: Text("Данилов Сергей(@utopicnarwhal)\ngigok@bk.ru"),
-              isThreeLine: true,
-            ),
-          )
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  ListTile(
+                    title: Text("Разработчик"),
+                    subtitle: Text("Данилов Сергей(@utopicnarwhal)\ngigok@bk.ru"),
+                    isThreeLine: true,
+                    onTap: () async {
+                      launch("mailto:gigok@bk.ru");
+                    }
+                  ),
+                  Divider(height: 1,),
+                  ListTile(
+                    title: Text("Github"),
+                    subtitle: Text("github.com/utopicnarwhal/FlibustaApp"),
+                    onTap: () async {
+                      await launch("https://github.com/utopicnarwhal/FlibustaApp");
+                    },
+                  )
+                ]
+              ),
+            )
+          ],
+        )
       ),
     );
   }

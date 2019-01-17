@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flibusta_app/services/http_client_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:simple_permissions/simple_permissions.dart';
+import 'package:open_file/open_file.dart';
 
 import 'dart:async';
 import 'dart:io';
@@ -40,6 +42,7 @@ class HomeState extends State<Home> {
     LocalStore().getIntroComplete().then((bool introCompleted) {
       if (!introCompleted) {
         Navigator.of(context).pushNamed("/Intro").then((x) {
+          _scaffoldKey.currentState.removeCurrentSnackBar();
           getData(null).then((response) {
             setState(() {
               data = response;
@@ -188,89 +191,133 @@ class HomeState extends State<Home> {
                               title: Text(data[index].size, style: _biggerFont,),
                             ),
                             data[index].downloadFormats.isNotEmpty ? ListTile(
-                              leading: data[index].downloadProgress == 0.0 ? Tooltip(message: "Скачать", child: Icon(Icons.file_download)) : 
+                              leading: data[index].downloadProgress == 0.0 ? Tooltip(message: "Форматы файлов", child: Icon(Icons.file_download)) : 
                                 CircularProgressIndicator(strokeWidth: 10, value: data[index].downloadProgress),
                               title: Text(data[index].downloadFormats.toString(), style: _biggerFont,),
-                              onTap: data[index].downloadProgress != 0.0 ? null : () {
-                                showModalBottomSheet<void>(context: context, builder: (BuildContext context) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: data[index].downloadFormats.list.map((downloadFormat) {
-                                      return Container(
-                                        padding: EdgeInsets.all(0),
-                                        child: FlatButton(
-                                          padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 16.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Icon(DownloadFormats.getIconDataForFormat(downloadFormat.keys.first), size: 28,),
-                                              Padding(
-                                                padding: const EdgeInsets.only(left: 15),
-                                                child: Text(downloadFormat.keys.first, style: _biggerFont,),
-                                              ),
-                                            ],
-                                          ),
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                            if (!await SimplePermissions.checkPermission(Permission.WriteExternalStorage)) {
-                                              await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
-                                            }
-                                            setState(() {
-                                              data[index].downloadProgress = 0.01;
-                                            });
-
-                                            Uri url = Uri.https("flibusta.is", "/b/${data[index].id}/${downloadFormat.values.first}");
-                                            var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
-                                            Directory saveDocDir = await getExternalStorageDirectory();
-                                            saveDocDir = Directory(saveDocDir.path + "/Flibusta");
-                                            if (!saveDocDir.existsSync()) {
-                                              saveDocDir.createSync(recursive: true);
-                                            }
-                                            var myFile = File(saveDocDir.path + "/" + response.headers["content-disposition"][0]?.split("\"")[1]);
-                                            if (myFile.existsSync()) {
-                                              setState(() {
-                                                data[index].downloadProgress = 0.0;
-                                              });
-                                              _scaffoldKey.currentState.showSnackBar(
-                                                SnackBar(
-                                                  content: Text("Файл с таким именем уже есть"),
-                                                )
-                                              );
-                                              _httpClient.close();
-                                              return;
-                                            }
-                                            
-                                            int downloadedContents = 0;
-                                            var myFileSink = myFile.openWrite();
-                                            var fileSize = response.contentLength;
-                                            try {
-                                              await response.listen((contents) {
-                                                myFileSink.add(contents);
-                                                downloadedContents += contents.length;
-                                                setState(() {
-                                                  data[index].downloadProgress = downloadedContents / fileSize;
-                                                });
-                                              }).asFuture();
-                                            } catch (exc) {
-                                              print(exc);
-                                            }
-                                            await myFileSink.flush();
-                                            await myFileSink.close();
-                                            _httpClient.close();
-                                            setState(() {
-                                              data[index].downloadProgress = 0.0;
-                                            });
-                                          },
-                                        )
-                                      );
-                                    }).toList(),
-                                  );
-                                });
-                              },
                             ) : Container(),
+                            ButtonTheme.bar(
+                              padding: EdgeInsets.fromLTRB(0, 12, 0, 12),
+                              child: ButtonBar(
+                                alignment: MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  FlatButton(
+                                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                    child: Text("СКАЧАТЬ", style: TextStyle(fontSize: 20.0)),
+                                    onPressed: data[index].downloadProgress != 0.0 ? null : () {
+                                      showModalBottomSheet<void>(context: context, builder: (BuildContext context) {
+                                        return Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: data[index].downloadFormats.list.map((downloadFormat) {
+                                            return Container(
+                                              padding: EdgeInsets.all(0),
+                                              child: FlatButton(
+                                                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 16.0),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Icon(DownloadFormats.getIconDataForFormat(downloadFormat.keys.first), size: 28,),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(left: 15),
+                                                      child: Text(downloadFormat.keys.first, style: _biggerFont,),
+                                                    ),
+                                                  ],
+                                                ),
+                                                onPressed: () async {
+                                                  Navigator.pop(context);
+                                                  if (!await SimplePermissions.checkPermission(Permission.WriteExternalStorage)) {
+                                                    await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
+                                                  }
+                                                  setState(() {
+                                                    data[index].downloadProgress = 0.01;
+                                                  });
+
+                                                  var prepareToDownloadSB = _scaffoldKey.currentState.showSnackBar(
+                                                    SnackBar(
+                                                      content: Text("Подготовка к загрузке"),
+                                                      duration: Duration(minutes: 1),
+                                                    )
+                                                  );
+
+                                                  Uri url = Uri.https("flibusta.is", "/b/${data[index].id}/${downloadFormat.values.first}");
+                                                  var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
+                                                  Directory saveDocDir = await getExternalStorageDirectory();
+                                                  saveDocDir = Directory(saveDocDir.path + "/Flibusta");
+                                                  if (!saveDocDir.existsSync()) {
+                                                    saveDocDir.createSync(recursive: true);
+                                                    await _rescanFolder(saveDocDir.path + "/Flibusta");
+                                                  }
+
+                                                  prepareToDownloadSB.close();
+
+                                                  var myFile = File(saveDocDir.path + "/" + response.headers["content-disposition"][0]?.split("\"")[1]);
+                                                  if (myFile.existsSync()) {
+                                                    setState(() {
+                                                      data[index].downloadProgress = 0.0;
+                                                    });
+                                                    _scaffoldKey.currentState.showSnackBar(
+                                                      SnackBar(
+                                                        content: Text("Файл с таким именем уже есть"),
+                                                        action: SnackBarAction(
+                                                          label: "Открыть",
+                                                          onPressed: () async {
+                                                            await OpenFile.open(myFile.uri.toFilePath());
+                                                          },
+                                                        ),
+                                                      )
+                                                    );
+                                                    _httpClient.close();
+                                                    return;
+                                                  }
+                                                  
+                                                  int downloadedContents = 0;
+                                                  var myFileSink = myFile.openWrite();
+                                                  var fileSize = response.contentLength;
+                                                  try {
+                                                    await response.listen((contents) {
+                                                      myFileSink.add(contents);
+                                                      downloadedContents += contents.length;
+                                                      setState(() {
+                                                        data[index].downloadProgress = downloadedContents / fileSize;
+                                                      });
+                                                    }).asFuture();
+                                                  } catch (exc) {
+                                                    print(exc);
+                                                  }
+                                                  await myFileSink.flush();
+                                                  await myFileSink.close();
+                                                  _httpClient.close();
+
+                                                  await _rescanFolder(myFile.path);
+
+                                                  setState(() {
+                                                    data[index].downloadProgress = 0.0;
+                                                  });
+
+                                                  _scaffoldKey.currentState.showSnackBar(
+                                                    SnackBar(
+                                                      content: Text("Файл скачан"),
+                                                      action: SnackBarAction(
+                                                        label: "Открыть",
+                                                        onPressed: () async {
+                                                          await OpenFile.open(myFile.uri.toFilePath());
+                                                        },
+                                                      ),
+                                                    )
+                                                  );
+                                                },
+                                              )
+                                            );
+                                          }).toList(),
+                                        );
+                                      });
+                                    },
+                                  )
+                                ],
+                              )
+                            )
                           ],
                         )
                       ),
@@ -285,9 +332,20 @@ class HomeState extends State<Home> {
     );
   }
 
+  static const platform = const MethodChannel('ru.utopicnarwhal.flibusta/native_methods_channel');
+
+  Future<void> _rescanFolder(String dir) async {
+    try {
+      await platform.invokeMethod('rescan_folder', dir);
+      print("Сканирование успешно завершено");
+    } on PlatformException catch (e) {
+      print("Сканирование не удалось. Ошибка: " + e.toString());
+    }
+  }
+
   Future<List<BookCard>> getData(String title) async {
     setState(() {
-      _load = true;     
+      _load = true;
     });
     Map<String, String> queryParams = { "ab" : "ab1", "sort": "sd2" };
     if (title != null && title.isNotEmpty) {
@@ -309,6 +367,11 @@ class HomeState extends State<Home> {
       return result;
     } on TimeoutException catch(timeoutError) {
       print(timeoutError);
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Время ожидания ответа от сервера истекло. Проверьте соединение с интернетом и доступность прокси."),
+        )
+      );
       setState(() {
         _load = false;     
       });
@@ -364,6 +427,7 @@ class HomeState extends State<Home> {
         if (downloadFormatName == 'читать') {
           continue;
         }
+        downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
         var downloadFormatType = temp.attributes["href"].split("/").last;
         downloadFormats.add({ downloadFormatName: downloadFormatType });
       }

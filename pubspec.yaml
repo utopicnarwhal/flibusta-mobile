@@ -1,15 +1,17 @@
 name: flibusta_app
-description: A new Flutter project.
+description: Mobile application for site https://flibusta.is
 
 dependencies:
   flutter:
     sdk: flutter
 
+  url_launcher: ^4.0.3
   font_awesome_flutter: ^8.2.0
   path_provider: ^0.4.1
   html: ^0.13.3+3
   simple_permissions: ^0.1.9
   shared_preferences: ^0.4.3
+  open_file: ^1.1.1
 
 dev_dependencies:
   flutter_test:

@@ -1,74 +1,66 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 
 class Login extends StatefulWidget {
   @override
-  createState() => new LoginState();
+  createState() => LoginState();
 }
 
 class LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
+    return Scaffold(
+      appBar: AppBar(
         centerTitle: false,
-        title: new Text("Вход"),
+        title: Text("Вход"),
       ),
       body: 
         SingleChildScrollView(
           child: Center(
-            child: new Container(
+            child: Container(
               margin: const EdgeInsets.all(10.0),
-              child: new Form(
-                child: new Theme(
-                  data: new ThemeData(
+              child: Form(
+                child: Theme(
+                  data: ThemeData(
                     primarySwatch: Colors.blue,
-                    inputDecorationTheme: new InputDecorationTheme(
+                    inputDecorationTheme: InputDecorationTheme(
 
                     )
                   ),
-                  child: new Container(
+                  child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                    child: new Column(
+                    child: Column(
                       children: <Widget>[
-                        new Image(
-                          image: new AssetImage("assets/img/flibusta_logo.png"),
+                        Image(
+                          image: AssetImage("assets/img/flibusta_logo.png"),
                           width: 150.0,
                           height: 150.0,
                           fit: BoxFit.fill
                         ),
-                        new TextFormField(
+                        TextFormField(
                           maxLines: 1,
                           autofocus: true,
-                          decoration: new InputDecoration(
+                          decoration: InputDecoration(
                             
-                            icon: new Icon(Icons.assignment_ind,),
+                            icon: Icon(Icons.assignment_ind,),
                             hintText: "Логин"
                           ),
                         ),
-                        new TextFormField(
+                        TextFormField(
                           maxLines: 1,
-                          decoration: new InputDecoration(
-                            icon: new Icon(Icons.lock,),
+                          decoration: InputDecoration(
+                            icon: Icon(Icons.lock,),
                             hintText: "Пароль",
                           ),
                           keyboardType: TextInputType.text,
                           obscureText: true,
                         ),
-                        new Padding(
-                          padding: new EdgeInsets.only(top: 20.0),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20.0),
                         ),
-                        new RaisedButton(
-                          child: new Text("Войти"),
-                          onPressed: () {
-                            HttpClient httpClient = new HttpClient();
-                          },
-                        )
                       ],
                     ),
                   )
-                  
                 ),
               )
             ),
