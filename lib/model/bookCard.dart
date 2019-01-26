@@ -12,7 +12,7 @@ class BookCard {
   Authors authors;
   int translatorId;
   String translatorName;
-  double downloadProgress = 0.0;
+  double downloadProgress;
 
   BookCard({
     this.id,

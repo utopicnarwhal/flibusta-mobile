@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flibusta_app/pages/book/book_page.dart';
 import 'package:flibusta_app/services/http_client_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,7 +44,7 @@ class HomeState extends State<Home> {
       if (!introCompleted) {
         Navigator.of(context).pushNamed("/Intro").then((x) {
           _scaffoldKey.currentState.removeCurrentSnackBar();
-          getData(null).then((response) {
+          getData().then((response) {
             setState(() {
               data = response;
             });
@@ -52,7 +53,7 @@ class HomeState extends State<Home> {
       }
     });
     super.initState();
-    getData(null).then((response) {
+    getData().then((response) {
       setState(() {
         data = response;
       });
@@ -85,38 +86,42 @@ class HomeState extends State<Home> {
         title: 
           Container(
             child: !_isSearchActive ? Text("Главная") :
-              WillPopScope(
-                onWillPop: () {
+              WillPopScope(onWillPop: () {
+                getData().then((response) {
                   setState(() {
-                    _isSearchActive = false;
+                    data = response;          
                   });
-                },
-                child: 
-                  TextField(
-                  style: TextStyle(
+                });
+                setState(() {
+                  searchTitleController.text = "";
+                  _isSearchActive = false;
+                });
+              },
+              child: TextField(
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                ),
+                autocorrect: true,
+                autofocus: true,
+                controller: searchTitleController,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Поиск по названию",
+                  hintStyle: TextStyle(
                     color: Colors.white,
                     fontSize: 18.0,
                   ),
-                  autocorrect: true,
-                  autofocus: true,
-                  controller: searchTitleController,
-                  decoration: InputDecoration(
-                    hintText: "Поиск по названию",
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: (String title) {
-                    getData(title).then((response) {
-                      setState(() {
-                        data = response;          
-                      });
-                    });
-                  },
                 ),
-              )
+                onSubmitted: (String title) {
+                  getData(title).then((response) {
+                    setState(() {
+                      data = response;          
+                    });
+                  });
+                },
+              ),
+            )
           ),
         actions: <Widget>[
           IconButton(
@@ -154,8 +159,8 @@ class HomeState extends State<Home> {
         },
         child: Container(
           color: Colors.black12,
-          child: _load ? LoadingIndicator() :
-            Scrollbar(
+          child: _load ? LoadingIndicator() : 
+            (data != null && data.length == 0 ? _noResults() : Scrollbar(
               child: ListView.builder(
                 padding: EdgeInsets.all(0),
                 itemCount: data == null ? 0 : data.length,
@@ -191,19 +196,30 @@ class HomeState extends State<Home> {
                               title: Text(data[index].size, style: _biggerFont,),
                             ),
                             data[index].downloadFormats.isNotEmpty ? ListTile(
-                              leading: data[index].downloadProgress == 0.0 ? Tooltip(message: "Форматы файлов", child: Icon(Icons.file_download)) : 
-                                CircularProgressIndicator(strokeWidth: 10, value: data[index].downloadProgress),
+                              leading: data[index].downloadProgress == null ? Tooltip(message: "Форматы файлов", child: Icon(Icons.file_download)) : 
+                                CircularProgressIndicator(value: data[index].downloadProgress == 0.0 ? null : data[index].downloadProgress),
                               title: Text(data[index].downloadFormats.toString(), style: _biggerFont,),
                             ) : Container(),
                             ButtonTheme.bar(
-                              padding: EdgeInsets.fromLTRB(0, 12, 0, 12),
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               child: ButtonBar(
                                 alignment: MainAxisAlignment.spaceAround,
                                 children: <Widget>[
                                   FlatButton(
                                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                    child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 20.0)),
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) => BookPage(bookId: data[index].id,),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  FlatButton(
+                                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                     child: Text("СКАЧАТЬ", style: TextStyle(fontSize: 20.0)),
-                                    onPressed: data[index].downloadProgress != 0.0 ? null : () {
+                                    onPressed: data[index].downloadProgress != null ? null : () {
                                       showModalBottomSheet<void>(context: context, builder: (BuildContext context) {
                                         return Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
@@ -231,7 +247,7 @@ class HomeState extends State<Home> {
                                                     await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
                                                   }
                                                   setState(() {
-                                                    data[index].downloadProgress = 0.01;
+                                                    data[index].downloadProgress = 0.0;
                                                   });
 
                                                   var prepareToDownloadSB = _scaffoldKey.currentState.showSnackBar(
@@ -242,7 +258,7 @@ class HomeState extends State<Home> {
                                                   );
 
                                                   Uri url = Uri.https("flibusta.is", "/b/${data[index].id}/${downloadFormat.values.first}");
-                                                  var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
+                                                  var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 10)).then((r) => r.close());
                                                   Directory saveDocDir = await getExternalStorageDirectory();
                                                   saveDocDir = Directory(saveDocDir.path + "/Flibusta");
                                                   if (!saveDocDir.existsSync()) {
@@ -252,10 +268,27 @@ class HomeState extends State<Home> {
 
                                                   prepareToDownloadSB.close();
 
-                                                  var myFile = File(saveDocDir.path + "/" + response.headers["content-disposition"][0]?.split("\"")[1]);
+                                                  if (response.statusCode != 200) {
+                                                    setState(() {
+                                                      data[index].downloadProgress = null;
+                                                    });
+                                                    return;
+                                                  }
+
+                                                  var contentDisposition = response.headers["content-disposition"][0];
+                                                  var fileUri = "";
+                                                  try {
+                                                    fileUri = saveDocDir.path + "/" + contentDisposition?.split("filename=")[1].replaceAll("\"", "");
+                                                  } catch (e) {
+                                                    setState(() {
+                                                      data[index].downloadProgress = null;
+                                                    });
+                                                    return;
+                                                  }
+                                                  var myFile = File(fileUri);
                                                   if (myFile.existsSync()) {
                                                     setState(() {
-                                                      data[index].downloadProgress = 0.0;
+                                                      data[index].downloadProgress = null;
                                                     });
                                                     _scaffoldKey.currentState.showSnackBar(
                                                       SnackBar(
@@ -268,7 +301,6 @@ class HomeState extends State<Home> {
                                                         ),
                                                       )
                                                     );
-                                                    _httpClient.close();
                                                     return;
                                                   }
                                                   
@@ -293,7 +325,7 @@ class HomeState extends State<Home> {
                                                   await _rescanFolder(myFile.path);
 
                                                   setState(() {
-                                                    data[index].downloadProgress = 0.0;
+                                                    data[index].downloadProgress = null;
                                                   });
 
                                                   _scaffoldKey.currentState.showSnackBar(
@@ -325,7 +357,8 @@ class HomeState extends State<Home> {
                     ]
                   );
                 },
-            ),
+              ),
+            )
           ),
         ),
       )
@@ -343,7 +376,7 @@ class HomeState extends State<Home> {
     }
   }
 
-  Future<List<BookCard>> getData(String title) async {
+  Future<List<BookCard>> getData([String title]) async {
     setState(() {
       _load = true;
     });
@@ -375,13 +408,13 @@ class HomeState extends State<Home> {
       setState(() {
         _load = false;     
       });
-      return List<BookCard>();
+      return null;
     } catch(error) {
       print(error);
       setState(() {
         _load = false;     
       });
-      return List<BookCard>();
+      return null;
     }
   }
 
@@ -452,5 +485,19 @@ class HomeState extends State<Home> {
     }
 
     return result;
+  }
+
+  Widget _noResults() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(FontAwesomeIcons.frownOpen, size: 45),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text("Извините, но книг с данным названием не существует в нашей библиотеке.", style: TextStyle(fontSize: 22), textAlign: TextAlign.center),
+        ),
+      ],
+    );
   }
 }
