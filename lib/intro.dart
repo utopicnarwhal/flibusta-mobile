@@ -1,5 +1,5 @@
-import 'package:flibusta_app/services/http_client_service.dart';
-import 'package:flibusta_app/services/local_store_service.dart';
+import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatefulWidget {

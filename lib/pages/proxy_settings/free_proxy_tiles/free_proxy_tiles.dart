@@ -1,15 +1,19 @@
-import 'package:flibusta_app/services/http_client_service.dart';
-import 'package:flibusta_app/services/local_store_service.dart';
+import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
 
 class FreeProxyTiles extends StatefulWidget {
+  final Function(bool) getUseFreeProxyChangeCallBack;
+
+  FreeProxyTiles({Key key, this.getUseFreeProxyChangeCallBack}): super(key: key);
+
   @override
   createState() => FreeProxyTilesState();
 }
 
 class FreeProxyTilesState extends State<FreeProxyTiles> {
-  var useFreeProxy = false;
-  var freeProxyRefreshing = false;
+  var _useFreeProxy = false;
+  var _freeProxyRefreshing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
         children: <Widget>[
           FutureBuilder(future: LocalStore().getUseFreeProxy(),
             builder: (context, snapshot) {
-              useFreeProxy = snapshot.data ?? false;
+              _useFreeProxy = snapshot.data ?? false;
               return Container(
                 color: Colors.white,
                 child: SwitchListTile(
@@ -30,17 +34,21 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
                       Text(' ip-adress.com/proxy-list', style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),),
                     ]
                   ),
-                  value: useFreeProxy,
+                  value: _useFreeProxy,
                   onChanged: (useFreeProxy) async {
-                    setState(() {
-                      this.useFreeProxy = useFreeProxy;
-                    });
-                    LocalStore().setUseFreeProxy(useFreeProxy);
+                    await LocalStore().setUseFreeProxy(useFreeProxy);
+                    
                     if (useFreeProxy) {
                       ProxyHttpClient().setProxy(await LocalStore().getActualFreeProxy());
                     } else {
-                      ProxyHttpClient().setProxy(""); // TODO перенаправление на список прокси
+                      ProxyHttpClient().setProxy(await LocalStore().getActualCustomProxy());
                     }
+
+                    setState(() {
+                      _useFreeProxy = useFreeProxy;
+                    });
+
+                    widget.getUseFreeProxyChangeCallBack(_useFreeProxy);
                   },
                 ),
               );
@@ -50,7 +58,7 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
             builder: (context, snapshot) {
               return ListTile(
                 title: Text(snapshot.data != null && snapshot.data != "" ? snapshot.data : "Не найдено. Обновите."),
-                subtitle: snapshot.data != "" && useFreeProxy ? FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data),
+                subtitle: snapshot.data != "" && _useFreeProxy ? FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data),
                   builder: (context, snapshot) {
                     var subtitleText = "";
                     var subtitleColor;
@@ -69,22 +77,25 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
                     return Text(subtitleText, style: TextStyle(color: subtitleColor));
                   },
                 ) : Container(),
-                trailing: freeProxyRefreshing ? CircularProgressIndicator() : 
+                trailing: _freeProxyRefreshing ? CircularProgressIndicator() : 
                   IconButton(
                     disabledColor: Colors.grey,
                     icon: Icon(Icons.refresh, size: 32.0,),
-                    onPressed: useFreeProxy ? () async {
+                    onPressed: _useFreeProxy ? () async {
                       setState(() {
-                        freeProxyRefreshing = true;
+                        _freeProxyRefreshing = true;
                       });
                       var newFreeProxy = await ProxyHttpClient().getWorkingProxyHost();
-                      await LocalStore().setActualFreeProxy(newFreeProxy);
-                      ProxyHttpClient().setProxy(newFreeProxy);
-                      if (this.mounted) {
+                      if (mounted && _freeProxyRefreshing) {
+                        await LocalStore().setActualFreeProxy(newFreeProxy);
+                      }
+                      if (mounted && _freeProxyRefreshing) {
+                        ProxyHttpClient().setProxy(newFreeProxy);
+                      }
+                      if (this.mounted && _freeProxyRefreshing) {
                         setState(() {
-                          freeProxyRefreshing = false;
+                          _freeProxyRefreshing = false;
                         });
-                        freeProxyRefreshing = false;
                       }
                     } : null
                   )

@@ -52,12 +52,32 @@ class LocalStore {
       if (useFreeProxy) {
         actualProxy = prefs.getString("ActualFreeProxy");
       } else {
-        // TODO получать выбранный из списка, когда не бесплатный
+        actualProxy = prefs.getString("ActualCustomProxy");
       }
       return actualProxy;
     } catch (e) {
       return "";
     }
+  }
+
+  Future<String> getActualCustomProxy() async {
+    var prefs = await _prefs;
+    try {
+      var actualCustomProxy = prefs.getString("ActualCustomProxy");
+      if (actualCustomProxy == null) {
+        prefs.setString("ActualCustomProxy", "");
+        actualCustomProxy = "";
+      }
+      return actualCustomProxy;
+    } catch (e) {
+      prefs.setString("ActualCustomProxy", "");
+      return "";
+    }
+  }
+
+  Future<bool> setActualCustomProxy(String ipPort) async {
+    var prefs = await _prefs;
+    return prefs.setString("ActualCustomProxy", ipPort);
   }
 
   Future<String> getActualFreeProxy() async {

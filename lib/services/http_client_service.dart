@@ -2,7 +2,7 @@ import "dart:io";
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flibusta_app/services/local_store_service.dart';
+import 'package:flibusta/services/local_store_service.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
 

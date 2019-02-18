@@ -1,4 +1,4 @@
-import 'package:flibusta_app/services/http_client_service.dart';
+import 'package:flibusta/services/http_client_service.dart';
 
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,4 @@
-import 'package:flibusta_app/pages/proxy_settings/proxy_setting_page.dart';
+import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
 import './pages/login/login_page.dart';
@@ -15,11 +15,16 @@ class FlibustaApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.blue,
         primarySwatch: Colors.blue,
-        pageTransitionsTheme: PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder> {
-            TargetPlatform.android: CupertinoPageTransitionsBuilder()
-          }
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          )
         )
+        // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
+        //   builders: <TargetPlatform, PageTransitionsBuilder> {
+        //     TargetPlatform.android: CupertinoPageTransitionsBuilder()
+        //   }
+        // )
       ),
       routes: <String, WidgetBuilder> {
         "/": (BuildContext context) => Home(),
