@@ -158,6 +158,9 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 return;
               }
 
+              setState(() {
+                searchResults = null; 
+              });
               makeBookList(_advancedSearchParams).then((response) {
                 setState(() {
                   data = response;          

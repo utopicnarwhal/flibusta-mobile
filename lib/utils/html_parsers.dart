@@ -20,7 +20,7 @@ List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
     var genres = List<Map<int, String>>();
     if (bookCardDivs[i].getElementsByTagName("p").isNotEmpty) {
       bookCardDivs[i].getElementsByTagName("p")?.first?.getElementsByTagName("a")?.forEach((f) {
-        genres.add({ int.tryParse(f.attributes["href"].replaceAll("/g/", "")): f.text });
+        genres.add({ int.tryParse(f.attributes["href"].replaceAll("/g/", "")?.split("?")[0]): f.text });
       });
     } else {
       genres = result[i-1].genres.list;
@@ -34,7 +34,7 @@ List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
     var temp = title.nextElementSibling;
     while (temp.localName != "span") {
       if (temp.attributes["href"] != null && temp.attributes["href"].contains("/a/")) {
-        translators.add({ int.tryParse(temp?.attributes["href"]?.replaceAll("/a/", "")): temp.text });
+        translators.add({ int.tryParse(temp?.attributes["href"]?.replaceAll("/a/", "")?.split("?")[0]): temp.text });
       } else if (temp.attributes["href"] != null && temp.attributes["href"].contains("/s/")) {
         sequence = temp;
       }
@@ -55,7 +55,7 @@ List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
 
     var authors = List<Map<int, String>>();
     for (; temp.attributes["href"] != null && temp.attributes["href"].contains("/a/"); temp = temp.nextElementSibling) {
-      authors.add({ int.tryParse(temp?.attributes["href"]?.replaceAll("/a/", "")): temp.text });
+      authors.add({ int.tryParse(temp?.attributes["href"]?.replaceAll("/a/", "")?.split("?")[0]): temp.text });
     }
 
     result.add(BookCard(
@@ -63,7 +63,7 @@ List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
       genres: Genres(genres),
       title: title?.text,
       authors: Authors(authors),
-      sequenceId: sequence != null ? int.tryParse(sequence?.attributes["href"]?.replaceAll("/s/", "")) : null,
+      sequenceId: sequence != null ? int.tryParse(sequence?.attributes["href"].replaceAll("/s/", "").split("?")[0]) : null,
       sequenceTitle: sequence?.text,
       translators: Translators(translators),
       size: size.text,
@@ -147,8 +147,8 @@ BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
   for (int i = titleNodeIndex + 1; i < mainNode.nodes.length && (mainNode.nodes[i].attributes["href"] == null || !mainNode.nodes[i].attributes["href"].contains(RegExp(r"^(/g/)[0-9]*$"))); ++i) {
     var currentNode = mainNode.nodes[i];
 
-    if (currentNode.attributes["href"] != null && currentNode.attributes["href"].contains(RegExp(r"^(/a/)[0-9]*$"))) {
-      var id = int.tryParse(currentNode.attributes["href"]?.replaceAll("/a/", ""));
+    if (currentNode.attributes["href"] != null && currentNode.attributes["href"].contains(RegExp(r"^(/a/)[0-9]*"))) {
+      var id = int.tryParse(currentNode.attributes["href"].replaceAll("/a/", "").split("?")[0]);
       var name = currentNode.text;
 
       if (!hasTranslators) {
@@ -166,15 +166,15 @@ BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
   bookInfo.translators = Translators(translatorsList);
 
   var genresA = allA.where((a) {
-    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp(r"^(/g/)[0-9]*$"));
+    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp(r"^(/g/)[0-9]*"));
   });
   var downloadFormatsA = allA.where((a) {
-    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp("^(/b/$bookId/)(?!read).*\$"));
+    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp("^(/b/$bookId/)(?!read).*"));
   });
 
   var genresList = List<Map<int, String>>();
   genresA.forEach((genreA) {
-    var genreId = int.tryParse(genreA.attributes["href"]?.replaceAll("/g/", ""));
+    var genreId = int.tryParse(genreA.attributes["href"].replaceAll("/g/", "").split("?")[0]);
     var genreName = genreA.text;
     genresList.add({genreId: genreName});
   });
@@ -189,11 +189,11 @@ BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
   bookInfo.downloadFormats = DownloadFormats(downloadFormatsList);
 
   var sequenceA = allA.where((a) {
-    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp(r"^(/s/)[0-9]*$"));
+    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp(r"^(/s/)[0-9]*"));
   });
 
   if (sequenceA.isNotEmpty) {
-    bookInfo.sequenceId = int.tryParse(sequenceA.first.attributes["href"]?.replaceAll("/s/", ""));
+    bookInfo.sequenceId = int.tryParse(sequenceA.first.attributes["href"].replaceAll("/s/", "").split("?")[0]);
     bookInfo.sequenceTitle = sequenceA.first.text;
   }
   
