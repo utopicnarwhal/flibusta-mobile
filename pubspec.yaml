@@ -25,9 +25,11 @@ dependencies:
   html: ^0.13.3+3
   simple_permissions: ^0.1.9
   shared_preferences: ^0.4.3
+  flutter_typeahead: ^1.0.2
   # open_file: ^1.2.2+1
 
 dev_dependencies:
+  # source_gen: 0.9.4+1
   flutter_test:
     sdk: flutter
 

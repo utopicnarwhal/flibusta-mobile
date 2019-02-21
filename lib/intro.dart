@@ -63,7 +63,7 @@ class IntroScreenState extends State<IntroScreen> {
                   Text("Прокси", style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text("Есть вероятность, что в вашей стране не работает сайт 'flibusta.is', в таком случае рекомендуется использовать proxy. В данном приложении настроена автоматическая подборка работающего прокси с сайта 'ip-adress.com/proxy-list', желаете ли вы его использовать или сами разберётесь?"),
+                    child: Text("Есть вероятность, что в вашей стране сайт 'flibusta.is' заблокирован, в таком случае рекомендую использовать зеркало расположенное по адресу 'flibusta.appspot.com'. Если у Вас к нему тоже не будет доступа, пожалуйста, напишите отзыв. Желаете ли Вы его использовать или сами разберётесь?"),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -86,21 +86,10 @@ class IntroScreenState extends State<IntroScreen> {
                           disabledColor: Colors.grey,
                           child: Text("Использовать", style: TextStyle(color: Colors.white),),
                           onPressed: searchingProxy ? null : () async {
-                            setState(() {
-                              searchingProxy = true;
-                            });
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text("Поиск работающего прокси"),
-                              duration: Duration(seconds: 10),
-                            ));
-                            await LocalStore().setUseFreeProxy(true);
-                            var ipPort = await ProxyHttpClient().getWorkingProxyHost();
-                            await LocalStore().setActualFreeProxy(ipPort);
-                            ProxyHttpClient().setProxy(ipPort);
+                            await LocalStore().setUseFreeProxy(false);
+                            await LocalStore().setFlibustaHostAddress("flibusta.appspot.com");
+                            ProxyHttpClient().setFlibustaHostAddress("flibusta.appspot.com");
                             await LocalStore().setIntroComplete();
-                            setState(() {
-                              searchingProxy = false;
-                            });
                             Navigator.of(context).pop(true);
                           }
                         ),

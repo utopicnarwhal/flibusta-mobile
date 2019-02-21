@@ -48,13 +48,13 @@ class BookPageState extends State<BookPage> {
         return;
       }
 
-      coverImg = Image.network("http://cn.flibusta.is" + bookInfo.coverImgSrc, fit: BoxFit.fitWidth);
+      coverImg = Image.network("https://cn-dot-flibusta.appspot.com" + bookInfo.coverImgSrc, fit: BoxFit.fitWidth);
 
       coverImageStream = coverImg.image.resolve(new ImageConfiguration());
       coverImageStream.addListener(imageStreamListener);
 
       if (coverImageLoading && bookInfo.coverImgSrc != null) {
-        var url = Uri.https("flibusta.is", bookInfo.coverImgSrc);
+        var url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), bookInfo.coverImgSrc);
         var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
         var result = List<int>();
         await response.listen((contents) {

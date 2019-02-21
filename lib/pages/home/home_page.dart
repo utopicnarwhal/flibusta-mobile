@@ -110,6 +110,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   searchTitleController.text = "";
                   _isSearchActive = false;
                   _isAdvancedSearch = false;
+                  _advancedSearchParams = AdvancedSearchParams();
                 });
               },
               child: _isAdvancedSearch ? Text("Расширенный поиск") : TextField(
@@ -118,7 +119,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   fontSize: 18.0,
                 ),
                 autocorrect: true,
-                autofocus: true,
+                autofocus: false,
                 controller: searchTitleController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
@@ -142,24 +143,28 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
             )
           ),
         actions: <Widget>[
-          // _isSearchActive ? IconButton(
-          //   icon: Icon(FontAwesomeIcons.slidersH, size: 18,),
-          //   onPressed: () async {
-          //     setState(() {
-          //       _isAdvancedSearch = true;
-          //       _isSearchActive = false;
-          //     });
-          //     _advancedSearchParams = await showAdvancedSearchBS(_scaffoldKey, AdvancedSearchParams());
-          //     if (_advancedSearchParams == null) {
-          //       setState(() {
-          //         _isAdvancedSearch = false;
-          //       });
-          //       return;
-          //     }
+          _isSearchActive ? IconButton(
+            icon: Icon(FontAwesomeIcons.slidersH, size: 18,),
+            onPressed: () async {
+              setState(() {
+                _isAdvancedSearch = true;
+              });
+              _advancedSearchParams = await showAdvancedSearchBS(_scaffoldKey, AdvancedSearchParams());
+              if (_advancedSearchParams == null) {
+                setState(() {
+                  _isAdvancedSearch = false;
+                  _advancedSearchParams = AdvancedSearchParams();
+                });
+                return;
+              }
 
-          //     makeBookList(_advancedSearchParams);
-          //   },
-          // ) : Container(),
+              makeBookList(_advancedSearchParams).then((response) {
+                setState(() {
+                  data = response;          
+                });
+              });
+            },
+          ) : Container(),
           !_isAdvancedSearch ? IconButton(
             icon: Icon(FontAwesomeIcons.search),
             onPressed: () {
@@ -233,7 +238,10 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
     if (advancedSearchParams.middlename != null && advancedSearchParams.middlename.isNotEmpty) {
       queryParams.addAll({ "mn": advancedSearchParams.middlename });
     }
-    Uri url = Uri.https("flibusta.is", "/makebooklist", queryParams);
+    if (advancedSearchParams.genres != null && advancedSearchParams.genres.isNotEmpty) {
+      queryParams.addAll({ "g": advancedSearchParams.genres });
+    }
+    Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/makebooklist", queryParams);
     try {
       var superRealResponse = "";
       var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
@@ -278,7 +286,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
       _load = true;
     });
     Map<String, String> queryParams = { "page" : "0", "ask": searchText, "chs" : "on", "cha" : "on", "chb" : "on" };
-    Uri url = Uri.https("flibusta.is", "/booksearch", queryParams);
+    Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/booksearch", queryParams);
     try {
       var superRealResponse = "";
       var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());

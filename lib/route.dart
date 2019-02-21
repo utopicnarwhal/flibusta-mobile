@@ -18,7 +18,8 @@ class FlibustaApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          )
+          ),
+          isDense: true,
         )
         // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
         //   builders: <TargetPlatform, PageTransitionsBuilder> {

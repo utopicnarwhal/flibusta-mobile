@@ -10,7 +10,9 @@ class ProxySettings extends StatefulWidget {
 
 class ProxySettingsState extends State<ProxySettings> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  ProxyHttpClient _httpClient = ProxyHttpClient();
 
+  String _flibustaHostAddress;
   String _customProxy;
   bool _cachedGetUseFreeProxy;
 
@@ -27,6 +29,12 @@ class ProxySettingsState extends State<ProxySettings> {
     LocalStore().getActualCustomProxy().then((value) {
       setState(() {
         _customProxy = value;
+      });
+    });
+    _flibustaHostAddress = _httpClient.getFlibustaHostAddress();
+    LocalStore().getFlibustaHostAddress().then((value) {
+      setState(() {
+        _flibustaHostAddress = value;
       });
     });
   }
@@ -50,16 +58,66 @@ class ProxySettingsState extends State<ProxySettings> {
       ),
       body: ListView(
         children: <Widget> [
+          Container(
+            decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                  child: Text("Используемый сайт Флибусты:", style: TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.w600),),
+                ),
+                RadioListTile(
+                  title: Text("Оригинальный (flibusta.is)"),
+                  groupValue: _flibustaHostAddress,
+                  value: "flibusta.is",
+                  onChanged: ((hostAddress) {
+                    setState(() {
+                      _flibustaHostAddress = hostAddress;
+                      LocalStore().setFlibustaHostAddress(_flibustaHostAddress);
+                      ProxyHttpClient().setFlibustaHostAddress(_flibustaHostAddress);
+                    });
+                  }),
+                ),
+                Divider(height: 1,),
+                RadioListTile(
+                  title: Text("В облаке гугл (flibusta.appspot.com)"),
+                  groupValue: _flibustaHostAddress,
+                  value: "flibusta.appspot.com",
+                  onChanged: ((hostAddress) {
+                    setState(() {
+                      _flibustaHostAddress = hostAddress;
+                      LocalStore().setFlibustaHostAddress(_flibustaHostAddress);
+                      ProxyHttpClient().setFlibustaHostAddress(_flibustaHostAddress);
+                    });
+                  }),
+                ),
+                // Divider(height: 1,),
+                // RadioListTile(
+                //   title: Text("Tor версия (flibustahezeous3.onion)"),
+                //   groupValue: _flibustaHostAddress,
+                //   value: "flibustahezeous3.onion",
+                //   onChanged: ((hostAddress) {
+                //     setState(() {
+                //       _flibustaHostAddress = hostAddress;
+                //       LocalStore().setFlibustaHostAddress(_flibustaHostAddress);
+                //       ProxyHttpClient().setFlibustaHostAddress(_flibustaHostAddress);
+                //     });
+                //   }),
+                // ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.transparent, 
+            height: 20.0,
+          ),
           FreeProxyTiles(getUseFreeProxyChangeCallBack: (value) {
             changeGetUseFreeProxy(value);
           }),
           Container(
             color: Colors.transparent, 
-            height: 60.0,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("Вы также можете указать свой Proxy сервер, при необходимости", style: TextStyle(color: Colors.grey.shade600, fontSize: 16)),
-            )
+            height: 20.0,
           ),
           Container(
             decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
@@ -72,6 +130,25 @@ class ProxySettingsState extends State<ProxySettings> {
                 ),
                 RadioListTile(
                   title: Text("Без прокси"),
+                  subtitle: FutureBuilder(future: ProxyHttpClient().connectionCheck(""),
+                    builder: (context, snapshot) {
+                      var subtitleText = "";
+                      var subtitleColor;
+                      if (snapshot.data != null && snapshot.connectionState != ConnectionState.waiting) {
+                        if (snapshot.data >= 0) {
+                          subtitleText = "доступно (пинг: " + snapshot.data.toString() + "мс)";
+                          subtitleColor = Colors.green;
+                        } else {
+                          subtitleText = "недоступно";
+                          subtitleColor = Colors.red;
+                        }
+                      } else {
+                        subtitleText = "проверка...";
+                        subtitleColor = Colors.grey[400];
+                      }
+                      return Text(subtitleText, style: TextStyle(color: subtitleColor));
+                    }
+                  ),
                   groupValue: _customProxy,
                   value: "",
                   onChanged: _cachedGetUseFreeProxy ?? true ? null : ((proxy) {
@@ -107,6 +184,25 @@ class ProxySettingsState extends State<ProxySettings> {
                                   },
                                 ),
                               ],
+                            ),
+                            subtitle: FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data[index]),
+                              builder: (context, snapshot) {
+                                var subtitleText = "";
+                                var subtitleColor;
+                                if (snapshot.data != null && snapshot.connectionState != ConnectionState.waiting) {
+                                  if (snapshot.data >= 0) {
+                                    subtitleText = "доступно (пинг: " + snapshot.data.toString() + "мс)";
+                                    subtitleColor = Colors.green;
+                                  } else {
+                                    subtitleText = "недоступно";
+                                    subtitleColor = Colors.red;
+                                  }
+                                } else {
+                                  subtitleText = "проверка...";
+                                  subtitleColor = Colors.grey[400];
+                                }
+                                return Text(subtitleText, style: TextStyle(color: subtitleColor));
+                              }
                             ),
                             onChanged: _cachedGetUseFreeProxy ?? true ? null : (proxy) {
                               setState(() {

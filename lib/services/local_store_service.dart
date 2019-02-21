@@ -134,4 +134,24 @@ class LocalStore {
     userProxies.remove(userProxy);
     return prefs.setStringList("UserProxies", userProxies);
   }
+
+  Future<String> getFlibustaHostAddress() async {
+    var prefs = await _prefs;
+    try {
+      var flibustaHostAddress = prefs.getString("FlibustaHostAddress");
+      if (flibustaHostAddress == null) {
+        prefs.setString("FlibustaHostAddress", "flibusta.is");
+        flibustaHostAddress = "flibusta.is";
+      }
+      return flibustaHostAddress;
+    } catch (e) {
+      prefs.setString("FlibustaHostAddress", "flibusta.is");
+      return "";
+    }
+  }
+
+  Future<bool> setFlibustaHostAddress(String hostAddress) async {
+    var prefs = await _prefs;
+    return prefs.setString("FlibustaHostAddress", hostAddress);
+  }
 }

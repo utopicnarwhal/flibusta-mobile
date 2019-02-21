@@ -3,7 +3,7 @@ class AdvancedSearchParams {
   String lastname;
   String firstname;
   String middlename;
-  String genre;
+  String genres;
   String sizeStart;
   String sizeEnd;
   String issueYearMin;
@@ -16,7 +16,7 @@ class AdvancedSearchParams {
     this.lastname,
     this.firstname,
     this.middlename,
-    this.genre,
+    this.genres,
     this.sizeStart,
     this.sizeEnd,
     this.issueYearMin,

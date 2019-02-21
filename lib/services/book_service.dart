@@ -29,7 +29,7 @@ class BookService {
     downloadProgressCallback(0.0);
     alertsCallback("Подготовка к загрузке", Duration(minutes: 1));
 
-    Uri url = Uri.https("flibusta.is", "/b/$id/${downloadFormat.values.first}");
+    Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/b/$id/${downloadFormat.values.first}");
     var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 10), onTimeout: () {return null;}).then((r) => r.close());
 
     if (response == null || response.statusCode != 200) {
@@ -88,7 +88,7 @@ class BookService {
   static Future<BookInfo> getBookInfo(int bookId) async {
     var bookInfo = BookInfo(id: bookId);
     try {
-      Uri url = Uri.https("flibusta.is", "/b/" + bookId.toString());
+      Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/b/" + bookId.toString());
       var superRealResponse = "";
       var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
       await response.transform(utf8.decoder).listen((contents) {

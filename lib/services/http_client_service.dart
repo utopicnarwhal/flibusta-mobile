@@ -2,7 +2,6 @@ import "dart:io";
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flibusta/services/local_store_service.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
 
@@ -18,18 +17,20 @@ class ProxyHttpClient {
   String _proxyHostPort = "";
   Uri _proxylistUri = new Uri.https("ip-adress.com", "/proxy-list");
 
+  String _flibustaHostAddress = "flibusta.is";
+
   HttpClient getHttpClient() {
     return _httpClient;
   }
 
   void setProxy(String hostPort) {
+    _proxyHostPort = hostPort;
+
     if (hostPort == "") {
-      _proxyHostPort = "";
       _httpClient.findProxy = null;
       return;
     }
 
-    _proxyHostPort = hostPort;
     _httpClient.findProxy = (url) {
       return HttpClient.findProxyFromEnvironment(
         url, 
@@ -46,24 +47,34 @@ class ProxyHttpClient {
     return _proxyHostPort;
   }
 
+  void setFlibustaHostAddress(String hostAddress) {
+    _flibustaHostAddress = hostAddress;
+  }
+
+  String getFlibustaHostAddress() {
+    return _flibustaHostAddress;
+  }
+
   Future<int> connectionCheck(String hostPort) async {
     var httpClientForCheck = new HttpClient();
-    httpClientForCheck.findProxy = (url) {
-      return HttpClient.findProxyFromEnvironment(
-        url, 
-        environment: {
-          "HTTPS_PROXY": hostPort,
-          "HTTP_PROXY": hostPort,
-          "https_proxy": hostPort,
-          "http_proxy": hostPort
-      });
-    };
+    if (hostPort != "") {
+      httpClientForCheck.findProxy = (url) {
+        return HttpClient.findProxyFromEnvironment(
+          url, 
+          environment: {
+            "HTTPS_PROXY": hostPort,
+            "HTTP_PROXY": hostPort,
+            "https_proxy": hostPort,
+            "http_proxy": hostPort
+        });
+      };
+    }
 
     var result = -1;
     var stopWatch = new Stopwatch()..start();
 
     try {
-      var request = httpClientForCheck.getUrl(new Uri.https("flibusta.is", "/"))
+      var request = httpClientForCheck.getUrl(new Uri.https(getFlibustaHostAddress(), "/"))
         .timeout(new Duration(seconds: 5))
         .then((r) => r.close());
 
