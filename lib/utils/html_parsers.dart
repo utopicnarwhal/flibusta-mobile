@@ -94,9 +94,9 @@ SearchResults parseHtmlFromBookSearch(htmldom.Document document) {
         var bookLis = division.nextElementSibling.getElementsByTagName("li");
         bookLis.forEach((bookLi) {
           var bookAndAuthorTags = bookLi.getElementsByTagName("a");
-          var bookId = int.tryParse(bookAndAuthorTags[0].attributes["href"].replaceAll("/b/", ""));
+          var bookId = int.tryParse(bookAndAuthorTags[0].attributes["href"].replaceAll("/b/", "").split("?")[0]);
           var bookTitle = bookAndAuthorTags[0].text;
-          var authorId = int.tryParse(bookAndAuthorTags[1].attributes["href"].replaceAll("/a/", ""));
+          var authorId = int.tryParse(bookAndAuthorTags[1].attributes["href"].replaceAll("/a/", "").split("?")[0]);
           var authorName = bookAndAuthorTags[1].text;
           searchResults.books.add(BookCard(id: bookId, title: bookTitle, authors: Authors([{authorId: authorName}])));
         });
@@ -105,7 +105,7 @@ SearchResults parseHtmlFromBookSearch(htmldom.Document document) {
         var authorLis = division.nextElementSibling.getElementsByTagName("li");
         authorLis.forEach((authorLi) {
           var authorTag = authorLi.getElementsByTagName("a");
-          var authorId = int.tryParse(authorTag[0].attributes["href"].replaceAll("/a/", ""));
+          var authorId = int.tryParse(authorTag[0].attributes["href"].replaceAll("/a/", "").split("?")[0]);
           var authorName = authorTag[0].text;
           var booksCount = authorLi.nodes[1].text.trim();
           searchResults.authors.add(AuthorCard(id: authorId, name: authorName, booksCount: booksCount));
@@ -115,7 +115,7 @@ SearchResults parseHtmlFromBookSearch(htmldom.Document document) {
         var sequenceLis = division.nextElementSibling.getElementsByTagName("li");
         sequenceLis.forEach((sequenceLi) {
           var sequenceTag = sequenceLi.getElementsByTagName("a");
-          var sequenceId = int.tryParse(sequenceTag[0].attributes["href"].replaceAll("/sequence/", ""));
+          var sequenceId = int.tryParse(sequenceTag[0].attributes["href"].replaceAll("/sequence/", "").split("?")[0]);
           var sequenceTitle = sequenceTag[0].text;
           var booksCount = sequenceLi.nodes[1].text.trim();
           searchResults.sequences.add(SequenceCard(id: sequenceId, title: sequenceTitle, booksCount: booksCount));
