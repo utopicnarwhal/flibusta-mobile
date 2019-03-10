@@ -92,7 +92,7 @@ class _BookListBuilderState extends State<BookListBuilder> {
                                     widget.data[index].downloadProgress = downloadProgress;
                                   });
                                 },
-                                (alertText, alertDuration) {
+                                (alertText, alertDuration, {SnackBarAction action}) {
                                   widget.scaffoldKey.currentState.hideCurrentSnackBar();
                                   if (alertText.isEmpty) {
                                     return;
@@ -102,9 +102,11 @@ class _BookListBuilderState extends State<BookListBuilder> {
                                     SnackBar(
                                       content: Text(alertText),
                                       duration: alertDuration,
+                                      action: action,
                                     )
                                   );
-                              });
+                                },
+                              );
                             },
                           )
                         ],

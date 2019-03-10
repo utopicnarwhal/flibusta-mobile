@@ -26,7 +26,7 @@ dependencies:
   simple_permissions: ^0.1.9
   shared_preferences: ^0.4.3
   flutter_typeahead: ^1.0.2
-  # dio: ^2.0.10
+  dio: ^2.0.15
   # open_file: ^1.2.2+1
 
 dev_dependencies:

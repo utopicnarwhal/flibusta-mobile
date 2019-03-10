@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/advanced_search/advanced_search_bs.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
@@ -27,7 +25,7 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  HttpClient _httpClient = ProxyHttpClient().getHttpClient();
+  Dio _dio = ProxyHttpClient().getDio();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _isSearchActive = false;
@@ -246,12 +244,8 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
     Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/makebooklist", queryParams);
     try {
-      var superRealResponse = "";
-      var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
-      await response.transform(utf8.decoder).listen((contents) {
-        superRealResponse += contents;
-      }).asFuture();
-      htmldom.Document document = parse(superRealResponse);
+      var response = await _dio.getUri(url);
+      htmldom.Document document = parse(response.data);
       var result = parseHtmlFromMakeBookList(document);
       setState(() {
         _load = false;     
@@ -291,12 +285,8 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
     Map<String, String> queryParams = { "page" : "0", "ask": searchText, "chs" : "on", "cha" : "on", "chb" : "on" };
     Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/booksearch", queryParams);
     try {
-      var superRealResponse = "";
-      var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
-      await response.transform(utf8.decoder).listen((contents) {
-        superRealResponse += contents;
-      }).asFuture();
-      htmldom.Document document = parse(superRealResponse);
+      var response = await _dio.getUri(url);
+      htmldom.Document document = parse(response.data);
       var result = parseHtmlFromBookSearch(document);
       setState(() {
         _load = false;     

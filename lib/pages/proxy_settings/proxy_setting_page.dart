@@ -82,6 +82,7 @@ class ProxySettingsState extends State<ProxySettings> {
                 Divider(height: 1,),
                 RadioListTile(
                   title: Text("В облаке гугл (flibusta.appspot.com)"),
+                  subtitle: Text("Некоторые функции приложения могут не работать"),
                   groupValue: _flibustaHostAddress,
                   value: "flibusta.appspot.com",
                   onChanged: ((hostAddress) {
@@ -130,7 +131,7 @@ class ProxySettingsState extends State<ProxySettings> {
                 ),
                 RadioListTile(
                   title: Text("Без прокси"),
-                  subtitle: FutureBuilder(future: ProxyHttpClient().connectionCheck(""),
+                  subtitle: _cachedGetUseFreeProxy ?? true ? Container() : FutureBuilder(future: ProxyHttpClient().connectionCheck(""),
                     builder: (context, snapshot) {
                       var subtitleText = "";
                       var subtitleColor;
@@ -185,7 +186,7 @@ class ProxySettingsState extends State<ProxySettings> {
                                 ),
                               ],
                             ),
-                            subtitle: FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data[index]),
+                            subtitle: _cachedGetUseFreeProxy ?? true ? Container() : FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data[index]),
                               builder: (context, snapshot) {
                                 var subtitleText = "";
                                 var subtitleColor;

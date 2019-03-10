@@ -1,6 +1,8 @@
+import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/searchResults.dart';
+import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:html/dom.dart' as htmldom;
 
 List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
@@ -49,7 +51,7 @@ List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
         continue;
       }
       downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
-      var downloadFormatType = temp.attributes["href"].split("/").last;
+      var downloadFormatType = temp.attributes["href"].split("/").last.split("?")[0];
       downloadFormats.add({ downloadFormatName: downloadFormatType });
     }
 
@@ -183,7 +185,7 @@ BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
   var downloadFormatsList = List<Map<String, String>>();
   downloadFormatsA.forEach((downloadFormatA) {
     var downloadFormatName = downloadFormatA.text.replaceAll(RegExp(r'(\(|\))'), "").replaceAll("скачать ", "");
-    var downloadFormatType = downloadFormatA.attributes["href"].split("/").last;
+    var downloadFormatType = downloadFormatA.attributes["href"].split("/").last.split("?")[0];
     downloadFormatsList.add({ downloadFormatName: downloadFormatType });
   });
   bookInfo.downloadFormats = DownloadFormats(downloadFormatsList);
@@ -213,4 +215,204 @@ BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
 
   bookInfo.coverImgSrc = fb2infoContent?.first?.nextElementSibling?.nextElementSibling?.attributes["src"];
   return bookInfo;
+}
+
+AuthorInfo parseHtmlFromAuthorInfo(htmldom.Document document, int authorId) {
+  var authorInfo = AuthorInfo(id: authorId, books: List<BookCard>());
+  var mainElement = document.getElementById("main");
+  authorInfo.name = mainElement.getElementsByTagName("h1").first.innerHtml;
+
+  var forms = mainElement.getElementsByTagName("form");
+  htmldom.Element form;
+  forms.forEach((f) {
+    if (f.attributes["method"] != null) {
+      form = f;
+    }
+  });
+
+  if (forms.isEmpty || form == null) {
+    return authorInfo;
+  }
+
+  var formChildren = form.children;
+  int actualSequenceId;
+  String actualSequenceTitle;
+  Genres actualGenres = Genres(List());
+  Translators actualTranslators;
+  BookCard actualBookCard;
+  List<Map<String, String>> actualDownloadFormats;
+  bool nextGenres = false;
+
+  formChildren.forEach((child) {
+    if (child.localName == "br" && actualDownloadFormats != null) {
+      actualBookCard.translators = actualTranslators;
+      actualBookCard.downloadFormats = DownloadFormats(actualDownloadFormats);
+      authorInfo.books.add(actualBookCard);
+      actualDownloadFormats = null;
+      actualTranslators = null;
+      actualBookCard = null;
+      nextGenres = true;
+      return;
+    }
+
+    if (child.localName == "br" || child.localName == "img" || child.localName == "svg" || child.localName == "input") {
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains("/a/")) {
+      if (actualTranslators == null) {
+        actualTranslators = Translators(List());
+      }
+      var translatorId = int.tryParse(child.attributes["href"].replaceAll("/a/", ""));
+      var translatorName = child.text;
+      actualTranslators.list.add({ translatorId: translatorName });
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains("/s/")) {
+      actualSequenceId = int.tryParse(child.attributes["href"].replaceAll("/s/", ""));
+      actualSequenceTitle = child.text;
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains("/g/")) {
+      if (nextGenres) {
+        actualSequenceId = null;
+        actualSequenceTitle = null;
+        actualGenres = Genres(List());
+        nextGenres = false;
+      }
+
+      var genreId = int.tryParse(child.attributes["href"].replaceAll("/g/", ""));
+      var genreName = child.text;
+      actualGenres.list.add({ genreId: genreName });
+      return;
+    }
+    
+    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
+      actualBookCard = BookCard(
+        id: int.tryParse(child.attributes["href"].replaceAll("/b/", "")),
+        title: child.text,
+        genres: actualGenres,
+        sequenceId: actualSequenceId,
+        sequenceTitle: actualSequenceTitle,
+      );
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*/.*$'))) {
+      var downloadFormatName = child.text.replaceAll(RegExp(r'(\(|\))'), "");
+      if (downloadFormatName == 'читать') {
+        return;
+      }
+      downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
+      var downloadFormatType = child.attributes["href"].split("/").last.split("?")[0];
+      if (actualDownloadFormats == null) {
+        actualDownloadFormats = List<Map<String, String>>();
+      }
+      actualDownloadFormats.add({ downloadFormatName: downloadFormatType });
+      return;
+    }
+
+    if (child.localName == "span" && child.attributes["style"] == "size" && actualBookCard != null) {
+      actualBookCard.size = child.text;
+      return;
+    }
+  });
+
+  return authorInfo;
+}
+
+SequenceInfo parseHtmlFromSequenceInfo(htmldom.Document document, int authorId) {
+  var sequenceInfo = SequenceInfo(id: authorId, books: List<BookCard>());
+  var mainElement = document.getElementById("main");
+  sequenceInfo.title = mainElement.getElementsByTagName("h1").first.innerHtml;
+
+  var mainElementChildren = mainElement.children;
+  int actualSequenceId;
+  String actualSequenceTitle;
+  Genres actualGenres = Genres(List());
+  Translators actualTranslators;
+  BookCard actualBookCard;
+  List<Map<String, String>> actualDownloadFormats;
+  bool nextGenres = false;
+
+  mainElementChildren.forEach((child) {
+    if (child.localName == "br" && actualDownloadFormats != null) {
+      actualBookCard.translators = actualTranslators;
+      actualBookCard.downloadFormats = DownloadFormats(actualDownloadFormats);
+      sequenceInfo.books.add(actualBookCard);
+      actualDownloadFormats = null;
+      actualTranslators = null;
+      actualBookCard = null;
+      nextGenres = true;
+      return;
+    }
+
+    if (child.localName == "br" || child.localName == "img" || child.localName == "svg" || child.localName == "input") {
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains("/a/")) {
+      if (actualTranslators == null) {
+        actualTranslators = Translators(List());
+      }
+      var translatorId = int.tryParse(child.attributes["href"].replaceAll("/a/", ""));
+      var translatorName = child.text;
+      actualTranslators.list.add({ translatorId: translatorName });
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains("/s/")) {
+      actualSequenceId = int.tryParse(child.attributes["href"].replaceAll("/s/", ""));
+      actualSequenceTitle = child.text;
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains("/g/")) {
+      if (nextGenres) {
+        actualSequenceId = null;
+        actualSequenceTitle = null;
+        actualGenres = Genres(List());
+        nextGenres = false;
+      }
+
+      var genreId = int.tryParse(child.attributes["href"].replaceAll("/g/", ""));
+      var genreName = child.text;
+      actualGenres.list.add({ genreId: genreName });
+      return;
+    }
+    
+    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
+      actualBookCard = BookCard(
+        id: int.tryParse(child.attributes["href"].replaceAll("/b/", "")),
+        title: child.text,
+        genres: actualGenres,
+        sequenceId: actualSequenceId,
+        sequenceTitle: actualSequenceTitle,
+      );
+      return;
+    }
+
+    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*/.*$'))) {
+      var downloadFormatName = child.text.replaceAll(RegExp(r'(\(|\))'), "");
+      if (downloadFormatName == 'читать') {
+        return;
+      }
+      downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
+      var downloadFormatType = child.attributes["href"].split("/").last.split("?")[0];
+      if (actualDownloadFormats == null) {
+        actualDownloadFormats = List<Map<String, String>>();
+      }
+      actualDownloadFormats.add({ downloadFormatName: downloadFormatType });
+      return;
+    }
+
+    if (child.localName == "span" && child.attributes["style"] == "size" && actualBookCard != null) {
+      actualBookCard.size = child.text;
+      return;
+    }
+  });
+
+  return sequenceInfo;
 }

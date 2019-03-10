@@ -1,12 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/book_service.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flutter/material.dart';
 import '../../components/loading_indicator.dart';
-
 
 class BookPage extends StatefulWidget {
   final int bookId;
@@ -17,7 +16,7 @@ class BookPage extends StatefulWidget {
 }
 
 class BookPageState extends State<BookPage> {
-  HttpClient _httpClient = ProxyHttpClient().getHttpClient();
+  Dio _dio = ProxyHttpClient().getDio();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   BookInfo bookInfo;
@@ -55,29 +54,21 @@ class BookPageState extends State<BookPage> {
 
       if (coverImageLoading && bookInfo.coverImgSrc != null) {
         var url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), bookInfo.coverImgSrc);
-        var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
-        var result = List<int>();
-        await response.listen((contents) {
-          if (!coverImageLoading) {
-            return;
-          }
-          result.addAll(contents);
-        }).asFuture();
+        var response = await _dio.getUri(url, options: Options(
+          connectTimeout: 10000,
+          receiveTimeout: 6000,
+          responseType: ResponseType.bytes,
+        ));
 
         if (mounted && coverImageLoading) {
           setState(() {
-            coverImg = Image.memory(Uint8List.fromList(result), fit: BoxFit.fitWidth);
-            coverImageStream = coverImg.image.resolve(new ImageConfiguration());
-            coverImageStream.addListener(imageStreamListener);
+              coverImg = Image.memory(Uint8List.fromList(response.data), fit: BoxFit.fitWidth);
+              coverImageStream = coverImg.image.resolve(new ImageConfiguration());
+              coverImageStream.addListener(imageStreamListener);
           });
         }
       }
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   imageStreamListener(ImageInfo info, bool _) {
@@ -207,7 +198,7 @@ class BookPageState extends State<BookPage> {
                                     bookInfo.downloadProgress = downloadProgress;
                                   });
                                 }, 
-                                (alertText, alertDuration) {
+                                (alertText, alertDuration, {SnackBarAction action}) {
                                   _scaffoldKey.currentState.hideCurrentSnackBar();
                                   if (alertText.isEmpty) {
                                     return;
@@ -217,6 +208,7 @@ class BookPageState extends State<BookPage> {
                                     SnackBar(
                                       content: Text(alertText),
                                       duration: alertDuration,
+                                      action: action,
                                     )
                                   );
                                 }

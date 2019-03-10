@@ -8,7 +8,7 @@ class Profile extends StatefulWidget {
 }
 
 class ProfileState extends State<Profile> {
-  var _httpClient = new ProxyHttpClient().getHttpClient();
+  var _dio = new ProxyHttpClient().getDio();
 
   @override
   Widget build(BuildContext context) {

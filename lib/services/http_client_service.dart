@@ -1,45 +1,53 @@
 import "dart:io";
 import 'dart:async';
-import 'dart:convert';
+import 'package:dio/dio.dart';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
 
 class ProxyHttpClient {
-  static final ProxyHttpClient proxyHttpClient = ProxyHttpClient._internal();
+  static final ProxyHttpClient proxyDio = ProxyHttpClient._internal();
 
   factory ProxyHttpClient() {
-    return proxyHttpClient;
+    return proxyDio;
   }
   ProxyHttpClient._internal();
 
-  HttpClient _httpClient = new HttpClient();
+  static BaseOptions defaultDioOptions = BaseOptions(
+    connectTimeout: 10000,
+    receiveTimeout: 6000,
+  );
+  Dio _dio = Dio(defaultDioOptions);
   String _proxyHostPort = "";
-  Uri _proxylistUri = new Uri.https("ip-adress.com", "/proxy-list");
+  Uri _proxylistUri = Uri.https("ip-adress.com", "/proxy-list");
 
   String _flibustaHostAddress = "flibusta.is";
 
-  HttpClient getHttpClient() {
-    return _httpClient;
+  Dio getDio() {
+    return _dio;
   }
 
   void setProxy(String hostPort) {
     _proxyHostPort = hostPort;
 
     if (hostPort == "") {
-      _httpClient.findProxy = null;
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+        client.findProxy = null;
+      };
       return;
     }
 
-    _httpClient.findProxy = (url) {
-      return HttpClient.findProxyFromEnvironment(
-        url, 
-        environment: {
-          "HTTPS_PROXY": hostPort,
-          "HTTP_PROXY": hostPort,
-          "https_proxy": hostPort,
-          "http_proxy": hostPort
-      });
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+      client.findProxy = (url) {
+        return HttpClient.findProxyFromEnvironment(
+          url, 
+          environment: {
+            "HTTPS_PROXY": hostPort,
+            "HTTP_PROXY": hostPort,
+            "https_proxy": hostPort,
+            "http_proxy": hostPort
+        });
+      };
     };
   }
 
@@ -56,17 +64,19 @@ class ProxyHttpClient {
   }
 
   Future<int> connectionCheck(String hostPort) async {
-    var httpClientForCheck = new HttpClient();
+    var dioForConnectionCheck = Dio();
     if (hostPort != "") {
-      httpClientForCheck.findProxy = (url) {
-        return HttpClient.findProxyFromEnvironment(
-          url, 
-          environment: {
-            "HTTPS_PROXY": hostPort,
-            "HTTP_PROXY": hostPort,
-            "https_proxy": hostPort,
-            "http_proxy": hostPort
-        });
+      (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+        client.findProxy = (url) {
+          return HttpClient.findProxyFromEnvironment(
+            url, 
+            environment: {
+              "HTTPS_PROXY": hostPort,
+              "HTTP_PROXY": hostPort,
+              "https_proxy": hostPort,
+              "http_proxy": hostPort
+          });
+        };
       };
     }
 
@@ -74,9 +84,13 @@ class ProxyHttpClient {
     var stopWatch = new Stopwatch()..start();
 
     try {
-      var request = httpClientForCheck.getUrl(new Uri.https(getFlibustaHostAddress(), "/"))
-        .timeout(new Duration(seconds: 5))
-        .then((r) => r.close());
+      var request = dioForConnectionCheck.getUri(
+        Uri.https(getFlibustaHostAddress(), "/"),
+        options: Options(
+          connectTimeout: 10000,
+          receiveTimeout: 6000,
+        ),
+      );
 
       var response = await request;
       stopWatch.stop();
@@ -88,12 +102,11 @@ class ProxyHttpClient {
         default:
           result = -1;
       }
-      response.drain();
     } catch (error) {
       result = -1;
       print(error);
     }
-    httpClientForCheck.close();
+    dioForConnectionCheck.clear();
     return result;
   }
 
@@ -117,24 +130,23 @@ class ProxyHttpClient {
   }
 
   Future<List<dynamic>> _getNewProxyList() async {
-    var responseBody = "";
     var proxyList = [];
-    var httpClient = new HttpClient();
-    httpClient.findProxy = null;
+    var dioForGetProxyList = Dio();
 
     try {
-      var request = httpClient.getUrl(_proxylistUri)
-        .timeout(new Duration(seconds: 5))
-        .then((r) => r.close());
+      var request = dioForGetProxyList.getUri(
+        _proxylistUri,
+        options: Options(
+          connectTimeout: 5000,
+          receiveTimeout: 3000,
+        ),
+      );
       var response = await request;
 
       if (response.statusCode != 200)
         return proxyList;
 
-      await response.transform(utf8.decoder).listen((contents) {
-        responseBody += contents;
-      }).asFuture();
-      htmldom.Document proxyListDocument = parse(responseBody);
+      htmldom.Document proxyListDocument = parse(response.data);
 
       var tbody = proxyListDocument.getElementsByTagName("tbody").first;
       if (tbody == null)
@@ -146,7 +158,7 @@ class ProxyHttpClient {
       print(error);
     }
 
-    httpClient.close();
+    dioForGetProxyList.clear();
     return proxyList;
   }
 }

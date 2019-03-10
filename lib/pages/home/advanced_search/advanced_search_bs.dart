@@ -1,6 +1,4 @@
-import 'dart:io';
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/services/http_client_service.dart';
@@ -178,19 +176,14 @@ Future<AdvancedSearchParams> showAdvancedSearchBS(GlobalKey<ScaffoldState> scaff
 }
 
 Future<List<Genre>> getAllGenres() async {
-  HttpClient _httpClient = ProxyHttpClient().getHttpClient();
+  Dio _dio = ProxyHttpClient().getDio();
 
   var result = List<Genre>();
   Map<String, String> queryParams = { "op" : "getList",};
   Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/ajaxro/genre", queryParams);
   try {
-    var superRealResponse = "";
-    var response = await _httpClient.getUrl(url).timeout(Duration(seconds: 5)).then((r) => r.close());
-    await response.transform(utf8.decoder).listen((contents) {
-      superRealResponse += contents;
-    }).asFuture();
-    var jsonresult = json.decode(superRealResponse);
-    jsonresult.forEach((headIndex, headGenre) {
+    var response = await _dio.getUri(url);
+    response.data.forEach((headIndex, headGenre) {
       headGenre.forEach((genre) {
         result.add(
           Genre(
@@ -201,6 +194,7 @@ Future<List<Genre>> getAllGenres() async {
         );
       });
     });
+    print(result);
     return result;
   } catch(error) {
     print(error);

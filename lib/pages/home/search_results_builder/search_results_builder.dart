@@ -1,5 +1,7 @@
 import 'package:flibusta/model/searchResults.dart';
+import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flutter/material.dart';
 
 List<Widget> searchResultsBuilder(SearchResults searchResults) {
@@ -42,8 +44,8 @@ List<Widget> searchResultsBuilder(SearchResults searchResults) {
                             },
                           ),
                         ],
-                      )
-                    )
+                      ),
+                    ),
                   ],
                 )
               ),
@@ -72,6 +74,25 @@ List<Widget> searchResultsBuilder(SearchResults searchResults) {
                       leading: Tooltip(message: "Количество книг", preferBelow: false, child: Icon(Icons.confirmation_number)),
                       title: Text(searchResults.authors[index].booksCount, style: _biggerFont,),
                     ) : Container(),
+                    ButtonTheme.bar(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: ButtonBar(
+                        alignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          FlatButton(
+                            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 20.0)),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) => AuthorPage(authorId: searchResults.authors[index].id,),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 )
               ),
@@ -100,6 +121,25 @@ List<Widget> searchResultsBuilder(SearchResults searchResults) {
                       leading: Tooltip(message: "Количество книг в серии", preferBelow: false, child: Icon(Icons.assignment_ind)),
                       title: Text(searchResults.sequences[index].booksCount, style: _biggerFont,),
                     ) : Container(),
+                    ButtonTheme.bar(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: ButtonBar(
+                        alignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          FlatButton(
+                            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 20.0)),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) => SequencePage(sequenceId: searchResults.sequences[index].id,),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 )
               ),
