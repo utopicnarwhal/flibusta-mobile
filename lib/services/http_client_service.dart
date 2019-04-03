@@ -2,9 +2,6 @@ import "dart:io";
 import 'dart:async';
 import 'package:dio/dio.dart';
 
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as htmldom;
-
 class ProxyHttpClient {
   static final ProxyHttpClient proxyDio = ProxyHttpClient._internal();
 
@@ -19,7 +16,12 @@ class ProxyHttpClient {
   );
   Dio _dio = Dio(defaultDioOptions);
   String _proxyHostPort = "";
-  Uri _proxylistUri = Uri.https("ip-adress.com", "/proxy-list");
+  Uri _proxyApiUri = Uri.https("api.getproxylist.com", "/proxy", {
+    "lastTested": "900",
+    "allowsHttps": "1",
+    "notCountry": "RU",
+    "maxConnectTime": "6",
+  });
 
   String _flibustaHostAddress = "flibusta.is";
 
@@ -106,36 +108,31 @@ class ProxyHttpClient {
       result = -1;
       print(error);
     }
-    dioForConnectionCheck.clear();
     return result;
   }
 
-  Future<String> getWorkingProxyHost() async {
-    var proxyList = [];
-    var result = "";
-    proxyList = await _getNewProxyList();
+  Future<String> getFreeWorkingProxyHost() async {
+    var _result = "";
+    var _newFreeProxy = "";
 
-    for (var proxyHostPort in proxyList) {
-      if (result != "") {
-        break;
-      }
+    while (_result == "") {
+      _newFreeProxy = await getNewProxy();
       
-      if (await connectionCheck(proxyHostPort) >= 0) {
-        _proxyHostPort = proxyHostPort;
-        return _proxyHostPort;
+      var latency = await connectionCheck(_newFreeProxy);
+      if (latency >= 0 && latency <= 7000) {
+        return _newFreeProxy;
       }
     }
 
-    return _proxyHostPort;
+    return "";
   }
 
-  Future<List<dynamic>> _getNewProxyList() async {
-    var proxyList = [];
-    var dioForGetProxyList = Dio();
+  Future<String> getNewProxy() async {
+    var dioForGetProxyAPI = Dio();
 
     try {
-      var request = dioForGetProxyList.getUri(
-        _proxylistUri,
+      var request = dioForGetProxyAPI.getUri(
+        _proxyApiUri,
         options: Options(
           connectTimeout: 5000,
           receiveTimeout: 3000,
@@ -143,22 +140,19 @@ class ProxyHttpClient {
       );
       var response = await request;
 
-      if (response.statusCode != 200)
-        return proxyList;
+      if (response.statusCode != 200 || response.data == null) {
+        return "";
+      }
 
-      htmldom.Document proxyListDocument = parse(response.data);
+      print(response.data);
+      var ip = response.data["ip"];
+      var port = response.data["port"].toString();
 
-      var tbody = proxyListDocument.getElementsByTagName("tbody").first;
-      if (tbody == null)
-        return null;
-
-      var trs = tbody.getElementsByTagName("tr");
-      trs.forEach((tr) => proxyList.add(tr.nodes[1].text));
+      return "$ip:$port";
     } catch (error) {
       print(error);
     }
 
-    dioForGetProxyList.clear();
-    return proxyList;
+    return "";
   }
 }

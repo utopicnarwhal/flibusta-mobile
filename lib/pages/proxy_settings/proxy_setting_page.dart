@@ -51,7 +51,7 @@ class ProxySettingsState extends State<ProxySettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey[350],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: false,
         title: Text("Настройки Proxy"),
@@ -59,13 +59,13 @@ class ProxySettingsState extends State<ProxySettings> {
       body: ListView(
         children: <Widget> [
           Container(
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
+            decoration: BoxDecoration(color: Theme.of(context).cardColor, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)]),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-                  child: Text("Используемый сайт Флибусты:", style: TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.w600),),
+                  child: Text("Используемый сайт Флибусты:", style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18, fontWeight: FontWeight.w600),),
                 ),
                 RadioListTile(
                   title: Text("Оригинальный (flibusta.is)"),
@@ -121,13 +121,13 @@ class ProxySettingsState extends State<ProxySettings> {
             height: 20.0,
           ),
           Container(
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
+            decoration: BoxDecoration(color: Theme.of(context).cardColor, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)]),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-                  child: Text("Подключения:", style: TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.w600),),
+                  child: Text("Подключения:", style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18, fontWeight: FontWeight.w600),),
                 ),
                 RadioListTile(
                   title: Text("Без прокси"),
@@ -164,62 +164,61 @@ class ProxySettingsState extends State<ProxySettings> {
                 FutureBuilder(
                   future: LocalStore().getUserProxies(),
                   builder: (context, snapshot) {
-                    return snapshot.data != null && snapshot.data.length > 0 ?
-                    Column(
-                      children:
-                        List<Widget>.generate(
-                          snapshot.data.length,
-                          (int index) =>
-                          RadioListTile(
-                            groupValue: _customProxy,
-                            value: snapshot.data[index],
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(snapshot.data[index]),
-                                IconButton(
-                                  icon: Icon(Icons.close, color: Colors.black),
-                                  onPressed: () async {
-                                    await LocalStore().deleteUserProxy(snapshot.data[index]);  
-                                    setState(() {});
-                                  },
-                                ),
-                              ],
-                            ),
-                            subtitle: _cachedGetUseFreeProxy ?? true ? Container() : FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data[index]),
-                              builder: (context, snapshot) {
-                                var subtitleText = "";
-                                var subtitleColor;
-                                if (snapshot.data != null && snapshot.connectionState != ConnectionState.waiting) {
-                                  if (snapshot.data >= 0) {
-                                    subtitleText = "доступно (пинг: " + snapshot.data.toString() + "мс)";
-                                    subtitleColor = Colors.green;
+                    if (snapshot.data != null && snapshot.data.length > 0) {
+                      return Column(
+                        children:
+                          List<Widget>.generate(
+                            snapshot.data.length,
+                            (int index) =>
+                            RadioListTile(
+                              groupValue: _customProxy,
+                              value: snapshot.data[index],
+                              title: Text(snapshot.data[index]),
+                              subtitle: _cachedGetUseFreeProxy ?? true ? Container() : FutureBuilder(future: ProxyHttpClient().connectionCheck(snapshot.data[index]),
+                                builder: (context, snapshot) {
+                                  var subtitleText = "";
+                                  var subtitleColor;
+                                  if (snapshot.data != null && snapshot.connectionState != ConnectionState.waiting) {
+                                    if (snapshot.data >= 0) {
+                                      subtitleText = "доступно (пинг: " + snapshot.data.toString() + "мс)";
+                                      subtitleColor = Colors.green;
+                                    } else {
+                                      subtitleText = "недоступно";
+                                      subtitleColor = Colors.red;
+                                    }
                                   } else {
-                                    subtitleText = "недоступно";
-                                    subtitleColor = Colors.red;
+                                    subtitleText = "проверка...";
+                                    subtitleColor = Colors.grey[400];
                                   }
-                                } else {
-                                  subtitleText = "проверка...";
-                                  subtitleColor = Colors.grey[400];
+                                  return Text(subtitleText, style: TextStyle(color: subtitleColor));
                                 }
-                                return Text(subtitleText, style: TextStyle(color: subtitleColor));
-                              }
+                              ),
+                              onChanged: _cachedGetUseFreeProxy ?? true ? null : (proxy) {
+                                setState(() {
+                                  _customProxy = proxy;
+                                  LocalStore().setActualCustomProxy(_customProxy);
+                                  ProxyHttpClient().setProxy(_customProxy);
+                                });
+                              },
+                              secondary: IconButton(
+                                icon: Icon(Icons.close, color: Theme.of(context).accentColor),
+                                onPressed: () async {
+                                  await LocalStore().deleteUserProxy(snapshot.data[index]);  
+                                  setState(() {});
+                                },
+                              ),
                             ),
-                            onChanged: _cachedGetUseFreeProxy ?? true ? null : (proxy) {
-                              setState(() {
-                                _customProxy = proxy;
-                                LocalStore().setActualCustomProxy(_customProxy);
-                                ProxyHttpClient().setProxy(_customProxy);
-                              });
-                            },
-                          )
-                        )
-                    ) : Container();
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
                   },
                 ),
-                Divider(height: 1,),
+                Divider(height: 1, color: Theme.of(context).dividerColor,),
                 ListTile(
-                  leading: Icon(Icons.add, color: Colors.black,),
+                  enabled: _cachedGetUseFreeProxy ?? true ? false : true,
+                  leading: Icon(Icons.add, color: Theme.of(context).accentColor,),
                   title: Text("Добавить прокси"),
                   onTap: _cachedGetUseFreeProxy ?? true ? null : () async {
                     var userProxy = await showDialog<String>(

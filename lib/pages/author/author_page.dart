@@ -1,15 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/home/book_list_builder/show_download_format_mbs.dart';
-import 'package:flibusta/services/book_service.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as htmldom;
 
 class AuthorPage extends StatefulWidget {
   final int authorId;
@@ -105,27 +102,18 @@ class _AuthorPageState extends State<AuthorPage> {
                                 return;
                               }
 
-                              BookService.downloadBook(authorInfo.books[index].id, downloadFormat,
+                              var _bookBloc = BookBloc(authorInfo.books[index].id);
+
+                              await _bookBloc.downloadBook(downloadFormat,
+                                _scaffoldKey,
                                 (downloadProgress) {
                                   setState(() {
                                     authorInfo.books[index].downloadProgress = downloadProgress;
                                   });
                                 },
-                                (alertText, alertDuration, {SnackBarAction action}) {
-                                  _scaffoldKey.currentState.hideCurrentSnackBar();
-                                  if (alertText.isEmpty) {
-                                    return;
-                                  }
-
-                                  _scaffoldKey.currentState.showSnackBar(
-                                    SnackBar(
-                                      content: Text(alertText),
-                                      duration: alertDuration,
-                                      action: action,
-                                    )
-                                  );
-                                },
                               );
+
+                              _bookBloc.dispose();
                             },
                           )
                         ],
@@ -147,9 +135,8 @@ class _AuthorPageState extends State<AuthorPage> {
     try {
       Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/a/" + authorId.toString());
       var response = await _dio.getUri(url);
-      htmldom.Document document = parse(response.data);
 
-      authorInfo = parseHtmlFromAuthorInfo(document, authorId);
+      authorInfo = parseHtmlFromAuthorInfo(response.data, authorId);
     } catch(e) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
@@ -170,5 +157,10 @@ class _AuthorPageState extends State<AuthorPage> {
     }
 
     return authorInfo;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

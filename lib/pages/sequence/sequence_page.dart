@@ -1,16 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flibusta/model/authorInfo.dart';
+import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/home/book_list_builder/show_download_format_mbs.dart';
-import 'package:flibusta/services/book_service.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as htmldom;
 
 class SequencePage extends StatefulWidget {
   final int sequenceId;
@@ -106,27 +102,18 @@ class _SequencePageState extends State<SequencePage> {
                                 return;
                               }
 
-                              BookService.downloadBook(sequenceInfo.books[index].id, downloadFormat,
+                              var _bookBloc = BookBloc(sequenceInfo.books[index].id);
+
+                              await _bookBloc.downloadBook(downloadFormat,
+                                _scaffoldKey,
                                 (downloadProgress) {
                                   setState(() {
                                     sequenceInfo.books[index].downloadProgress = downloadProgress;
                                   });
                                 },
-                                (alertText, alertDuration, {SnackBarAction action}) {
-                                  _scaffoldKey.currentState.hideCurrentSnackBar();
-                                  if (alertText.isEmpty) {
-                                    return;
-                                  }
-
-                                  _scaffoldKey.currentState.showSnackBar(
-                                    SnackBar(
-                                      content: Text(alertText),
-                                      duration: alertDuration,
-                                      action: action,
-                                    )
-                                  );
-                                },
                               );
+
+                              _bookBloc.dispose();
                             },
                           )
                         ],
@@ -148,9 +135,8 @@ class _SequencePageState extends State<SequencePage> {
     try {
       Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/s/" + sequenceId.toString());
       var response = await _dio.getUri(url);
-      htmldom.Document document = parse(response.data);
 
-      sequenceInfo = parseHtmlFromSequenceInfo(document, sequenceId);
+      sequenceInfo = parseHtmlFromSequenceInfo(response.data, sequenceId);
     } catch(e) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(

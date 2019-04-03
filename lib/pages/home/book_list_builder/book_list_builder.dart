@@ -1,6 +1,6 @@
+import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/pages/home/book_list_builder/show_download_format_mbs.dart';
-import 'package:flibusta/services/book_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -29,7 +29,7 @@ class _BookListBuilderState extends State<BookListBuilder> {
           return Column(
             children: <Widget>[
               Container(
-                decoration: BoxDecoration(color: Colors.white),
+                decoration: BoxDecoration(color: Theme.of(context).cardColor),
                 child: Column(
                   children: <Widget>[
                     ListTile(
@@ -86,27 +86,18 @@ class _BookListBuilderState extends State<BookListBuilder> {
                                 return;
                               }
 
-                              BookService.downloadBook(widget.data[index].id, downloadFormat,
+                              var _bookBloc = BookBloc(widget.data[index].id);
+
+                              await _bookBloc.downloadBook(downloadFormat,
+                                widget.scaffoldKey,
                                 (downloadProgress) {
                                   setState(() {
                                     widget.data[index].downloadProgress = downloadProgress;
                                   });
                                 },
-                                (alertText, alertDuration, {SnackBarAction action}) {
-                                  widget.scaffoldKey.currentState.hideCurrentSnackBar();
-                                  if (alertText.isEmpty) {
-                                    return;
-                                  }
-
-                                  widget.scaffoldKey.currentState.showSnackBar(
-                                    SnackBar(
-                                      content: Text(alertText),
-                                      duration: alertDuration,
-                                      action: action,
-                                    )
-                                  );
-                                },
                               );
+
+                              _bookBloc.dispose();
                             },
                           )
                         ],
@@ -115,7 +106,7 @@ class _BookListBuilderState extends State<BookListBuilder> {
                   ],
                 )
               ),
-              Divider(height: 1,)
+              Divider(height: 1, color: Theme.of(context).dividerColor,)
             ]
           );
         },

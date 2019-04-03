@@ -3,9 +3,13 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
+
+import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
 
-List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
+List<BookCard> parseHtmlFromMakeBookList(String htmlString) {
+  htmldom.Document document = parse(htmlString);
+
   var result = List<BookCard>();
   var form = document.getElementsByTagName("form");
   if (form.isEmpty) {
@@ -76,8 +80,9 @@ List<BookCard> parseHtmlFromMakeBookList(htmldom.Document document) {
   return result;
 }
 
-SearchResults parseHtmlFromBookSearch(htmldom.Document document) {
+SearchResults parseHtmlFromBookSearch(String htmlString) {
   SearchResults searchResults = SearchResults(books: List<BookCard>(), authors: List<AuthorCard>(), sequences: List<SequenceCard>());
+  htmldom.Document document = parse(htmlString);
 
   var mainIdTag = document.getElementById("main");
   if (mainIdTag == null) {
@@ -129,8 +134,9 @@ SearchResults parseHtmlFromBookSearch(htmldom.Document document) {
   return searchResults;
 }
 
-BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
+BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   var bookInfo = BookInfo(id: bookId);
+  htmldom.Document document = parse(htmlString);
 
   document.getElementById("content-top").remove();
   var mainElement = document.getElementById("main");
@@ -217,7 +223,9 @@ BookInfo parseHtmlFromBookInfo(htmldom.Document document, int bookId) {
   return bookInfo;
 }
 
-AuthorInfo parseHtmlFromAuthorInfo(htmldom.Document document, int authorId) {
+AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
+  htmldom.Document document = parse(htmlString);
+
   var authorInfo = AuthorInfo(id: authorId, books: List<BookCard>());
   var mainElement = document.getElementById("main");
   authorInfo.name = mainElement.getElementsByTagName("h1").first.innerHtml;
@@ -323,8 +331,10 @@ AuthorInfo parseHtmlFromAuthorInfo(htmldom.Document document, int authorId) {
   return authorInfo;
 }
 
-SequenceInfo parseHtmlFromSequenceInfo(htmldom.Document document, int authorId) {
+SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
   var sequenceInfo = SequenceInfo(id: authorId, books: List<BookCard>());
+  htmldom.Document document = parse(htmlString);
+
   var mainElement = document.getElementById("main");
   sequenceInfo.title = mainElement.getElementsByTagName("h1").first.innerHtml;
 

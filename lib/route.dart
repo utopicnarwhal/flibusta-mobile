@@ -8,26 +8,40 @@ import './pages/help/help_page.dart';
 import './intro.dart';
 
 class FlibustaApp extends StatelessWidget {
+  ThemeData _customDarkTheme;
+
+  FlibustaApp() {
+    _customDarkTheme = ThemeData.dark().copyWith(
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        isDense: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flibusta',
-      theme: ThemeData(
-        primaryColor: Colors.blue,
-        primarySwatch: Colors.blue,
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          ),
-          isDense: true,
-        )
-        // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
-        //   builders: <TargetPlatform, PageTransitionsBuilder> {
-        //     TargetPlatform.android: CupertinoPageTransitionsBuilder()
-        //   }
-        // )
-      ),
-      routes: <String, WidgetBuilder> {
+      theme: _customDarkTheme,
+      // theme: ThemeData(
+      //   primaryColor: Colors.blue,
+      //   primarySwatch: Colors.blue,
+      //   inputDecorationTheme: InputDecorationTheme(
+      //     border: OutlineInputBorder(
+      //       borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      //     ),
+      //     isDense: true,
+      //   )
+      //   // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
+      //   //   builders: <TargetPlatform, PageTransitionsBuilder> {
+      //   //     TargetPlatform.android: CupertinoPageTransitionsBuilder()
+      //   //   }
+      //   // )
+      // ),
+      routes: <String, WidgetBuilder>{
         "/": (BuildContext context) => Home(),
         "/Profile": (BuildContext context) => Profile(),
         "/Login": (BuildContext context) => Login(),

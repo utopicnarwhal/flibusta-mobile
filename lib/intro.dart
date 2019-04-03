@@ -97,7 +97,7 @@ class IntroScreenState extends State<IntroScreen> {
                               duration: Duration(minutes: 1),
                             ));
                             await LocalStore().setUseFreeProxy(true);
-                            var ipPort = await ProxyHttpClient().getWorkingProxyHost();
+                            var ipPort = await ProxyHttpClient().getFreeWorkingProxyHost();
                             _scaffoldKey.currentState.hideCurrentSnackBar();
                             await LocalStore().setActualFreeProxy(ipPort);
                             ProxyHttpClient().setProxy(ipPort);

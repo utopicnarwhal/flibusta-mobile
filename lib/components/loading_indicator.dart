@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class LoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-      // TODO: implement build
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.center,

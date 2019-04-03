@@ -8,9 +8,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'dart:async';
 
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as htmldom;
-
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/services/local_store_service.dart';
 import 'package:flibusta/drawer.dart';
@@ -126,6 +123,12 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     color: Colors.white,
                     fontSize: 18.0,
                   ),
+                  suffixIcon: searchTitleController.text.isNotEmpty ? IconButton(
+                    icon: Icon(Icons.clear), 
+                    onPressed: () {
+                      searchTitleController.clear();
+                    },
+                  ) : null,
                 ),
                 onSubmitted: (String text) {
                   setState(() {
@@ -245,8 +248,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
     Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/makebooklist", queryParams);
     try {
       var response = await _dio.getUri(url);
-      htmldom.Document document = parse(response.data);
-      var result = parseHtmlFromMakeBookList(document);
+      var result = parseHtmlFromMakeBookList(response.data);
       setState(() {
         _load = false;     
       });
@@ -286,8 +288,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
     Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/booksearch", queryParams);
     try {
       var response = await _dio.getUri(url);
-      htmldom.Document document = parse(response.data);
-      var result = parseHtmlFromBookSearch(document);
+      var result = parseHtmlFromBookSearch(response.data);
       setState(() {
         _load = false;     
       });

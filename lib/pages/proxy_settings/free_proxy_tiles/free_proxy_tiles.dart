@@ -18,20 +18,23 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black38, blurRadius: 4)]),
+      decoration: BoxDecoration(color: Theme.of(context).cardColor, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)]),
       child: Column(
         children: <Widget>[
           FutureBuilder(future: LocalStore().getUseFreeProxy(),
             builder: (context, snapshot) {
               _useFreeProxy = snapshot.data ?? false;
               return Container(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 child: SwitchListTile(
                   title: Text('Использовать бесплатный прокси', style: TextStyle(fontSize: 15.0),),
-                  subtitle: Row(
+                  subtitle: Wrap(
                     children: <Widget>[
                       Text('с сайта', style: TextStyle(fontSize: 15.0),),
-                      Text(' ip-adress.com/proxy-list', style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),),
+                      Text(' api.getproxylist.com', 
+                        style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text('(30 запросов в день)', style: TextStyle(fontSize: 15.0),),
                     ]
                   ),
                   value: _useFreeProxy,
@@ -80,12 +83,13 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
                 trailing: _freeProxyRefreshing ? CircularProgressIndicator() : 
                   IconButton(
                     disabledColor: Colors.grey,
+                    tooltip: "Запросить новый прокси",
                     icon: Icon(Icons.refresh, size: 32.0,),
                     onPressed: _useFreeProxy ? () async {
                       setState(() {
                         _freeProxyRefreshing = true;
                       });
-                      var newFreeProxy = await ProxyHttpClient().getWorkingProxyHost();
+                      var newFreeProxy = await ProxyHttpClient().getNewProxy();
                       if (mounted && _freeProxyRefreshing) {
                         await LocalStore().setActualFreeProxy(newFreeProxy);
                       }
@@ -98,7 +102,7 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
                         });
                       }
                     } : null
-                  )
+                  ),
               );
             }
           ),
