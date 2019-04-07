@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Help extends StatefulWidget {
+  static const routeName = "/Help";
+  
   @override
   createState() => HelpState();
 }

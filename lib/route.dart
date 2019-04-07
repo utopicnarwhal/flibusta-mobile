@@ -1,3 +1,4 @@
+import 'package:flibusta/blocs/theme_data/theme_data_bloc.dart';
 import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
@@ -8,47 +9,41 @@ import './pages/help/help_page.dart';
 import './intro.dart';
 
 class FlibustaApp extends StatelessWidget {
-  ThemeData _customDarkTheme;
-
-  FlibustaApp() {
-    _customDarkTheme = ThemeData.dark().copyWith(
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-        ),
-        isDense: true,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flibusta',
-      theme: _customDarkTheme,
-      // theme: ThemeData(
-      //   primaryColor: Colors.blue,
-      //   primarySwatch: Colors.blue,
-      //   inputDecorationTheme: InputDecorationTheme(
-      //     border: OutlineInputBorder(
-      //       borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      //     ),
-      //     isDense: true,
-      //   )
-      //   // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
-      //   //   builders: <TargetPlatform, PageTransitionsBuilder> {
-      //   //     TargetPlatform.android: CupertinoPageTransitionsBuilder()
-      //   //   }
-      //   // )
-      // ),
-      routes: <String, WidgetBuilder>{
-        "/": (BuildContext context) => Home(),
-        "/Profile": (BuildContext context) => Profile(),
-        "/Login": (BuildContext context) => Login(),
-        "/Settings": (BuildContext context) => Settings(),
-        "/Intro": (BuildContext context) => IntroScreen(),
-        "/ProxySettings": (BuildContext context) => ProxySettings(),
-        "/Help": (BuildContext context) => Help()
+    return StreamBuilder(
+      initialData: ThemeData.light(),
+      stream: ThemeDataBloc().themeDataStream,
+      builder: (BuildContext context, AsyncSnapshot<ThemeData> themeData) {
+        return MaterialApp(
+          title: 'Flibusta',
+          theme: themeData.data,
+          // theme: ThemeData(
+          //   primaryColor: Colors.blue,
+          //   primarySwatch: Colors.blue,
+          //   inputDecorationTheme: InputDecorationTheme(
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          //     ),
+          //     isDense: true,
+          //   )
+          //   // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
+          //   //   builders: <TargetPlatform, PageTransitionsBuilder> {
+          //   //     TargetPlatform.android: CupertinoPageTransitionsBuilder()
+          //   //   }
+          //   // )
+          // ),
+          home: Home(),
+          routes: <String, WidgetBuilder>{
+            Home.routeName: (BuildContext context) => Home(),
+            Profile.routeName: (BuildContext context) => Profile(),
+            Login.routeName: (BuildContext context) => Login(),
+            Settings.routeName: (BuildContext context) => Settings(),
+            IntroScreen.routeName: (BuildContext context) => IntroScreen(),
+            ProxySettings.routeName: (BuildContext context) => ProxySettings(),
+            Help.routeName: (BuildContext context) => Help(),
+          },
+        );
       },
     );
   }

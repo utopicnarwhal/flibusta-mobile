@@ -2,6 +2,8 @@ import '../../drawer.dart';
 import 'package:flutter/material.dart';
 
 class Settings extends StatefulWidget {
+  static const routeName = "/Settings";
+  
   @override
   createState() => new SettingsState();
 }

@@ -3,6 +3,7 @@ import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatefulWidget {
+  static const routeName = "/IntroSreen";
   @override
   createState() => IntroScreenState();
 }

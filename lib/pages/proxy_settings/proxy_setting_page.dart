@@ -4,6 +4,7 @@ import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
 
 class ProxySettings extends StatefulWidget {
+  static const routeName = "/ProxySettings";
   @override
   createState() => ProxySettingsState();
 }

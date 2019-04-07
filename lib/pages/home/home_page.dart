@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flibusta/intro.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/advanced_search/advanced_search_bs.dart';
@@ -17,6 +18,8 @@ import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/pages/home/book_list_builder/book_list_builder.dart';
 
 class Home extends StatefulWidget {
+  static const routeName = "/Home";
+
   @override
   createState() => HomeState();
 }
@@ -42,7 +45,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     LocalStore().getIntroComplete().then((bool introCompleted) {
       if (!introCompleted) {
-        Navigator.of(context).pushNamed("/Intro").then((x) {
+        Navigator.of(context).pushNamed(IntroScreen.routeName).then((x) {
           _scaffoldKey.currentState.removeCurrentSnackBar();
           makeBookList(AdvancedSearchParams()).then((response) {
             setState(() {
