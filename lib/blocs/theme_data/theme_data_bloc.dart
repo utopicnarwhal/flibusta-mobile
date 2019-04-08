@@ -1,5 +1,4 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ThemeDataBloc implements BlocBase {
@@ -10,34 +9,16 @@ class ThemeDataBloc implements BlocBase {
   }
   ThemeDataBloc._internal();
 
-  var _themeDataController = BehaviorSubject<ThemeData>.seeded(null);
-  Stream<ThemeData> get themeDataStream => _themeDataController.stream;
-  Sink<ThemeData> get _themeDataSink => _themeDataController.sink;
-
-  var _customDarkTheme = ThemeData.dark().copyWith(
-    inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      ),
-      isDense: true,
-    ),
-  );
-
-  var _customLightTheme = ThemeData.light().copyWith(
-    inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      ),
-      isDense: true,
-    ),
-  );
+  var _themeDataController = BehaviorSubject<bool>.seeded(false);
+  Stream<bool> get themeDataStream => _themeDataController.stream;
+  Sink<bool> get _themeDataSink => _themeDataController.sink;
 
   void switchToDarkTheme() {
-    _themeDataSink.add(_customDarkTheme);
+    _themeDataSink.add(true);
   }
 
   void switchToLightTheme() {
-    _themeDataSink.add(_customLightTheme);
+    _themeDataSink.add(false);
   }
 
   @override

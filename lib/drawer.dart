@@ -1,6 +1,7 @@
 import 'package:flibusta/blocs/theme_data/theme_data_bloc.dart';
 import 'package:flibusta/pages/help/help_page.dart';
 import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
+import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -87,23 +88,25 @@ class ThemeSwitcher extends StatefulWidget {
 }
 
 class _ThemeSwitcherState extends State<ThemeSwitcher> {
-  var darkTheme = false;
-
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
-      title: Text("Режим День/Ночь"),
-      value: darkTheme,
-      onChanged: (value) {
-        setState(() {        
-          darkTheme = value;
-        });
-        if (darkTheme) {
-          ThemeDataBloc().switchToDarkTheme();
-        } else {
-          ThemeDataBloc().switchToLightTheme();
-        }
-      },
+    return StreamBuilder<Object>(
+      initialData: false,
+      stream: ThemeDataBloc().themeDataStream,
+      builder: (context, snapshot) {
+        return SwitchListTile(
+          title: Text("Включить тёмную тему"),
+          value: snapshot.data,
+          onChanged: (value) {
+            LocalStore().setIsDarkTheme(value);
+            if (value) {
+              ThemeDataBloc().switchToDarkTheme();
+            } else {
+              ThemeDataBloc().switchToLightTheme();
+            }
+          },
+        );
+      }
     );
   }
 }

@@ -4,6 +4,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStore {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  Future<bool> getIsDarkTheme() async {
+    var prefs = await _prefs;
+    try {
+      var isDarkTheme = prefs.getBool("DarkTheme");
+      if (isDarkTheme == null) {
+        prefs.setBool("DarkTheme", false);
+        isDarkTheme = false;
+      }
+      return isDarkTheme;
+    } catch (e) {
+      prefs.setBool("DarkTheme", false);
+      return false;
+    }
+  }
+
+  Future<bool> setIsDarkTheme(bool value) async {
+    var prefs = await _prefs;
+    return prefs.setBool("DarkTheme", value);
+  }
+
   Future<bool> getIntroComplete() async {
     var prefs = await _prefs;
     try {
