@@ -211,7 +211,6 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
           });
         },
         child: Container(
-          color: Colors.black12,
           child: _load ? LoadingIndicator() : whatContentShow()
         ),
       ),

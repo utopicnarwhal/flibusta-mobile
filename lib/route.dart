@@ -1,4 +1,4 @@
-import 'package:flibusta/blocs/theme_data/theme_data_bloc.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
 import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,6 @@ class FlibustaApp extends StatelessWidget {
         ),
         isDense: true,
       ),
-      scaffoldBackgroundColor: Color(0xFF00003f),
     );
 
     var _customLightTheme = ThemeData.light().copyWith(
@@ -29,22 +28,20 @@ class FlibustaApp extends StatelessWidget {
         ),
         isDense: true,
       ),
-      scaffoldBackgroundColor: Colors.grey.shade300,
     );
 
-    LocalStore().getIsDarkTheme().then((isDarkTheme) {
-      if (isDarkTheme) {
-        ThemeDataBloc().switchToDarkTheme();
-      }
-    });
-    
-    return StreamBuilder(
-      initialData: false,
-      stream: ThemeDataBloc().themeDataStream,
-      builder: (BuildContext context, AsyncSnapshot<bool> isDarkTheme) {
+    return DynamicTheme(
+      defaultBrightness: Brightness.light,
+      data: (brightness) {
+        if (brightness == Brightness.dark) {
+          return _customDarkTheme;
+        }
+        return _customLightTheme;
+      },
+      themedWidgetBuilder: (context, theme) {
         return MaterialApp(
-          title: 'Flibusta',
-          theme: isDarkTheme.data ? _customDarkTheme : _customLightTheme,
+          title: 'Флибуста',
+          theme: theme,
           // theme: ThemeData(
           //   primaryColor: Colors.blue,
           //   primarySwatch: Colors.blue,

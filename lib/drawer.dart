@@ -1,4 +1,4 @@
-import 'package:flibusta/blocs/theme_data/theme_data_bloc.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flibusta/pages/help/help_page.dart';
 import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
 import 'package:flibusta/services/local_store_service.dart';
@@ -90,23 +90,14 @@ class ThemeSwitcher extends StatefulWidget {
 class _ThemeSwitcherState extends State<ThemeSwitcher> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Object>(
-      initialData: false,
-      stream: ThemeDataBloc().themeDataStream,
-      builder: (context, snapshot) {
-        return SwitchListTile(
-          title: Text("Включить тёмную тему"),
-          value: snapshot.data,
-          onChanged: (value) {
-            LocalStore().setIsDarkTheme(value);
-            if (value) {
-              ThemeDataBloc().switchToDarkTheme();
-            } else {
-              ThemeDataBloc().switchToLightTheme();
-            }
-          },
-        );
-      }
+    return SwitchListTile(
+      title: Text("Включить тёмную тему"),
+      value: DynamicTheme.of(context).brightness == Brightness.dark,
+      onChanged: (value) {
+        setState(() {
+          DynamicTheme.of(context).setBrightness(value ? Brightness.dark : Brightness.light);
+        });
+      },
     );
   }
 }

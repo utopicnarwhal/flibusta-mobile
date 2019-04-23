@@ -99,14 +99,18 @@ class IntroScreenState extends State<IntroScreen> {
                             ));
                             await LocalStore().setUseFreeProxy(true);
                             var ipPort = await ProxyHttpClient().getFreeWorkingProxyHost();
-                            _scaffoldKey.currentState.hideCurrentSnackBar();
+                            if (mounted) {
+                              _scaffoldKey.currentState.hideCurrentSnackBar();
+                            }
                             await LocalStore().setActualFreeProxy(ipPort);
                             ProxyHttpClient().setProxy(ipPort);
                             await LocalStore().setIntroComplete();
-                            setState(() {
-                              searchingProxy = false;
-                            });
-                            Navigator.of(context).pop(true);
+                            if (mounted) {
+                              setState(() {
+                                searchingProxy = false;
+                              });
+                              Navigator.of(context).pop(true);
+                            }
                           }
                         ),
                       ],

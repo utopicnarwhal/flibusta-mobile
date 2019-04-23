@@ -93,10 +93,7 @@ Future<AdvancedSearchParams> showAdvancedSearchBS(GlobalKey<ScaffoldState> scaff
                 Padding(
                   padding: const EdgeInsets.only(bottom: 14.0),
                   child: TypeAheadField(
-                    suggestionsBoxVerticalOffset: -200,
-                    suggestionsBoxDecoration: SuggestionsBoxDecoration(
-                      constraints: BoxConstraints.loose(Size.fromHeight(150.0))
-                    ),
+                    autoFlipDirection: true,
                     textFieldConfiguration: TextFieldConfiguration(
                       autocorrect: true,
                       controller: genresTextFieldController,
