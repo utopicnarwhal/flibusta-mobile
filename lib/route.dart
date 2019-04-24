@@ -1,6 +1,5 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
-import 'package:flibusta/services/local_store_service.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
 import './pages/login/login_page.dart';

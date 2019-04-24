@@ -3,6 +3,7 @@ import 'package:flibusta/intro.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/advanced_search/advanced_search_bs.dart';
+import 'package:flibusta/pages/home/components/drawer.dart';
 import 'package:flibusta/pages/home/search_results_builder/search_results_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,7 +12,6 @@ import 'dart:async';
 
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/services/local_store_service.dart';
-import 'package:flibusta/drawer.dart';
 import 'package:flibusta/components/loading_indicator.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/utils/html_parsers.dart';
@@ -43,7 +43,7 @@ class HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     tabController = TabController(vsync: this, length: 3);
 
-    LocalStore().getIntroComplete().then((bool introCompleted) {
+    LocalStore().getIntroCompleted().then((bool introCompleted) {
       if (!introCompleted) {
         Navigator.of(context).pushNamed(IntroScreen.routeName).then((x) {
           _scaffoldKey.currentState.removeCurrentSnackBar();

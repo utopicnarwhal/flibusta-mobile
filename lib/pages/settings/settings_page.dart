@@ -1,4 +1,4 @@
-import '../../drawer.dart';
+import 'package:flibusta/pages/home/components/drawer.dart';
 import 'package:flutter/material.dart';
 
 class Settings extends StatefulWidget {
@@ -12,18 +12,18 @@ class SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
+    return Scaffold(
+      appBar: AppBar(
         centerTitle: false,
-        title: new Text("Настройки"),
+        title: Text("Настройки"),
       ),
-      drawer: new MyDrawer().build(context),
-      body: new Column(
+      drawer: MyDrawer().build(context),
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          new TextField(
-            decoration: new InputDecoration(
+          TextField(
+            decoration: InputDecoration(
               labelText: "Proxy Host"
             ),
           )
