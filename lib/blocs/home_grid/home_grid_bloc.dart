@@ -4,19 +4,25 @@ import './bloc.dart';
 
 class HomeGridBloc extends Bloc<HomeGridEvent, HomeGridState> {
   @override
-  HomeGridState get initialState => UnHomeGridState(null, null);
+  HomeGridState get initialState => UnHomeGridState();
 
-  void searchAllByQuery(String searchQuery) {
-    this.dispatch(FetchBooks(searchQuery));
+  void globalSearch(String searchQuery) {
+    this.dispatch(GlobalSearchEvent(searchQuery));
+  }
+
+  void getLatestBooks() {
+    this.dispatch(GetLatestBooksEvent());
   }
 
   @override
   Stream<HomeGridState> mapEventToState(
     HomeGridEvent event,
   ) async* {
-    yield LoadingHomeGridState(currentState.searchResults, currentState.searchQuery);
-    if (event is FetchBooks) {
-      yield await event.applyAsync(currentState: currentState, bloc: this);
-    }
+    yield LoadingHomeGridState(
+      latestBooks: currentState.latestBooks,
+      searchResults: currentState.searchResults,
+      searchQuery: currentState.searchQuery,
+    );
+    yield await event.applyAsync(currentState: currentState, bloc: this);
   }
 }

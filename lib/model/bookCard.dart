@@ -155,6 +155,6 @@ class Genres {
         result += ", ";
       }
     });
-    return result;
+    return result.replaceAll(RegExp(r'(\[|\])'), "");
   }
 }

@@ -14,75 +14,127 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  BookSearch _bookSearch;
+  BookSearch _bookSearch = BookSearch();
   List<String> _previousBookSearches;
-  HomeGridBloc _homeGridBloc;
+  HomeGridBloc _homeGridBloc = HomeGridBloc();
 
   TabController _tabController;
+
+  String searchQuery;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: 0, vsync: this, length: 3);
-    _bookSearch = BookSearch();
     LocalStore().getPreviousBookSearches().then((previousBookSearches) {
       _previousBookSearches = previousBookSearches;
       _bookSearch.suggestions = _previousBookSearches;
     });
-    _homeGridBloc = HomeGridBloc();
+    _homeGridBloc.getLatestBooks();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        centerTitle: false,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            _scaffoldKey.currentState.openDrawer();
-          },
-        ),
-        title: Text(_bookSearch.query == null ? 'Книги' : 'Результаты поиска'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () async {
-              var searchQuery = await showSearch(
-                context: context,
-                delegate: _bookSearch,
-              );
-              if (!_previousBookSearches.contains(searchQuery)) {
-                _previousBookSearches.add(searchQuery);
-                LocalStore().setPreviousBookSearches(_previousBookSearches);
+    return BlocBuilder(
+      bloc: _homeGridBloc,
+      builder: (context, homeGridState) {
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            centerTitle: false,
+            leading: IconButton(
+              icon: Builder(builder: (context) {
+                if (homeGridState is LoadingHomeGridState ||
+                    homeGridState is LatestBooksState) {
+                  return Icon(Icons.menu);
+                }
+                if (homeGridState is GlobalSearchResultsState) {
+                  return Icon(Icons.arrow_back);
+                }
+                return Icon(Icons.menu);
+              }),
+              onPressed: () {
+                if (homeGridState is LoadingHomeGridState ||
+                    homeGridState is LatestBooksState) {
+                  _scaffoldKey.currentState.openDrawer();
+                }
+              },
+            ),
+            title: Builder(builder: (context) {
+              if (homeGridState is LoadingHomeGridState) {
+                return Text(
+                  'Поиск...',
+                  overflow: TextOverflow.fade,
+                );
               }
-              _homeGridBloc.searchAllByQuery(searchQuery);
-            },
-          )
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: <Widget>[
-            Tab(
-              text: "КНИГИ",
+              if (homeGridState is LatestBooksState) {
+                return Text(
+                  'Последние книги',
+                  overflow: TextOverflow.fade,
+                );
+              }
+              if (homeGridState is GlobalSearchResultsState) {
+                return Text(
+                  'Результаты поиска',
+                  overflow: TextOverflow.fade,
+                );
+              }
+              return Text(
+                'Что?',
+                overflow: TextOverflow.fade,
+              );
+            }),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () async {
+                  searchQuery = await showSearch<String>(
+                    context: context,
+                    delegate: _bookSearch,
+                  );
+                  if (!_previousBookSearches.contains(searchQuery)) {
+                    _previousBookSearches.add(searchQuery);
+                    LocalStore().setPreviousBookSearches(_previousBookSearches);
+                  }
+                  _homeGridBloc.globalSearch(searchQuery);
+                },
+              )
+            ],
+            bottom: homeGridState is GlobalSearchResultsState
+                ? TabBar(
+                    controller: _tabController,
+                    tabs: <Widget>[
+                      Tab(
+                        text: "КНИГИ",
+                      ),
+                      Tab(
+                        text: "ПИСАТЕЛИ",
+                      ),
+                      Tab(
+                        text: "СЕРИИ",
+                      ),
+                    ],
+                  )
+                : null,
+          ),
+          drawer: MyDrawer().build(context),
+          body: RefreshIndicator(
+            onRefresh: () => Future.microtask(() {
+                  if (homeGridState is LatestBooksState) {
+                    _homeGridBloc.getLatestBooks();
+                  }
+                  if (homeGridState is GlobalSearchResultsState) {
+                    _homeGridBloc.globalSearch(searchQuery);
+                  }
+                  return _homeGridBloc;
+                }),
+            child: HomeGridScreen(
+              scaffoldKey: _scaffoldKey,
+              homeGridState: homeGridState,
             ),
-            Tab(
-              text: "ПИСАТЕЛИ",
-            ),
-            Tab(
-              text: "СЕРИИ",
-            ),
-          ],
-        ),
-      ),
-      drawer: MyDrawer().build(context),
-      body: BlocBuilder(
-        bloc: _homeGridBloc,
-        builder: (BuildContext context, HomeGridState state) {
-          return Container();
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -93,7 +145,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 }
 
-class BookSearch<String> extends SearchDelegate {
+class BookSearch extends SearchDelegate<String> {
   List<String> suggestions = [];
 
   @override

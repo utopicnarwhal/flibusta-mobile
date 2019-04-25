@@ -78,7 +78,7 @@ class IntroScreenState extends State<IntroScreen> {
                           color: Colors.white,
                           child: Text("Сам разберусь", style: TextStyle(color: Colors.black),),
                           onPressed: () async {
-                            await LocalStore().setIntroComplete();
+                            await LocalStore().setIntroCompleted();
                             await LocalStore().setUseFreeProxy(false);
                             Navigator.of(context).pop(true);
                           }
@@ -104,7 +104,7 @@ class IntroScreenState extends State<IntroScreen> {
                             }
                             await LocalStore().setActualFreeProxy(ipPort);
                             ProxyHttpClient().setProxy(ipPort);
-                            await LocalStore().setIntroComplete();
+                            await LocalStore().setIntroCompleted();
                             if (mounted) {
                               setState(() {
                                 searchingProxy = false;

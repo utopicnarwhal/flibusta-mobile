@@ -1,7 +1,7 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
 import 'package:flutter/material.dart';
-import './pages/home/home_page.dart';
+import './pages/home/home_page_new.dart';
 import './pages/login/login_page.dart';
 import './pages/profile/profile_page.dart';
 import './pages/settings/settings_page.dart';
