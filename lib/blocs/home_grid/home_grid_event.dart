@@ -31,7 +31,7 @@ class GlobalSearchEvent extends HomeGridEvent {
       return GlobalSearchResultsState(latestBooks: currentState.latestBooks, searchResults: searchResults, searchQuery: searchQuery);
     } catch (e) {
       return ErrorHomeGridState(
-        errorMessage: this.toString() + ' error: ' + e,
+        errorMessage: this.toString() + ' error: ' + e.toString(),
         latestBooks: currentState.latestBooks,
         searchResults: currentState.searchResults,
         searchQuery: currentState.searchQuery,

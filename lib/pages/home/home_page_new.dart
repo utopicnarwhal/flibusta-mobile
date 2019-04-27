@@ -49,7 +49,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   return Icon(Icons.menu);
                 }
                 if (homeGridState is GlobalSearchResultsState) {
-                  return Icon(Icons.arrow_back);
+                  return WillPopScope(
+                    child: Icon(Icons.arrow_back),
+                    onWillPop: () {
+                      _homeGridBloc.getLatestBooks();
+                    },
+                  );
                 }
                 return Icon(Icons.menu);
               }),
@@ -92,6 +97,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     context: context,
                     delegate: _bookSearch,
                   );
+                  if (searchQuery == null) {
+                    return;
+                  }
                   if (!_previousBookSearches.contains(searchQuery)) {
                     _previousBookSearches.add(searchQuery);
                     LocalStore().setPreviousBookSearches(_previousBookSearches);
@@ -119,18 +127,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           drawer: MyDrawer().build(context),
           body: RefreshIndicator(
-            onRefresh: () => Future.microtask(() {
-                  if (homeGridState is LatestBooksState) {
-                    _homeGridBloc.getLatestBooks();
-                  }
-                  if (homeGridState is GlobalSearchResultsState) {
-                    _homeGridBloc.globalSearch(searchQuery);
-                  }
-                  return _homeGridBloc;
-                }),
+            onRefresh: () {
+              return Future.microtask(() {
+                if (homeGridState is LatestBooksState) {
+                  _homeGridBloc.getLatestBooks();
+                }
+                if (homeGridState is GlobalSearchResultsState) {
+                  _homeGridBloc.globalSearch(searchQuery);
+                }
+              });
+            },
             child: HomeGridScreen(
               scaffoldKey: _scaffoldKey,
               homeGridState: homeGridState,
+              tabController: _tabController,
             ),
           ),
         );
@@ -173,7 +183,7 @@ class BookSearch extends SearchDelegate<String> {
     return IconButton(
       icon: Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, query);
+        close(context, null);
       },
     );
   }
@@ -190,9 +200,14 @@ class BookSearch extends SearchDelegate<String> {
       itemCount: suggestions?.length ?? 0,
       itemBuilder: (context, index) {
         return ListTile(
+          leading: Icon(Icons.history),
           title: Text(
             suggestions.elementAt(index).toString(),
           ),
+          onTap: () {
+            query = suggestions[index];
+            Future.microtask(() => close(context, query));
+          },
         );
       },
     );

@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:simple_permissions/simple_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BookBloc implements BlocBase {
   BookBloc(this._bookId);
@@ -39,13 +39,13 @@ class BookBloc implements BlocBase {
   }
 
   Future<Null> downloadBook(
-      Map<String, String> downloadFormat,
-      GlobalKey<ScaffoldState> _scaffoldKey,
-      void Function(double) downloadProgressCallback) async {
-    if (!await SimplePermissions.checkPermission(
-        Permission.WriteExternalStorage)) {
-      await SimplePermissions.requestPermission(
-          Permission.WriteExternalStorage);
+    Map<String, String> downloadFormat,
+    GlobalKey<ScaffoldState> _scaffoldKey,
+    void Function(double) downloadProgressCallback,
+  ) async {
+
+    if ((await PermissionHandler().checkPermissionStatus(PermissionGroup.contacts)) != PermissionStatus.granted) {
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     }
 
     Directory saveDocDir = await getExternalStorageDirectory();
