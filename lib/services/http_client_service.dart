@@ -16,11 +16,11 @@ class ProxyHttpClient {
   );
   Dio _dio = Dio(defaultDioOptions);
   String _proxyHostPort = "";
-  Uri _proxyApiUri = Uri.https("api.getproxylist.com", "/proxy", {
-    "lastTested": "900",
-    "allowsHttps": "1",
-    "notCountry": "RU",
-    "maxConnectTime": "6",
+  Uri _proxyApiUri = Uri.http("pubproxy.com", "/api/proxy", {
+    "https": "true",
+    "not_country": "RU",
+    "format": "txt",
+    "limit": "5",
   });
 
   String _flibustaHostAddress = "flibusta.is";
@@ -33,21 +33,21 @@ class ProxyHttpClient {
     _proxyHostPort = hostPort;
 
     if (hostPort == "") {
-      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (HttpClient client) {
         client.findProxy = null;
       };
       return;
     }
 
-    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (HttpClient client) {
       client.findProxy = (url) {
-        return HttpClient.findProxyFromEnvironment(
-          url, 
-          environment: {
-            "HTTPS_PROXY": hostPort,
-            "HTTP_PROXY": hostPort,
-            "https_proxy": hostPort,
-            "http_proxy": hostPort
+        return HttpClient.findProxyFromEnvironment(url, environment: {
+          "HTTPS_PROXY": hostPort,
+          "HTTP_PROXY": hostPort,
+          "https_proxy": hostPort,
+          "http_proxy": hostPort
         });
       };
     };
@@ -68,16 +68,18 @@ class ProxyHttpClient {
   Future<int> connectionCheck(String hostPort) async {
     var dioForConnectionCheck = Dio();
     if (hostPort != "") {
-      (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+      (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter)
+          .onHttpClientCreate = (HttpClient client) {
         client.findProxy = (url) {
           return HttpClient.findProxyFromEnvironment(
-            url, 
+            url,
             environment: {
               "HTTPS_PROXY": hostPort,
               "HTTP_PROXY": hostPort,
               "https_proxy": hostPort,
               "http_proxy": hostPort
-          });
+            },
+          );
         };
       };
     }
@@ -117,7 +119,7 @@ class ProxyHttpClient {
 
     while (_result == "") {
       _newFreeProxy = await getNewProxy();
-      
+
       var latency = await connectionCheck(_newFreeProxy);
       if (latency >= 0 && latency <= 7000) {
         return _newFreeProxy;
@@ -140,15 +142,12 @@ class ProxyHttpClient {
       );
       var response = await request;
 
-      if (response.statusCode != 200 || response.data == null) {
+      if (response.statusCode != 200 ||
+          response.data == null && response.data is String) {
         return "";
       }
 
-      print(response.data);
-      var ip = response.data["ip"];
-      var port = response.data["port"].toString();
-
-      return "$ip:$port";
+      return response.data;
     } catch (error) {
       print(error);
     }

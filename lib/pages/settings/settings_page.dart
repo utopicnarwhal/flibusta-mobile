@@ -1,4 +1,3 @@
-import 'package:flibusta/pages/home/components/drawer.dart';
 import 'package:flutter/material.dart';
 
 class Settings extends StatefulWidget {
@@ -17,7 +16,6 @@ class SettingsState extends State<Settings> {
         centerTitle: false,
         title: Text("Настройки"),
       ),
-      drawer: MyDrawer().build(context),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,

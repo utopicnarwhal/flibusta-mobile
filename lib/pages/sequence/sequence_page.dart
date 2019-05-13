@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SequencePage extends StatefulWidget {
+  static const routeName = "/SequencePage";
+
   final int sequenceId;
 
   const SequencePage({Key key, this.sequenceId}): super(key: key);

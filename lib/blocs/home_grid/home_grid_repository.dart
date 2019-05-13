@@ -61,10 +61,10 @@ class HomeGridRepository {
       return result;
     } on TimeoutException catch(timeoutError) {
       print(timeoutError);
-      return null;
+      rethrow;
     } catch(error) {
       print(error);
-      return null;
+      rethrow;
     }
   }
 }

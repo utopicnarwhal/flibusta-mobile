@@ -6,7 +6,8 @@ class HomeGridBloc extends Bloc<HomeGridEvent, HomeGridState> {
   @override
   HomeGridState get initialState => UnHomeGridState();
 
-  void globalSearch(String searchQuery) {
+  /// If searchQuery == null then repeat revious query
+  void globalSearch({String searchQuery}) {
     this.dispatch(GlobalSearchEvent(searchQuery));
   }
 

@@ -1,10 +1,10 @@
 import 'package:flibusta/services/http_client_service.dart';
-import 'package:flibusta/services/local_store_service.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import './route.dart';
 
 main() async {
-  ProxyHttpClient().setProxy(await LocalStore().getActualProxy());
-  ProxyHttpClient().setFlibustaHostAddress(await LocalStore().getFlibustaHostAddress());
+  ProxyHttpClient().setProxy(await LocalStorage().getActualProxy());
+  ProxyHttpClient().setFlibustaHostAddress(await LocalStorage().getFlibustaHostAddress());
   runApp(FlibustaApp());
 }

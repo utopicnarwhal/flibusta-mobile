@@ -6,29 +6,39 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 final _biggerFont = const TextStyle(fontSize: 18.0);
 
-class MyDrawer {
-  Drawer build(BuildContext context) {
+class FlibustaDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
-        padding: EdgeInsets.all(0),
-        children: <Widget> [
+        padding: const EdgeInsets.all(0),
+        children: <Widget>[
           UserAccountsDrawerHeader(
             margin: EdgeInsets.all(0),
-            accountName: Text("Флибуста", style: TextStyle(color: Colors.black),),
-            accountEmail: Text("Книжное братство", style: TextStyle(color: Colors.black),),
+            accountName: Text(
+              "Флибуста",
+              style: TextStyle(color: Colors.black),
+            ),
+            accountEmail: Text(
+              "Книжное братство",
+              style: TextStyle(color: Colors.black),
+            ),
             // currentAccountPicture: CircleAvatar(
 
             // ),
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage("assets/img/bg-header.png")
-              )
+                image: AssetImage("assets/img/bg-header.png"),
+              ),
             ),
           ),
           ListTile(
             leading: Icon(FontAwesomeIcons.home),
-            title: Text('Главная', style: _biggerFont,),
+            title: Text(
+              'Главная',
+              style: _biggerFont,
+            ),
             onTap: () {
               Navigator.of(context).pop();
             },
@@ -49,11 +59,16 @@ class MyDrawer {
           //   },
           // ),
           ListTile(
-            leading: Icon(FontAwesomeIcons.projectDiagram, size: 18.0,),
-            title: Text('Настройки Proxy', style: _biggerFont,),
+            leading: Icon(
+              FontAwesomeIcons.projectDiagram,
+              size: 18.0,
+            ),
+            title: Text(
+              'Настройки Proxy',
+              style: _biggerFont,
+            ),
             onTap: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pushNamed(ProxySettings.routeName);
+              Navigator.of(context).popAndPushNamed(ProxySettingsPage.routeName);
             },
           ),
           // ListTile(
@@ -66,17 +81,26 @@ class MyDrawer {
           // ),
           Divider(),
           ListTile(
-            leading: Icon(FontAwesomeIcons.infoCircle, size: 26.0,),
-            title: Text('О приложении', style: _biggerFont,),
+            leading: Icon(
+              FontAwesomeIcons.infoCircle,
+              size: 26.0,
+            ),
+            title: Text(
+              'О приложении',
+              style: _biggerFont,
+            ),
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).pushNamed(Help.routeName);
             },
           ),
-          ThemeSwitcher(),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: ThemeSwitcher(),
+          ),
           // AboutListTile(icon: Icon(Icons.info_outline),)
         ],
-      )
+      ),
     );
   }
 }
@@ -90,11 +114,16 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      title: Text("Включить тёмную тему"),
+      title: Text(
+        "Ночной режим",
+        style: _biggerFont,
+      ),
+      secondary: Icon(FontAwesomeIcons.solidMoon),
       value: DynamicTheme.of(context).brightness == Brightness.dark,
       onChanged: (value) {
         setState(() {
-          DynamicTheme.of(context).setBrightness(value ? Brightness.dark : Brightness.light);
+          DynamicTheme.of(context)
+              .setBrightness(value ? Brightness.dark : Brightness.light);
         });
       },
     );

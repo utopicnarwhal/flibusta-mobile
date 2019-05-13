@@ -127,7 +127,7 @@ class LatestBooksErrorHomeGridState extends LatestBooksState {
         );
 
   @override
-  String toString() => 'LatestBooksErrorHomeGridState';
+  String toString() => 'LatestBooksErrorHomeGridState $errorMessage';
 }
 
 // class AdvancedSearchErrorHomeGridState extends ErrorHomeGridState {

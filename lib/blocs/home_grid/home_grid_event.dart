@@ -24,13 +24,13 @@ class GlobalSearchEvent extends HomeGridEvent {
   Future<HomeGridState> applyAsync(
       {HomeGridState currentState, HomeGridBloc bloc}) async {
     try {
-      var searchResults = await _homeGridRepository.bookSearch(searchQuery);
+      var searchResults = await _homeGridRepository.bookSearch(searchQuery ?? currentState.searchQuery);
       if (searchResults == null) {
         throw Exception('searchResults == null');
       }
       return GlobalSearchResultsState(latestBooks: currentState.latestBooks, searchResults: searchResults, searchQuery: searchQuery);
     } catch (e) {
-      return ErrorHomeGridState(
+      return GlobalSearchErrorHomeGridState(
         errorMessage: this.toString() + ' error: ' + e.toString(),
         latestBooks: currentState.latestBooks,
         searchResults: currentState.searchResults,
@@ -55,8 +55,8 @@ class GetLatestBooksEvent extends HomeGridEvent {
         searchQuery: currentState.searchQuery,
       );
     } catch (e) {
-      return ErrorHomeGridState(
-        errorMessage: this.toString() + ' error: ' + e,
+      return LatestBooksErrorHomeGridState(
+        errorMessage: this.toString() + ' error: ' + e.toString(),
         latestBooks: currentState.latestBooks,
         searchResults: currentState.searchResults,
         searchQuery: currentState.searchQuery,

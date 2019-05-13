@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import '../../components/loading_indicator.dart';
 
 class BookPage extends StatefulWidget {
+  static const routeName = "/BookPage";
+
   final int bookId;
 
   const BookPage({Key key, this.bookId}): super(key: key);

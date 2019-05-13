@@ -1,7 +1,11 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
-import 'package:flibusta/pages/proxy_settings/proxy_setting_page.dart';
+import 'package:flibusta/pages/author/author_page.dart';
+import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flibusta/pages/proxy_settings_new/proxy_settings_page.dart';
+import 'package:flibusta/pages/sequence/sequence_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import './pages/home/home_page_new.dart';
+import './pages/home/home_page.dart';
 import './pages/login/login_page.dart';
 import './pages/profile/profile_page.dart';
 import './pages/settings/settings_page.dart';
@@ -18,6 +22,10 @@ class FlibustaApp extends StatelessWidget {
         ),
         isDense: true,
       ),
+      pageTransitionsTheme: PageTransitionsTheme(
+          builders: <TargetPlatform, PageTransitionsBuilder>{
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          }),
     );
 
     var _customLightTheme = ThemeData.light().copyWith(
@@ -27,6 +35,11 @@ class FlibustaApp extends StatelessWidget {
         ),
         isDense: true,
       ),
+      pageTransitionsTheme: PageTransitionsTheme(
+          builders: <TargetPlatform, PageTransitionsBuilder>{
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          }),
+      dividerColor: Colors.grey.shade400,
     );
 
     return DynamicTheme(
@@ -41,30 +54,29 @@ class FlibustaApp extends StatelessWidget {
         return MaterialApp(
           title: 'Флибуста',
           theme: theme,
-          // theme: ThemeData(
-          //   primaryColor: Colors.blue,
-          //   primarySwatch: Colors.blue,
-          //   inputDecorationTheme: InputDecorationTheme(
-          //     border: OutlineInputBorder(
-          //       borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          //     ),
-          //     isDense: true,
-          //   )
-          //   // pageTransitionsTheme: PageTransitionsTheme( TODO: uncomment when drawer with cupertino fixed
-          //   //   builders: <TargetPlatform, PageTransitionsBuilder> {
-          //   //     TargetPlatform.android: CupertinoPageTransitionsBuilder()
-          //   //   }
-          //   // )
-          // ),
-          home: Home(),
+          initialRoute: HomePage.routeName,
+          home: HomePage(),
           routes: <String, WidgetBuilder>{
-            Home.routeName: (BuildContext context) => Home(),
+            HomePage.routeName: (BuildContext context) => HomePage(),
             Profile.routeName: (BuildContext context) => Profile(),
             Login.routeName: (BuildContext context) => Login(),
             Settings.routeName: (BuildContext context) => Settings(),
             IntroScreen.routeName: (BuildContext context) => IntroScreen(),
-            ProxySettings.routeName: (BuildContext context) => ProxySettings(),
+            ProxySettingsPage.routeName: (BuildContext context) =>
+                ProxySettingsPage(),
             Help.routeName: (BuildContext context) => Help(),
+          },
+          onGenerateRoute: (RouteSettings settings) {
+            switch (settings.name) {
+              case BookPage.routeName:
+                return CupertinoPageRoute(settings: settings, builder: (context) => BookPage(bookId: settings.arguments));
+              case AuthorPage.routeName:
+                return CupertinoPageRoute(settings: settings, builder: (context) => AuthorPage(authorId: settings.arguments));
+              case SequencePage.routeName:
+                return CupertinoPageRoute(settings: settings, builder: (context) => SequencePage(sequenceId: settings.arguments));
+              default:
+                return null;
+            }
           },
         );
       },

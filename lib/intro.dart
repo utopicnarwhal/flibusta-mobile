@@ -1,5 +1,5 @@
 import 'package:flibusta/services/http_client_service.dart';
-import 'package:flibusta/services/local_store_service.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -78,8 +78,8 @@ class IntroScreenState extends State<IntroScreen> {
                           color: Colors.white,
                           child: Text("Сам разберусь", style: TextStyle(color: Colors.black),),
                           onPressed: () async {
-                            await LocalStore().setIntroCompleted();
-                            await LocalStore().setUseFreeProxy(false);
+                            await LocalStorage().setIntroCompleted();
+                            await LocalStorage().setUseFreeProxy(false);
                             Navigator.of(context).pop(true);
                           }
                         ),
@@ -97,14 +97,14 @@ class IntroScreenState extends State<IntroScreen> {
                               content: Text("Поиск работающего прокси"),
                               duration: Duration(minutes: 1),
                             ));
-                            await LocalStore().setUseFreeProxy(true);
+                            await LocalStorage().setUseFreeProxy(true);
                             var ipPort = await ProxyHttpClient().getFreeWorkingProxyHost();
                             if (mounted) {
                               _scaffoldKey.currentState.hideCurrentSnackBar();
                             }
-                            await LocalStore().setActualFreeProxy(ipPort);
+                            await LocalStorage().setActualFreeProxy(ipPort);
                             ProxyHttpClient().setProxy(ipPort);
-                            await LocalStore().setIntroCompleted();
+                            await LocalStorage().setIntroCompleted();
                             if (mounted) {
                               setState(() {
                                 searchingProxy = false;

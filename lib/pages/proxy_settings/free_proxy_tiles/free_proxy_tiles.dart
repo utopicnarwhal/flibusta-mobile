@@ -1,5 +1,5 @@
 import 'package:flibusta/services/http_client_service.dart';
-import 'package:flibusta/services/local_store_service.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class FreeProxyTiles extends StatefulWidget {
@@ -21,7 +21,7 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
       decoration: BoxDecoration(color: Theme.of(context).cardColor, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)]),
       child: Column(
         children: <Widget>[
-          FutureBuilder(future: LocalStore().getUseFreeProxy(),
+          FutureBuilder(future: LocalStorage().getUseFreeProxy(),
             builder: (context, snapshot) {
               _useFreeProxy = snapshot.data ?? false;
               return Container(
@@ -31,20 +31,20 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
                   subtitle: Wrap(
                     children: <Widget>[
                       Text('с сайта', style: TextStyle(fontSize: 15.0),),
-                      Text(' api.getproxylist.com', 
+                      Text(' http://pubproxy.com', 
                         style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
                       ),
-                      Text('(30 запросов в день)', style: TextStyle(fontSize: 15.0),),
+                      Text('(50 запросов в день)', style: TextStyle(fontSize: 15.0),),
                     ]
                   ),
                   value: _useFreeProxy,
                   onChanged: (useFreeProxy) async {
-                    await LocalStore().setUseFreeProxy(useFreeProxy);
+                    await LocalStorage().setUseFreeProxy(useFreeProxy);
                     
                     if (useFreeProxy) {
-                      ProxyHttpClient().setProxy(await LocalStore().getActualFreeProxy());
+                      ProxyHttpClient().setProxy(await LocalStorage().getActualFreeProxy());
                     } else {
-                      ProxyHttpClient().setProxy(await LocalStore().getActualCustomProxy());
+                      ProxyHttpClient().setProxy(await LocalStorage().getActualCustomProxy());
                     }
 
                     setState(() {
@@ -57,7 +57,7 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
               );
             }
           ),
-          FutureBuilder(future: LocalStore().getActualFreeProxy(),
+          FutureBuilder(future: LocalStorage().getActualFreeProxy(),
             builder: (context, snapshot) {
               return ListTile(
                 title: Text(snapshot.data != null && snapshot.data != "" ? snapshot.data : "Не найдено. Обновите."),
@@ -91,7 +91,7 @@ class FreeProxyTilesState extends State<FreeProxyTiles> {
                       });
                       var newFreeProxy = await ProxyHttpClient().getNewProxy();
                       if (mounted && _freeProxyRefreshing) {
-                        await LocalStore().setActualFreeProxy(newFreeProxy);
+                        await LocalStorage().setActualFreeProxy(newFreeProxy);
                       }
                       if (mounted && _freeProxyRefreshing) {
                         ProxyHttpClient().setProxy(newFreeProxy);

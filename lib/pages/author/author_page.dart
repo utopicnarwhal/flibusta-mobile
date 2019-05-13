@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AuthorPage extends StatefulWidget {
+  static const routeName = "/AuthorPage";
+
   final int authorId;
 
   const AuthorPage({Key key, this.authorId}): super(key: key);
@@ -86,11 +88,7 @@ class _AuthorPageState extends State<AuthorPage> {
                             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                             child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 20.0)),
                             onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) => BookPage(bookId: authorInfo.books[index].id,),
-                                ),
-                              );
+                              Navigator.of(context).pushNamed(BookPage.routeName, arguments: authorInfo.books[index].id);
                             },
                           ),
                           FlatButton(

@@ -6,6 +6,7 @@ import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/home/book_list_builder/show_download_format_mbs.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flibusta/utils/text_to_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GridCards<T> extends StatefulWidget {
@@ -156,31 +157,21 @@ class AdditionalInfoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var directToPage;
+    var routeName;
     if (element is BookCard) {
-      directToPage = BookPage(
-        bookId: element.id,
-      );
+      routeName = BookPage.routeName;
     }
     if (element is AuthorCard) {
-      directToPage = AuthorPage(
-        authorId: element.id,
-      );
+      routeName = AuthorPage.routeName;
     }
     if (element is SequenceCard) {
-      directToPage = SequencePage(
-        sequenceId: element.id,
-      );
+      routeName = SequencePage.routeName;
     }
     return FlatButton(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 20.0)),
       onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => directToPage,
-          ),
-        );
+        Navigator.of(context).pushNamed(routeName, arguments: element.id);
       },
     );
   }
@@ -259,6 +250,7 @@ class GridCardRow extends StatelessWidget {
       message: rowName,
       preferBelow: false,
       child: ListTile(
+        dense: true,
         leading: showCustomLeading && customLeading != null
             ? customLeading
             : Icon(gridRowNameToIcon(rowName)),
