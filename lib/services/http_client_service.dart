@@ -16,14 +16,14 @@ class ProxyHttpClient {
   );
   Dio _dio = Dio(defaultDioOptions);
   String _proxyHostPort = "";
-  Uri _proxyApiUri = Uri.http("pubproxy.com", "/api/proxy", {
-    "https": "true",
-    "not_country": "RU",
-    "format": "txt",
-    "limit": "5",
+  Uri _proxyApiUri = Uri.http('pubproxy.com', '/api/proxy', {
+    'api': 'ZU9KYkwrMGtXcVhBN2tqbzBwTjFUQT09',
+    'https': 'true',
+    'not_country': 'RU',
+    'format': 'txt',
   });
 
-  String _flibustaHostAddress = "flibusta.is";
+  String _flibustaHostAddress = 'flibusta.is';
 
   Dio getDio() {
     return _dio;
@@ -65,7 +65,7 @@ class ProxyHttpClient {
     return _flibustaHostAddress;
   }
 
-  Future<int> connectionCheck(String hostPort) async {
+  Future<int> connectionCheck(String hostPort, {CancelToken cancelToken}) async {
     var dioForConnectionCheck = Dio();
     if (hostPort != "") {
       (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter)
@@ -94,6 +94,7 @@ class ProxyHttpClient {
           connectTimeout: 10000,
           receiveTimeout: 6000,
         ),
+        cancelToken: cancelToken,
       );
 
       var response = await request;
@@ -107,30 +108,17 @@ class ProxyHttpClient {
           result = -1;
       }
     } catch (error) {
+      stopWatch.stop();
       result = -1;
       print(error);
     }
+    dioForConnectionCheck.clear();
     return result;
   }
 
-  Future<String> getFreeWorkingProxyHost() async {
-    var _result = "";
-    var _newFreeProxy = "";
-
-    while (_result == "") {
-      _newFreeProxy = await getNewProxy();
-
-      var latency = await connectionCheck(_newFreeProxy);
-      if (latency >= 0 && latency <= 7000) {
-        return _newFreeProxy;
-      }
-    }
-
-    return "";
-  }
-
-  Future<String> getNewProxy() async {
+  Future<List<String>> getNewProxies() async {
     var dioForGetProxyAPI = Dio();
+    List<String> result = [];
 
     try {
       var request = dioForGetProxyAPI.getUri(
@@ -143,15 +131,19 @@ class ProxyHttpClient {
       var response = await request;
 
       if (response.statusCode != 200 ||
-          response.data == null && response.data is String) {
-        return "";
+          response.data == null) {
+        return [];
       }
 
-      return response.data;
+      if (response.data is String) {
+        result = (response.data as String).split('\n');
+      }
+      print(result);
+      return result;
     } catch (error) {
       print(error);
     }
-
-    return "";
+    dioForGetProxyAPI.clear();
+    return result;
   }
 }

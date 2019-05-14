@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +7,7 @@ class ProxyRadioListTile extends StatefulWidget {
   final String _value;
   final String _groupValue;
   final void Function(String) _onChanged;
+  final void Function() _onDelete;
 
   ProxyRadioListTile({
     Key key,
@@ -13,14 +15,16 @@ class ProxyRadioListTile extends StatefulWidget {
     @required String value,
     @required String groupValue,
     @required void Function(String) onChanged,
+    void Function() onDelete,
   })  : _title = title,
         _value = value,
         _groupValue = groupValue,
         _onChanged = onChanged,
+        _onDelete = onDelete,
         super(key: key);
 
   _ProxyRadioListTileState createState() =>
-      _ProxyRadioListTileState(_title, _value, _groupValue, _onChanged);
+      _ProxyRadioListTileState(_title, _value, _groupValue, _onChanged, _onDelete);
 }
 
 class _ProxyRadioListTileState extends State<ProxyRadioListTile> {
@@ -28,15 +32,24 @@ class _ProxyRadioListTileState extends State<ProxyRadioListTile> {
   final String _value;
   final String _groupValue;
   final void Function(String) _onChanged;
+  final void Function() _onDelete;
   
-  _ProxyRadioListTileState(this._title, this._value, this._groupValue, this._onChanged);
+  _ProxyRadioListTileState(this._title, this._value, this._groupValue, this._onChanged, this._onDelete);
+
+  CancelToken _cancelToken;
+
+  @override
+  void initState() {
+    super.initState();
+    _cancelToken = CancelToken();
+  }
 
   @override
   Widget build(BuildContext context) {
     return RadioListTile(
       title: Text(_title),
       subtitle: FutureBuilder(
-        future: ProxyHttpClient().connectionCheck(_value),
+        future: ProxyHttpClient().connectionCheck(_value, cancelToken: _cancelToken),
         builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
           var subtitleText = "";
           var subtitleColor;
@@ -59,11 +72,17 @@ class _ProxyRadioListTileState extends State<ProxyRadioListTile> {
       groupValue: _groupValue,
       value: _value,
       onChanged: _onChanged,
+      secondary: _onDelete != null ? IconButton(
+        icon: Icon(Icons.delete),
+        tooltip: 'Удалить прокси',
+        onPressed: _onDelete,
+      ) : null,
     );
   }
 
   @override
   void dispose() {
+    _cancelToken.cancel();
     super.dispose();
   }
 }

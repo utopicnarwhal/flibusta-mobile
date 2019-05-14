@@ -1,7 +1,7 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
-import 'package:flibusta/pages/proxy_settings_new/proxy_settings_page.dart';
+import 'package:flibusta/pages/proxy_settings/proxy_settings_page.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +13,9 @@ import './pages/help/help_page.dart';
 import './intro.dart';
 
 class FlibustaApp extends StatelessWidget {
+  static const String versionName = '0.2.0';
+  static const int versionCode = 8;
+
   @override
   Widget build(BuildContext context) {
     var _customDarkTheme = ThemeData.dark().copyWith(

@@ -33,100 +33,6 @@ class _GridCardsState extends State<GridCards> {
             padding: const EdgeInsets.all(0),
             itemCount: widget.data == null ? 0 : widget.data.length,
             itemBuilder: (BuildContext context, int index) {
-              List<Widget> cardRows = [];
-
-              if (widget.data[index] is BookCard) {
-                cardRows.addAll([
-                  GridCardRow(
-                    rowName: 'Название произведения',
-                    value: widget.data[index].title,
-                  ),
-                  GridCardRow(
-                    rowName: 'Автор(-ы)',
-                    value: widget.data[index].authors,
-                  ),
-                  GridCardRow(
-                    rowName: 'Перевод',
-                    value: widget.data[index].translators,
-                  ),
-                  GridCardRow(
-                    rowName: 'Жанр произведения',
-                    value: widget.data[index].genres,
-                  ),
-                  GridCardRow(
-                    rowName: 'Из серии произведений',
-                    value: widget.data[index].sequenceTitle,
-                  ),
-                  GridCardRow(
-                    rowName: 'Размер книги',
-                    value: widget.data[index].size,
-                  ),
-                  GridCardRow(
-                    rowName: 'Форматы файлов',
-                    value: widget.data[index].downloadFormats,
-                    showCustomLeading:
-                        widget.data[index].downloadProgress != null,
-                    customLeading: CircularProgressIndicator(
-                      value: widget.data[index].downloadProgress == 0.0
-                          ? null
-                          : widget.data[index].downloadProgress,
-                    ),
-                  ),
-                ]);
-              }
-              if (widget.data[index] is AuthorCard) {
-                cardRows.addAll([
-                  GridCardRow(
-                    rowName: 'Имя автора',
-                    value: widget.data[index].name,
-                  ),
-                  GridCardRow(
-                    rowName: 'Количество книг',
-                    value: widget.data[index].booksCount,
-                  ),
-                ]);
-              }
-              if (widget.data[index] is SequenceCard) {
-                cardRows.addAll([
-                  GridCardRow(
-                    rowName: 'Название серии',
-                    value: widget.data[index].title,
-                  ),
-                  GridCardRow(
-                    rowName: 'Количество книг в серии',
-                    value: widget.data[index].booksCount,
-                  ),
-                ]);
-              }
-              List<Widget> cardButtonBar = [
-                AdditionalInfoButton(
-                  element: widget.data[index],
-                ),
-              ];
-              if (widget.data[index] is BookCard &&
-                  widget.data[index].downloadFormats != null) {
-                cardButtonBar.add(
-                  DownloadBookButton(
-                    scaffoldKey: widget.scaffoldKey,
-                    book: widget.data[index],
-                    downloadBookCallback: (downloadProgress) {
-                      setState(() {
-                        widget.data[index].downloadProgress = downloadProgress;
-                      });
-                    },
-                  ),
-                );
-              }
-              cardRows.add(
-                ButtonTheme.bar(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: ButtonBar(
-                    alignment: MainAxisAlignment.spaceAround,
-                    children: cardButtonBar,
-                  ),
-                ),
-              );
-
               return Column(
                 children: <Widget>[
                   Container(
@@ -134,7 +40,88 @@ class _GridCardsState extends State<GridCards> {
                       color: Theme.of(context).cardColor,
                     ),
                     child: Column(
-                      children: cardRows,
+                      children: [
+                        if (widget.data[index] is BookCard) ...[
+                          GridCardRow(
+                            rowName: 'Название произведения',
+                            value: widget.data[index].title,
+                          ),
+                          GridCardRow(
+                            rowName: 'Автор(-ы)',
+                            value: widget.data[index].authors,
+                          ),
+                          GridCardRow(
+                            rowName: 'Перевод',
+                            value: widget.data[index].translators,
+                          ),
+                          GridCardRow(
+                            rowName: 'Жанр произведения',
+                            value: widget.data[index].genres,
+                          ),
+                          GridCardRow(
+                            rowName: 'Из серии произведений',
+                            value: widget.data[index].sequenceTitle,
+                          ),
+                          GridCardRow(
+                            rowName: 'Размер книги',
+                            value: widget.data[index].size,
+                          ),
+                          GridCardRow(
+                            rowName: 'Форматы файлов',
+                            value: widget.data[index].downloadFormats,
+                            showCustomLeading:
+                                widget.data[index].downloadProgress != null,
+                            customLeading: CircularProgressIndicator(
+                              value: widget.data[index].downloadProgress == 0.0
+                                  ? null
+                                  : widget.data[index].downloadProgress,
+                            ),
+                          ),
+                        ],
+                        if (widget.data[index] is AuthorCard) ...[
+                          GridCardRow(
+                            rowName: 'Имя автора',
+                            value: widget.data[index].name,
+                          ),
+                          GridCardRow(
+                            rowName: 'Количество книг',
+                            value: widget.data[index].booksCount,
+                          ),
+                        ],
+                        if (widget.data[index] is SequenceCard) ...[
+                          GridCardRow(
+                            rowName: 'Название серии',
+                            value: widget.data[index].title,
+                          ),
+                          GridCardRow(
+                            rowName: 'Количество книг в серии',
+                            value: widget.data[index].booksCount,
+                          ),
+                        ],
+                        ButtonTheme.bar(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: ButtonBar(
+                            alignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              AdditionalInfoButton(
+                                element: widget.data[index],
+                              ),
+                              if (widget.data[index] is BookCard &&
+                                  widget.data[index].downloadFormats != null)
+                                DownloadBookButton(
+                                  scaffoldKey: widget.scaffoldKey,
+                                  book: widget.data[index],
+                                  downloadBookCallback: (downloadProgress) {
+                                    setState(() {
+                                      widget.data[index].downloadProgress =
+                                          downloadProgress;
+                                    });
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Divider(

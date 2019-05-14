@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import './route.dart';
 
 main() async {
+  LocalStorage().checkVersion();
   ProxyHttpClient().setProxy(await LocalStorage().getActualProxy());
   ProxyHttpClient().setFlibustaHostAddress(await LocalStorage().getFlibustaHostAddress());
   runApp(FlibustaApp());

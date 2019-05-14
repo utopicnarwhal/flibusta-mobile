@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flibusta/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -45,115 +46,59 @@ class LocalStorage {
     return prefs.setBool('IntroCompleted', true);
   }
 
-  Future<bool> getUseFreeProxy() async {
+  Future<String> getActualProxy() async {
     var prefs = await _prefs;
     try {
-      var useFreeProxy = prefs.getBool('UseFreeProxy');
-      if (useFreeProxy == null) {
-        prefs.setBool('UseFreeProxy', true);
-        useFreeProxy = true;
-      }
-      return useFreeProxy;
-    } catch (e) {
-      prefs.setBool('UseFreeProxy', true);
-      return true;
-    }
-  }
-
-  Future<bool> setUseFreeProxy(bool useFreeProxy) async {
-    var prefs = await _prefs;
-    return prefs.setBool('UseFreeProxy', useFreeProxy);
-  }
-
-  Future<String> getActualProxy() async { 
-    var prefs = await _prefs;
-    try {
-      var useFreeProxy = prefs.getBool('UseFreeProxy');
-      var actualProxy = '';
-      if (useFreeProxy) {
-        actualProxy = prefs.getString('ActualFreeProxy');
-      } else {
-        actualProxy = prefs.getString('ActualCustomProxy');
+      var actualProxy = prefs.getString('ActualProxy');
+      if (actualProxy == null) {
+        prefs.setString('ActualProxy', '');
+        actualProxy = '';
       }
       return actualProxy;
     } catch (e) {
+      prefs.setString('ActualProxy', '');
       return '';
     }
   }
 
-  Future<String> getActualCustomProxy() async {
+  Future<bool> setActualProxy(String ipPort) async {
+    var prefs = await _prefs;
+    return prefs.setString('ActualProxy', ipPort);
+  }
+
+  Future<List<String>> getProxies() async {
     var prefs = await _prefs;
     try {
-      var actualCustomProxy = prefs.getString('ActualCustomProxy');
-      if (actualCustomProxy == null) {
-        prefs.setString('ActualCustomProxy', '');
-        actualCustomProxy = '';
+      var proxies = prefs.getStringList('Proxies');
+      if (proxies == null) {
+        prefs.setStringList('Proxies', List<String>());
+        proxies = List<String>();
       }
-      return actualCustomProxy;
+      return proxies;
     } catch (e) {
-      prefs.setString('ActualCustomProxy', '');
-      return '';
-    }
-  }
-
-  Future<bool> setActualCustomProxy(String ipPort) async {
-    var prefs = await _prefs;
-    return prefs.setString('ActualCustomProxy', ipPort);
-  }
-
-  Future<String> getActualFreeProxy() async {
-    var prefs = await _prefs;
-    try {
-      var actualFreeProxy = prefs.getString('ActualFreeProxy');
-      if (actualFreeProxy == null) {
-        prefs.setString('ActualFreeProxy', '');
-        actualFreeProxy = '';
-      }
-      return actualFreeProxy;
-    } catch (e) {
-      prefs.setString('ActualFreeProxy', '');
-      return '';
-    }
-  }
-
-  Future<bool> setActualFreeProxy(String ipPort) async {
-    var prefs = await _prefs;
-    return prefs.setString('ActualFreeProxy', ipPort);
-  }
-
-  Future<List<String>> getUserProxies() async {
-    var prefs = await _prefs;
-    try {
-      var userProxies = prefs.getStringList('UserProxies');
-      if (userProxies == null) {
-        prefs.setStringList('UserProxies', List<String>());
-        userProxies = List<String>();
-      }
-      return userProxies;
-    } catch (e) {
-      prefs.setStringList('UserProxies', List<String>());
+      prefs.setStringList('Proxies', List<String>());
       return List<String>();
     }
   }
 
-  Future<bool> addUserProxy(String userProxy) async {
+  Future<bool> addProxy(String proxy) async {
     var prefs = await _prefs;
-    var userProxies = await getUserProxies();
-    if (userProxies.contains(userProxy))
+    var proxies = await getProxies();
+    if (proxies.contains(proxy))
       return true;
     
-    userProxies.add(userProxy);
-    return prefs.setStringList('UserProxies', userProxies);
+    proxies.add(proxy);
+    return prefs.setStringList('Proxies', proxies);
   }
 
-  Future<bool> deleteUserProxy(String userProxy) async {
+  Future<bool> deleteProxy(String proxy) async {
     var prefs = await _prefs;
-    var userProxies = await getUserProxies();
-    if (!userProxies.contains(userProxy))
+    var proxies = await getProxies();
+    if (!proxies.contains(proxy))
       return true;
 
-    userProxies.remove(userProxy);
-    return prefs.setStringList('UserProxies', userProxies);
+    proxies.remove(proxy);
+    return prefs.setStringList('Proxies', proxies);
   }
 
   Future<String> getFlibustaHostAddress() async {
@@ -174,5 +119,17 @@ class LocalStorage {
   Future<bool> setFlibustaHostAddress(String hostAddress) async {
     var prefs = await _prefs;
     return prefs.setString('FlibustaHostAddress', hostAddress);
+  }
+
+  Future<void> checkVersion() async {
+    var prefs = await _prefs;
+    if (prefs.getString('VersionCode') != FlibustaApp.versionName) {
+      _clearPrefs(prefs);
+      prefs.setString('VersionCode', FlibustaApp.versionName);
+    }
+  }
+
+  Future<bool> _clearPrefs(SharedPreferences prefs) async {
+    return prefs.clear();
   }
 }
