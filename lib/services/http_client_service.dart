@@ -31,6 +31,7 @@ class ProxyHttpClient {
 
   void setProxy(String hostPort) {
     _proxyHostPort = hostPort;
+    _dio.clear();
 
     if (hostPort == "") {
       (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =

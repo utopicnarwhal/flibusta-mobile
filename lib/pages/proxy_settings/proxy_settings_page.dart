@@ -1,6 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:flibusta/blocs/proxy_list_bloc/proxy_list_bloc.dart';
+import 'package:flibusta/pages/proxy_settings/components/get_new_proxy_tile.dart';
 import 'package:flibusta/pages/proxy_settings/components/proxy_radio_list_tile.dart';
-import 'package:flibusta/services/http_client_service.dart';
-import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class ProxySettingsPage extends StatefulWidget {
@@ -11,8 +12,13 @@ class ProxySettingsPage extends StatefulWidget {
 
 class _ProxySettingsPageState extends State<ProxySettingsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  ProxyListBloc _proxyListBloc;
 
-  bool requestingProxies = false;
+  @override
+  void initState() {
+    super.initState();
+    _proxyListBloc = ProxyListBloc();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +35,8 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
             color: Theme.of(context).cardColor,
             boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
           ),
-          child: FutureBuilder(
-            future: LocalStorage().getActualProxy(),
+          child: StreamBuilder(
+            stream: _proxyListBloc.actualProxyStream,
             builder: (BuildContext context,
                 AsyncSnapshot<String> actualProxySnapshot) {
               if (!actualProxySnapshot.hasData ||
@@ -55,92 +61,53 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                       ),
                     ),
                   ),
+                  // RadioListTile(
+                  //   title: Text('Без прокси'),
+                  //   value: '',
+                  //   groupValue: actualProxySnapshot.data,
+                  //   onChanged: _proxyListBloc.setActualProxy,
+                  // ),
                   ProxyRadioListTile(
                     title: 'Без прокси',
                     value: '',
                     groupValue: actualProxySnapshot.data,
-                    onChanged: (proxy) async {
-                      await LocalStorage().setActualProxy(proxy);
-                      ProxyHttpClient().setProxy(proxy);
-                      setState(() {});
-                    },
+                    onChanged: _proxyListBloc.setActualProxy,
+                    // cancelToken: _proxyListBloc.cancelToken,
                   ),
-                  FutureBuilder(
-                    future: LocalStorage().getProxies(),
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null && snapshot.data.length > 0) {
-                        return Column(
-                          children: List<Widget>.generate(
-                            snapshot.data.length,
-                            (int index) => ProxyRadioListTile(
-                                  title: snapshot.data[index],
-                                  value: snapshot.data[index],
-                                  groupValue: actualProxySnapshot.data,
-                                  onChanged: (proxy) async {
-                                    await LocalStorage().setActualProxy(proxy);
-                                    ProxyHttpClient().setProxy(proxy);
-                                    setState(() {});
-                                  },
-                                  onDelete: () async {
-                                    await LocalStorage()
-                                        .deleteProxy(snapshot.data[index]);
-                                    setState(() {});
-                                  },
-                                ),
-                          ),
-                        );
-                      } else {
+                  Divider(
+                    height: 1,
+                  ),
+                  StreamBuilder(
+                    stream: _proxyListBloc.proxyListStream,
+                    builder: (context, AsyncSnapshot<List<String>> snapshot) {
+                      if (snapshot.data == null || snapshot.data.isEmpty) {
                         return Container();
                       }
+
+                      List<Widget> tiles = [];
+                      for (var proxyElement in snapshot.data) {
+                        tiles.addAll([
+                          ProxyRadioListTile(
+                            title: proxyElement,
+                            value: proxyElement,
+                            groupValue: actualProxySnapshot.data,
+                            onChanged: _proxyListBloc.setActualProxy,
+                            onDelete: _proxyListBloc.removeFromProxyList,
+                            // cancelToken: _proxyListBloc.cancelToken,
+                          ),
+                          Divider(height: 1),
+                        ]);
+                      }
+                      return Column(
+                        children: tiles,
+                      );
                     },
+                  ),
+                  GetNewProxyTile(
+                    callback: _proxyListBloc.addToProxyList,
                   ),
                   Divider(
                     height: 1,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                  ListTile(
-                    enabled: !requestingProxies,
-                    leading: Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: requestingProxies
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(),
-                            )
-                          : Icon(
-                              Icons.add,
-                              color: Theme.of(context).accentColor,
-                            ),
-                    ),
-                    title: Text('Добавить прокси с сайта http://pubproxy.com'),
-                    onTap: () async {
-                      setState(() {
-                        requestingProxies = true;
-                      });
-                      var newProxies = await ProxyHttpClient().getNewProxies();
-                      if (newProxies != null && newProxies.isNotEmpty) {
-                        setState(() {
-                          newProxies.forEach((proxy) {
-                            LocalStorage().addProxy(proxy);
-                          });
-                        });
-                      } else {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text('Ошибка при получении прокси'),
-                        ));
-                      }
-                      await Future.delayed(Duration(seconds: 3));
-                      if (mounted) {
-                        setState(() {
-                          requestingProxies = false;
-                        });
-                      }
-                    },
-                  ),
-                  Divider(
-                    height: 1,
-                    color: Theme.of(context).dividerColor,
                   ),
                   ListTile(
                     enabled: true,
@@ -176,11 +143,8 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                         },
                       );
                       if (userProxy != null && userProxy.isNotEmpty) {
-                        setState(() {
-                          LocalStorage().addProxy(userProxy);
-                          LocalStorage().setActualProxy(userProxy);
-                          ProxyHttpClient().setProxy(userProxy);
-                        });
+                        _proxyListBloc.addToProxyList(userProxy);
+                        _proxyListBloc.setActualProxy(userProxy);
                       }
                     },
                   ),
@@ -191,5 +155,11 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _proxyListBloc.dispose();
+    super.dispose();
   }
 }

@@ -11,7 +11,8 @@ class HomePage extends StatefulWidget {
   createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   BookSearch _bookSearch = BookSearch();
@@ -126,7 +127,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               )
             : null,
       ),
-      drawer: ModalRoute.of(context).settings.name == HomePage.routeName ? FlibustaDrawer() : Container(),
+      drawer: ModalRoute.of(context).settings.name == HomePage.routeName ||
+              ModalRoute.of(context).settings.name == '/'
+          ? FlibustaDrawer()
+          : null,
       body: HomeGridScreen(
         scaffoldKey: _scaffoldKey,
         homeGridBloc: _homeGridBloc,

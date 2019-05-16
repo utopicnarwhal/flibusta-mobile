@@ -1,10 +1,10 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
+import 'package:dio/dio.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProxyListBloc extends BlocBase {
-
   var _actualProxyController = BehaviorSubject<String>.seeded('');
   //output
   Stream<String> get actualProxyStream => _actualProxyController.stream;
@@ -17,15 +17,35 @@ class ProxyListBloc extends BlocBase {
   //input
   Sink<List<String>> get _proxyListSink => _proxyListController.sink;
 
-  setActualProxy(String proxy){
-    _actualProxySink.add(proxy);
-    LocalStorage().setActualProxy(proxy);
-    ProxyHttpClient().setProxy(proxy);
+  // CancelToken cancelToken;
+
+  ProxyListBloc() {
+    // cancelToken = CancelToken();
+    LocalStorage().getProxies().then((proxyList) => _proxyListController.add(proxyList));
+    LocalStorage().getActualProxy().then((actualProxy) => _actualProxyController.add(actualProxy));
   }
 
-  setProxyList(List<String> proxyList) {
-    _proxyListSink.add(proxyList);
+  setActualProxy(String proxy) {
+    LocalStorage().setActualProxy(proxy);
+    ProxyHttpClient().setProxy(proxy);
+    _actualProxySink.add(proxy);
+    // cancelToken.cancel('view rebuilded');
+    // cancelToken = CancelToken();
+  }
+
+  addToProxyList(String proxy) {
     LocalStorage().addProxy(proxy);
+    var newProxyList = [..._proxyListController.value, proxy];
+    _proxyListSink.add(newProxyList);
+    // cancelToken.cancel('view rebuilded');
+    // cancelToken = CancelToken();
+  }
+
+  removeFromProxyList(String proxy) {
+    LocalStorage().deleteProxy(proxy);
+    _proxyListSink.add([..._proxyListController.value]..remove(proxy));
+    // cancelToken.cancel('view rebuilded');
+    // cancelToken = CancelToken();
   }
 
   @override
