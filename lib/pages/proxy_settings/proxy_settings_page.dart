@@ -1,5 +1,4 @@
-import 'package:dio/dio.dart';
-import 'package:flibusta/blocs/proxy_list_bloc/proxy_list_bloc.dart';
+import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/pages/proxy_settings/components/get_new_proxy_tile.dart';
 import 'package:flibusta/pages/proxy_settings/components/proxy_radio_list_tile.dart';
 import 'package:flutter/material.dart';
@@ -24,134 +23,143 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Theme.of(context).dividerColor,
       appBar: AppBar(
         centerTitle: false,
         title: Text('Настройки Proxy'),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
-          ),
-          child: StreamBuilder(
-            stream: _proxyListBloc.actualProxyStream,
-            builder: (BuildContext context,
-                AsyncSnapshot<String> actualProxySnapshot) {
-              if (!actualProxySnapshot.hasData ||
-                  !(actualProxySnapshot.data is String)) {
-                return Container();
-              }
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 16.0,
+                horizontal: 16.0,
+              ),
+              child: Text(
+                'Использование прокси-сервера может помочь, если Флибуста заблокирована Вашим интернет-провайдером.',
+                style: Theme.of(context).textTheme.body1,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 16.0,
+              ),
+              child: Text(
+                'Соединения:',
+                style: Theme.of(context)
+                    .textTheme
+                    .subhead
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Card(
+              elevation: 8.0,
+              child: StreamBuilder(
+                stream: _proxyListBloc.actualProxyStream,
+                builder: (BuildContext context,
+                    AsyncSnapshot<String> actualProxySnapshot) {
+                  if (!actualProxySnapshot.hasData ||
+                      !(actualProxySnapshot.data is String)) {
+                    return Container();
+                  }
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 16.0,
-                    ),
-                    child: Text(
-                      'Подключения:',
-                      style: TextStyle(
-                        color: Theme.of(context).accentColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      ProxyRadioListTile(
+                        title: 'Без прокси',
+                        value: '',
+                        groupValue: actualProxySnapshot.data,
+                        onChanged: _proxyListBloc.setActualProxy,
+                        cancelToken: _proxyListBloc.cancelToken,
                       ),
-                    ),
-                  ),
-                  // RadioListTile(
-                  //   title: Text('Без прокси'),
-                  //   value: '',
-                  //   groupValue: actualProxySnapshot.data,
-                  //   onChanged: _proxyListBloc.setActualProxy,
-                  // ),
-                  ProxyRadioListTile(
-                    title: 'Без прокси',
-                    value: '',
-                    groupValue: actualProxySnapshot.data,
-                    onChanged: _proxyListBloc.setActualProxy,
-                    // cancelToken: _proxyListBloc.cancelToken,
-                  ),
-                  Divider(
-                    height: 1,
-                  ),
-                  StreamBuilder(
-                    stream: _proxyListBloc.proxyListStream,
-                    builder: (context, AsyncSnapshot<List<String>> snapshot) {
-                      if (snapshot.data == null || snapshot.data.isEmpty) {
-                        return Container();
-                      }
+                      Divider(
+                        height: 1,
+                      ),
+                      StreamBuilder(
+                        stream: _proxyListBloc.proxyListStream,
+                        builder:
+                            (context, AsyncSnapshot<List<String>> snapshot) {
+                          if (snapshot.data == null || snapshot.data.isEmpty) {
+                            return Container();
+                          }
 
-                      List<Widget> tiles = [];
-                      for (var proxyElement in snapshot.data) {
-                        tiles.addAll([
-                          ProxyRadioListTile(
-                            title: proxyElement,
-                            value: proxyElement,
-                            groupValue: actualProxySnapshot.data,
-                            onChanged: _proxyListBloc.setActualProxy,
-                            onDelete: _proxyListBloc.removeFromProxyList,
-                            // cancelToken: _proxyListBloc.cancelToken,
-                          ),
-                          Divider(height: 1),
-                        ]);
-                      }
-                      return Column(
-                        children: tiles,
-                      );
-                    },
-                  ),
-                  GetNewProxyTile(
-                    callback: _proxyListBloc.addToProxyList,
-                  ),
-                  Divider(
-                    height: 1,
-                  ),
-                  ListTile(
-                    enabled: true,
-                    leading: Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Icon(
-                        Icons.add,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
-                    title: Text('Добавить свой прокси'),
-                    onTap: () async {
-                      var userProxy = await showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          final TextEditingController proxyHostController =
-                              TextEditingController();
-                          return SimpleDialog(
-                            title: Text('Добавить свой прокси'),
-                            children: <Widget>[
-                              TextField(
-                                controller: proxyHostController,
-                                autofocus: true,
-                                onEditingComplete: () {
-                                  Navigator.pop(
-                                    context,
-                                    proxyHostController.text,
-                                  );
-                                },
-                              )
-                            ],
+                          return Column(
+                            children: ListTile.divideTiles(
+                              context: context,
+                              tiles: [
+                                for (var proxyElement in snapshot.data)
+                                  ProxyRadioListTile(
+                                    title: proxyElement,
+                                    value: proxyElement,
+                                    groupValue: actualProxySnapshot.data,
+                                    onChanged: _proxyListBloc.setActualProxy,
+                                    onDelete:
+                                        _proxyListBloc.removeFromProxyList,
+                                    cancelToken: _proxyListBloc.cancelToken,
+                                  ),
+                              ],
+                            ).toList(),
                           );
                         },
-                      );
-                      if (userProxy != null && userProxy.isNotEmpty) {
-                        _proxyListBloc.addToProxyList(userProxy);
-                        _proxyListBloc.setActualProxy(userProxy);
-                      }
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
+                      ),
+                      Divider(
+                        height: 1,
+                      ),
+                      GetNewProxyTile(
+                        callback: _proxyListBloc.addToProxyList,
+                      ),
+                      Divider(
+                        height: 1,
+                      ),
+                      ListTile(
+                        enabled: true,
+                        leading: Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Icon(
+                            Icons.add,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                        title: Text('Добавить свой прокси'),
+                        onTap: () async {
+                          var userProxy = await showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              final TextEditingController proxyHostController =
+                                  TextEditingController();
+                              return SimpleDialog(
+                                title: Text('Добавить свой прокси'),
+                                children: <Widget>[
+                                  TextField(
+                                    controller: proxyHostController,
+                                    autofocus: true,
+                                    onEditingComplete: () {
+                                      Navigator.pop(
+                                        context,
+                                        proxyHostController.text,
+                                      );
+                                    },
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                          if (userProxy != null && userProxy.isNotEmpty) {
+                            _proxyListBloc.addToProxyList(userProxy);
+                            _proxyListBloc.setActualProxy(userProxy);
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 12.0),
+          ],
         ),
       ),
     );

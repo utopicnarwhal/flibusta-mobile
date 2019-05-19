@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flibusta/blocs/home_grid/bloc.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
+import 'package:flibusta/model/searchResults.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -60,6 +62,38 @@ class GetLatestBooksEvent extends HomeGridEvent {
         latestBooks: currentState.latestBooks,
         searchResults: currentState.searchResults,
         searchQuery: currentState.searchQuery,
+      );
+    }
+  }
+}
+
+class AdvancedSearchEvent extends HomeGridEvent {
+
+  @override
+  String toString() => 'AdvancedSearchEvent';
+
+  final AdvancedSearchParams advancedSearchParams;
+
+  AdvancedSearchEvent({this.advancedSearchParams});
+
+  @override
+  Future<HomeGridState> applyAsync(
+      {HomeGridState currentState, HomeGridBloc bloc}) async {
+    try {
+      var searchResultsBooks = await _homeGridRepository.makeBookList(advancedSearchParams: advancedSearchParams ?? currentState.advancedSearchParams);
+      return AdvancedSearchResultsState(
+        latestBooks: currentState.latestBooks,
+        searchResults: SearchResults(books: searchResultsBooks),
+        searchQuery: currentState.searchQuery,
+        advancedSearchParams: advancedSearchParams ?? currentState.advancedSearchParams,
+      );
+    } catch (e) {
+      return AdvancedSearchErrorHomeGridState(
+        errorMessage: this.toString() + ' error: ' + e.toString(),
+        latestBooks: currentState.latestBooks,
+        searchResults: currentState.searchResults,
+        searchQuery: currentState.searchQuery,
+        advancedSearchParams: advancedSearchParams ?? currentState.advancedSearchParams,
       );
     }
   }

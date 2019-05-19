@@ -64,7 +64,7 @@ class FlibustaDrawer extends StatelessWidget {
               ListTile(
                 leading: Icon(
                   FontAwesomeIcons.projectDiagram,
-                  size: 18.0,
+                  size: 22.0,
                 ),
                 title: Text(
                   'Настройки Proxy',

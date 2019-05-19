@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
 import './bloc.dart';
 
 class HomeGridBloc extends Bloc<HomeGridEvent, HomeGridState> {
@@ -13,6 +14,10 @@ class HomeGridBloc extends Bloc<HomeGridEvent, HomeGridState> {
 
   void getLatestBooks() {
     this.dispatch(GetLatestBooksEvent());
+  }
+
+  void advancedSearch({AdvancedSearchParams advancedSearchParams}) {
+    this.dispatch(AdvancedSearchEvent(advancedSearchParams: advancedSearchParams));
   }
 
   @override

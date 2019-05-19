@@ -1,4 +1,6 @@
 import 'package:flibusta/blocs/home_grid/bloc.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
+import 'package:flibusta/pages/home/advanced_search/advanced_search_bs.dart';
 import 'package:flibusta/pages/home/components/drawer.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
@@ -15,17 +17,18 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  BookSearch _bookSearch = BookSearch();
+  BookSearch _bookSearch;
   List<String> _previousBookSearches;
   HomeGridBloc _homeGridBloc = HomeGridBloc();
 
   TabController _tabController;
 
-  String searchQuery;
+  dynamic searchQuery;
 
   @override
   void initState() {
     super.initState();
+    _bookSearch = BookSearch(_scaffoldKey);
     _tabController = TabController(initialIndex: 0, vsync: this, length: 3);
     LocalStorage().getPreviousBookSearches().then((previousBookSearches) {
       _previousBookSearches = previousBookSearches;
@@ -36,106 +39,140 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        centerTitle: false,
-        leading: IconButton(
-          icon: BlocBuilder(
-              bloc: _homeGridBloc,
-              builder: (context, homeGridState) {
+    return BlocBuilder(
+      bloc: _homeGridBloc,
+      builder: (context, homeGridState) {
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            centerTitle: false,
+            leading: IconButton(
+              icon: Builder(
+                builder: (context) {
+                  if (homeGridState is LoadingHomeGridState ||
+                      homeGridState is LatestBooksState) {
+                    return Icon(Icons.menu);
+                  }
+                  if (homeGridState is GlobalSearchResultsState ||
+                      homeGridState is AdvancedSearchResultsState) {
+                    return WillPopScope(
+                      child: Icon(Icons.arrow_back),
+                      onWillPop: () {
+                        _homeGridBloc.getLatestBooks();
+                      },
+                    );
+                  }
+                  return Icon(Icons.menu);
+                },
+              ),
+              onPressed: () {
                 if (homeGridState is LoadingHomeGridState ||
                     homeGridState is LatestBooksState) {
-                  return Icon(Icons.menu);
+                  _scaffoldKey.currentState.openDrawer();
                 }
-                if (homeGridState is GlobalSearchResultsState) {
-                  return WillPopScope(
-                    child: Icon(Icons.arrow_back),
-                    onWillPop: () {
-                      _homeGridBloc.getLatestBooks();
-                    },
+                if (homeGridState is GlobalSearchResultsState ||
+                    homeGridState is AdvancedSearchResultsState) {
+                  _homeGridBloc.getLatestBooks();
+                }
+              },
+            ),
+            title: Builder(
+              builder: (context) {
+                if (homeGridState is LoadingHomeGridState) {
+                  return Text(
+                    'Поиск...',
+                    overflow: TextOverflow.fade,
                   );
                 }
-                return Icon(Icons.menu);
-              }),
-          onPressed: () {
-            if (_homeGridBloc.currentState is LoadingHomeGridState ||
-                _homeGridBloc.currentState is LatestBooksState) {
-              _scaffoldKey.currentState.openDrawer();
-            }
-          },
-        ),
-        title: BlocBuilder(
-            bloc: _homeGridBloc,
-            builder: (context, homeGridState) {
-              if (homeGridState is LoadingHomeGridState) {
+                if (homeGridState is LatestBooksState) {
+                  return Text(
+                    'Последние книги',
+                    overflow: TextOverflow.fade,
+                  );
+                }
+                if (homeGridState is GlobalSearchResultsState ||
+                    homeGridState is AdvancedSearchResultsState) {
+                  return Text(
+                    'Результаты поиска',
+                    overflow: TextOverflow.fade,
+                  );
+                }
                 return Text(
-                  'Поиск...',
+                  '...',
                   overflow: TextOverflow.fade,
                 );
-              }
-              if (homeGridState is LatestBooksState) {
-                return Text(
-                  'Последние книги',
-                  overflow: TextOverflow.fade,
-                );
-              }
-              if (homeGridState is GlobalSearchResultsState) {
-                return Text(
-                  'Результаты поиска',
-                  overflow: TextOverflow.fade,
-                );
-              }
-              return Text(
-                'Что?',
-                overflow: TextOverflow.fade,
-              );
-            }),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () async {
-              searchQuery = await showSearch<String>(
-                context: context,
-                delegate: _bookSearch,
-              );
-              if (searchQuery == null) {
-                return;
-              }
-              if (!_previousBookSearches.contains(searchQuery)) {
-                _previousBookSearches.add(searchQuery);
-                LocalStorage().setPreviousBookSearches(_previousBookSearches);
-              }
-              _homeGridBloc.globalSearch(searchQuery: searchQuery);
-            },
-          )
-        ],
-        bottom: _homeGridBloc.currentState is GlobalSearchResultsState
-            ? TabBar(
-                controller: _tabController,
-                tabs: <Widget>[
-                  Tab(
-                    text: "КНИГИ",
-                  ),
-                  Tab(
-                    text: "ПИСАТЕЛИ",
-                  ),
-                  Tab(
-                    text: "СЕРИИ",
-                  ),
-                ],
-              )
-            : null,
-      ),
-      drawer: ModalRoute.of(context).settings.name == HomePage.routeName ||
-              ModalRoute.of(context).settings.name == '/'
-          ? FlibustaDrawer()
-          : null,
-      body: HomeGridScreen(
-        scaffoldKey: _scaffoldKey,
-        homeGridBloc: _homeGridBloc,
-        tabController: _tabController,
-      ),
+              },
+            ),
+            actions: <Widget>[
+              if (homeGridState is LatestBooksState)
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () async {
+                    searchQuery = await showSearch<dynamic>(
+                      context: context,
+                      delegate: _bookSearch,
+                    );
+                    if (searchQuery == null) {
+                      return;
+                    }
+                    if (searchQuery is AdvancedSearchParams) {
+                      var advancedSearchParams =
+                          await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return AdvancedSearchPage(
+                              advancedSearchParams: AdvancedSearchParams(),
+                            );
+                          },
+                        ),
+                      );
+                      if (advancedSearchParams == null) {
+                        return;
+                      }
+                      _homeGridBloc.advancedSearch(
+                          advancedSearchParams: advancedSearchParams);
+                      return;
+                    }
+                    if (searchQuery is String && searchQuery.trim() != '') {
+                      searchQuery = searchQuery.trim().toLowerCase();
+                      if (!_previousBookSearches.contains(searchQuery)) {
+                        _previousBookSearches.add(searchQuery);
+                        LocalStorage()
+                            .setPreviousBookSearches(_previousBookSearches);
+                      }
+                      _homeGridBloc.globalSearch(searchQuery: searchQuery);
+                    }
+                  },
+                ),
+            ],
+            bottom: homeGridState is GlobalSearchResultsState
+                ? TabBar(
+                    controller: _tabController,
+                    tabs: <Widget>[
+                      Tab(
+                        text: "КНИГИ",
+                      ),
+                      Tab(
+                        text: "ПИСАТЕЛИ",
+                      ),
+                      Tab(
+                        text: "СЕРИИ",
+                      ),
+                    ],
+                  )
+                : null,
+          ),
+          drawer: ModalRoute.of(context).settings.name == HomePage.routeName ||
+                  ModalRoute.of(context).settings.name == '/'
+              ? FlibustaDrawer()
+              : null,
+          body: HomeGridScreen(
+            scaffoldKey: _scaffoldKey,
+            homeGridBloc: _homeGridBloc,
+            tabController: _tabController,
+          ),
+        );
+      },
     );
   }
 
@@ -147,8 +184,12 @@ class _HomePageState extends State<HomePage>
   }
 }
 
-class BookSearch extends SearchDelegate<String> {
+class BookSearch extends SearchDelegate<dynamic> {
   List<String> suggestions = [];
+
+  final GlobalKey<ScaffoldState> _scaffoldKey;
+
+  BookSearch(this._scaffoldKey);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -188,20 +229,52 @@ class BookSearch extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    var filteredSuggestions = suggestions
+        .where(
+            (suggestion) => suggestion.startsWith(query.trim().toLowerCase()))
+        .toList();
+
     return ListView.builder(
-      itemCount: suggestions?.length ?? 0,
+      itemCount: (filteredSuggestions?.length ?? 0) + 1,
       itemBuilder: (context, index) {
-        return ListTile(
-          leading: Icon(Icons.history),
-          title: Text(
-            suggestions.elementAt(index).toString(),
-          ),
-          onTap: () {
-            query = suggestions[index];
-            close(context, query);
-          },
-        );
+        if (index == 0) {
+          return Material(
+            elevation: 4.0,
+            color: Theme.of(context).backgroundColor,
+            child: ListTile(
+              dense: true,
+              title: Center(
+                child: Text(
+                  'Расширенный поиск',
+                  style: Theme.of(context).textTheme.button,
+                ),
+              ),
+              onTap: () {
+                close(context, AdvancedSearchParams());
+              },
+            ),
+          );
+        }
+        if (filteredSuggestions
+            .elementAt(index - 1)
+            .startsWith(query.trim().toLowerCase())) {
+          return ListTile(
+            leading: Icon(Icons.history),
+            title: Text(
+              filteredSuggestions.elementAt(index - 1),
+            ),
+            onTap: () {
+              query = filteredSuggestions[index - 1];
+              close(context, query);
+            },
+          );
+        }
       },
     );
+  }
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return Theme.of(context);
   }
 }

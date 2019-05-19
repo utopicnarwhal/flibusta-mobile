@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:meta/meta.dart';
@@ -7,24 +8,32 @@ import 'package:meta/meta.dart';
 abstract class HomeGridState extends Equatable {
   final List<BookCard> latestBooks;
   final String searchQuery;
+  final AdvancedSearchParams advancedSearchParams;
   final SearchResults searchResults;
+  final message;
 
   HomeGridState({
+    this.message,
     this.latestBooks,
     this.searchResults,
     this.searchQuery,
+    this.advancedSearchParams,
   }) : super([searchResults]);
 }
 
 class LatestBooksState extends HomeGridState {
   LatestBooksState({
+    message,
     latestBooks,
     searchResults,
     searchQuery,
+    advancedSearchParams,
   }) : super(
+          message: message,
           latestBooks: latestBooks,
           searchResults: searchResults,
           searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
         );
 
   @override
@@ -33,13 +42,36 @@ class LatestBooksState extends HomeGridState {
 
 class GlobalSearchResultsState extends HomeGridState {
   GlobalSearchResultsState({
+    message,
     latestBooks,
     searchResults,
     searchQuery,
+    advancedSearchParams,
   }) : super(
+          message: message,
           latestBooks: latestBooks,
           searchResults: searchResults,
           searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
+        );
+
+  @override
+  String toString() => 'GlobalSearchResultsState';
+}
+
+class AdvancedSearchResultsState extends HomeGridState {
+  AdvancedSearchResultsState({
+    message,
+    latestBooks,
+    searchResults,
+    searchQuery,
+    advancedSearchParams,
+  }) : super(
+          message: message,
+          latestBooks: latestBooks,
+          searchResults: searchResults,
+          searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
         );
 
   @override
@@ -51,10 +83,12 @@ class UnHomeGridState extends HomeGridState {
     latestBooks,
     searchResults,
     searchQuery,
+    advancedSearchParams,
   }) : super(
           latestBooks: latestBooks,
           searchResults: searchResults,
           searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
         );
 
   @override
@@ -66,32 +100,16 @@ class LoadingHomeGridState extends HomeGridState {
     latestBooks,
     searchResults,
     searchQuery,
+    advancedSearchParams,
   }) : super(
           latestBooks: latestBooks,
           searchResults: searchResults,
           searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
         );
 
   @override
   String toString() => 'LoadingHomeGridState';
-}
-
-class ErrorHomeGridState extends HomeGridState {
-  final String errorMessage;
-
-  ErrorHomeGridState({
-    this.errorMessage,
-    latestBooks,
-    searchResults,
-    searchQuery,
-  }) : super(
-          latestBooks: latestBooks,
-          searchResults: searchResults,
-          searchQuery: searchQuery,
-        );
-
-  @override
-  String toString() => 'ErrorHomeGridState';
 }
 
 class GlobalSearchErrorHomeGridState extends GlobalSearchResultsState {
@@ -102,10 +120,13 @@ class GlobalSearchErrorHomeGridState extends GlobalSearchResultsState {
     latestBooks,
     searchResults,
     searchQuery,
+    advancedSearchParams,
   }) : super(
+          message: errorMessage,
           latestBooks: latestBooks,
           searchResults: searchResults,
           searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
         );
 
   @override
@@ -120,30 +141,36 @@ class LatestBooksErrorHomeGridState extends LatestBooksState {
     latestBooks,
     searchResults,
     searchQuery,
+    advancedSearchParams,
   }) : super(
+          message: errorMessage,
           latestBooks: latestBooks,
           searchResults: searchResults,
           searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
         );
 
   @override
   String toString() => 'LatestBooksErrorHomeGridState $errorMessage';
 }
 
-// class AdvancedSearchErrorHomeGridState extends ErrorHomeGridState {
-//   final String errorMessage;
+class AdvancedSearchErrorHomeGridState extends AdvancedSearchResultsState {
+  final String errorMessage;
 
-//   AdvancedSearchErrorHomeGridState({
-//     this.errorMessage,
-//     latestBooks,
-//     searchResults,
-//     searchQuery,
-//   }) : super(
-//           latestBooks: latestBooks,
-//           searchResults: searchResults,
-//           searchQuery: searchQuery,
-//         );
+  AdvancedSearchErrorHomeGridState({
+    this.errorMessage,
+    latestBooks,
+    searchResults,
+    searchQuery,
+    advancedSearchParams,
+  }) : super(
+          message: errorMessage,
+          latestBooks: latestBooks,
+          searchResults: searchResults,
+          searchQuery: searchQuery,
+          advancedSearchParams: advancedSearchParams,
+        );
 
-//   @override
-//   String toString() => 'AdvancedSearchErrorHomeGridState';
-// }
+  @override
+  String toString() => 'AdvancedSearchErrorHomeGridState';
+}

@@ -35,19 +35,27 @@ class HomeGridScreen extends StatelessWidget {
         bloc: _homeGridBloc,
         builder: (BuildContext context, HomeGridState _homeGridState) {
           if (_homeGridState is LatestBooksErrorHomeGridState ||
-              _homeGridState is GlobalSearchErrorHomeGridState) {
+              _homeGridState is GlobalSearchErrorHomeGridState ||
+              _homeGridState is AdvancedSearchErrorHomeGridState) {
             return Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'Ошибка $_homeGridState',
+                    'Ошибка ${_homeGridState.message}',
                     textAlign: TextAlign.center,
                   ),
                   RaisedButton(
                     child: Text('Попробовать ещё раз'),
-                    onPressed: () => _homeGridBloc.getLatestBooks(),
+                    onPressed: () {
+                      if (_homeGridState is LatestBooksErrorHomeGridState)
+                        _homeGridBloc.getLatestBooks();
+                      if (_homeGridState is GlobalSearchErrorHomeGridState)
+                        _homeGridBloc.globalSearch();
+                      if (_homeGridState is AdvancedSearchErrorHomeGridState)
+                        _homeGridBloc.advancedSearch();
+                    },
                   ),
                 ],
               ),
@@ -61,11 +69,6 @@ class HomeGridScreen extends StatelessWidget {
           }
 
           if (_homeGridState is LatestBooksState) {
-            if (_homeGridState is LatestBooksErrorHomeGridState) {
-              return Center(
-                child: Text('Ошибка ${_homeGridState.toString()}'),
-              );
-            }
             return GridCards(
               scaffoldKey: _scaffoldKey,
               data: _homeGridState.latestBooks,
@@ -92,8 +95,16 @@ class HomeGridScreen extends StatelessWidget {
               ],
             );
           }
+
+          if (_homeGridState is AdvancedSearchResultsState) {
+            return GridCards(
+              scaffoldKey: _scaffoldKey,
+              data: _homeGridState.searchResults.books,
+            );
+          }
+
           return Center(
-            child: Text('Ошибка ${_homeGridState.toString()}'),
+            child: Text('Ошибка в ${_homeGridState.toString()}'),
           );
         },
       ),

@@ -108,12 +108,12 @@ class ProxyHttpClient {
         default:
           result = -1;
       }
+      dioForConnectionCheck.clear();
     } catch (error) {
       stopWatch.stop();
       result = -1;
       print(error);
     }
-    dioForConnectionCheck.clear();
     return result;
   }
 

@@ -17,10 +17,10 @@ class ProxyListBloc extends BlocBase {
   //input
   Sink<List<String>> get _proxyListSink => _proxyListController.sink;
 
-  // CancelToken cancelToken;
+  CancelToken cancelToken;
 
   ProxyListBloc() {
-    // cancelToken = CancelToken();
+    cancelToken = CancelToken();
     LocalStorage().getProxies().then((proxyList) => _proxyListController.add(proxyList));
     LocalStorage().getActualProxy().then((actualProxy) => _actualProxyController.add(actualProxy));
   }
@@ -29,23 +29,17 @@ class ProxyListBloc extends BlocBase {
     LocalStorage().setActualProxy(proxy);
     ProxyHttpClient().setProxy(proxy);
     _actualProxySink.add(proxy);
-    // cancelToken.cancel('view rebuilded');
-    // cancelToken = CancelToken();
   }
 
   addToProxyList(String proxy) {
     LocalStorage().addProxy(proxy);
     var newProxyList = [..._proxyListController.value, proxy];
     _proxyListSink.add(newProxyList);
-    // cancelToken.cancel('view rebuilded');
-    // cancelToken = CancelToken();
   }
 
   removeFromProxyList(String proxy) {
     LocalStorage().deleteProxy(proxy);
     _proxyListSink.add([..._proxyListController.value]..remove(proxy));
-    // cancelToken.cancel('view rebuilded');
-    // cancelToken = CancelToken();
   }
 
   @override

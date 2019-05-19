@@ -12,7 +12,7 @@ class NoResults extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            "Извините, но книг с данным названием не существует в нашей библиотеке.",
+            'Ничего не найдено',
             style: TextStyle(fontSize: 22),
             textAlign: TextAlign.center,
           ),

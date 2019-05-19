@@ -34,9 +34,11 @@ dependencies:
   flutter_bloc: ^0.11.1
   equatable: ^0.2.3
   dynamic_theme: ^1.0.1
+  
 
 dev_dependencies:
-  # source_gen: 0.9.4+1
+  flutter_localizations:
+    sdk: flutter
   flutter_test:
     sdk: flutter
 
