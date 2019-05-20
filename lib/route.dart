@@ -13,8 +13,8 @@ import './pages/help/help_page.dart';
 import './intro.dart';
 
 class FlibustaApp extends StatelessWidget {
-  static const String versionName = '0.2.0';
-  static const int versionCode = 8;
+  static const String versionName = '0.2.1';
+  static const int versionCode = 9;
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +68,8 @@ class FlibustaApp extends StatelessWidget {
                 return MaterialPageRoute(builder: (context) => Login());
               case Settings.routeName:
                 return MaterialPageRoute(builder: (context) => Settings());
-              case IntroScreen.routeName:
-                return MaterialPageRoute(builder: (context) => IntroScreen());
+              case IntroPage.routeName:
+                return MaterialPageRoute(builder: (context) => IntroPage());
               case ProxySettingsPage.routeName:
                 return MaterialPageRoute(
                     builder: (context) => ProxySettingsPage());

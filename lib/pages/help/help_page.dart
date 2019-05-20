@@ -127,7 +127,7 @@ class HelpState extends State<Help> {
                 ],
               ),
             ),
-            SizedBox(height: 12.0),
+            SizedBox(height: 14.0),
           ],
         ),
       ),

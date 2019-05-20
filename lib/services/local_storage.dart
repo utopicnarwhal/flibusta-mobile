@@ -124,12 +124,12 @@ class LocalStorage {
   Future<void> checkVersion() async {
     var prefs = await _prefs;
     if (prefs.getString('VersionCode') != FlibustaApp.versionName) {
-      _clearPrefs(prefs);
+      // _clearPrefs(prefs);
       prefs.setString('VersionCode', FlibustaApp.versionName);
     }
   }
 
-  Future<bool> _clearPrefs(SharedPreferences prefs) async {
-    return prefs.clear();
-  }
+  // Future<bool> _clearPrefs(SharedPreferences prefs) async {
+  //   return prefs.clear();
+  // }
 }

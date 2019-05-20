@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
-import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class BookBloc implements BlocBase {
+class BookBloc {
   BookBloc(this._bookId);
 
   int _bookId;

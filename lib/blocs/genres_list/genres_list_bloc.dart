@@ -1,10 +1,9 @@
-import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:rxdart/rxdart.dart';
 
-class GenresListBloc extends BlocBase {
+class GenresListBloc {
 
   var _selectedGenresListController = BehaviorSubject<List<Genre>>.seeded([]);
   //output

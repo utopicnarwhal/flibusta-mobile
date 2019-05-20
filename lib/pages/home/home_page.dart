@@ -1,4 +1,5 @@
 import 'package:flibusta/blocs/home_grid/bloc.dart';
+import 'package:flibusta/intro.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/pages/home/advanced_search/advanced_search_bs.dart';
 import 'package:flibusta/pages/home/components/drawer.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
-  static const routeName = "/HomePage";
+  static const routeName = "/Home";
 
   @override
   createState() => _HomePageState();
@@ -28,12 +29,18 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  void _init() async {
+    if (!await LocalStorage().getIntroCompleted()) {
+      Navigator.of(context).pushReplacementNamed(IntroPage.routeName);
+    }
     _bookSearch = BookSearch(_scaffoldKey);
     _tabController = TabController(initialIndex: 0, vsync: this, length: 3);
-    LocalStorage().getPreviousBookSearches().then((previousBookSearches) {
-      _previousBookSearches = previousBookSearches;
-      _bookSearch.suggestions = _previousBookSearches;
-    });
+    var previousBookSearches = await LocalStorage().getPreviousBookSearches();
+    _previousBookSearches = previousBookSearches;
+    _bookSearch.suggestions = _previousBookSearches;
     _homeGridBloc.getLatestBooks();
   }
 
@@ -162,10 +169,7 @@ class _HomePageState extends State<HomePage>
                   )
                 : null,
           ),
-          drawer: ModalRoute.of(context).settings.name == HomePage.routeName ||
-                  ModalRoute.of(context).settings.name == '/'
-              ? FlibustaDrawer()
-              : null,
+          drawer: FlibustaDrawer(),
           body: HomeGridScreen(
             scaffoldKey: _scaffoldKey,
             homeGridBloc: _homeGridBloc,

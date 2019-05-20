@@ -101,12 +101,10 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                     cancelToken: _proxyListBloc.cancelToken,
                                   ),
                               ],
-                            ).toList(),
+                            ).toList()
+                              ..add(Divider(height: 1)),
                           );
                         },
-                      ),
-                      Divider(
-                        height: 1,
                       ),
                       GetNewProxyTile(
                         callback: _proxyListBloc.addToProxyList,
@@ -158,7 +156,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                 },
               ),
             ),
-            SizedBox(height: 12.0),
+            SizedBox(height: 14.0),
           ],
         ),
       ),
