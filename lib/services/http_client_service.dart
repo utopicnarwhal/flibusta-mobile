@@ -1,4 +1,4 @@
-import "dart:io";
+import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
 
@@ -15,11 +15,11 @@ class ProxyHttpClient {
     receiveTimeout: 6000,
   );
   Dio _dio = Dio(defaultDioOptions);
-  String _proxyHostPort = "";
+  String _proxyHostPort = '';
   Uri _proxyApiUri = Uri.http('pubproxy.com', '/api/proxy', {
-    'api': 'ZU9KYkwrMGtXcVhBN2tqbzBwTjFUQT09',
     'https': 'true',
     'not_country': 'RU',
+    'LEVEL': 'elite',
     'format': 'txt',
   });
 
@@ -33,7 +33,7 @@ class ProxyHttpClient {
     _proxyHostPort = hostPort;
     _dio.clear();
 
-    if (hostPort == "") {
+    if (hostPort == '') {
       (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
           (HttpClient client) {
         client.findProxy = null;
@@ -45,10 +45,10 @@ class ProxyHttpClient {
         (HttpClient client) {
       client.findProxy = (url) {
         return HttpClient.findProxyFromEnvironment(url, environment: {
-          "HTTPS_PROXY": hostPort,
-          "HTTP_PROXY": hostPort,
-          "https_proxy": hostPort,
-          "http_proxy": hostPort
+          'HTTPS_PROXY': hostPort,
+          'HTTP_PROXY': hostPort,
+          'https_proxy': hostPort,
+          'http_proxy': hostPort
         });
       };
     };
@@ -75,10 +75,10 @@ class ProxyHttpClient {
           return HttpClient.findProxyFromEnvironment(
             url,
             environment: {
-              "HTTPS_PROXY": hostPort,
-              "HTTP_PROXY": hostPort,
-              "https_proxy": hostPort,
-              "http_proxy": hostPort
+              'HTTPS_PROXY': hostPort,
+              'HTTP_PROXY': hostPort,
+              'https_proxy': hostPort,
+              'http_proxy': hostPort
             },
           );
         };
@@ -90,7 +90,7 @@ class ProxyHttpClient {
 
     try {
       var request = dioForConnectionCheck.getUri(
-        Uri.https(getFlibustaHostAddress(), "/"),
+        Uri.https(getFlibustaHostAddress(), '/'),
         options: Options(
           connectTimeout: 10000,
           receiveTimeout: 6000,

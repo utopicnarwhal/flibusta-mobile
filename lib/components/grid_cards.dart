@@ -25,7 +25,7 @@ class _GridCardsState extends State<GridCards> {
     if (widget.data != null && widget.data.length == 0) {
       return NoResults();
     }
-    
+
     return Stack(
       children: <Widget>[
         Container(
@@ -104,7 +104,7 @@ class _GridCardsState extends State<GridCards> {
                           ),
                         ],
                         ButtonTheme.bar(
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: EdgeInsets.symmetric(vertical: 0),
                           child: ButtonBar(
                             alignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -160,8 +160,8 @@ class AdditionalInfoButton extends StatelessWidget {
       routeName = SequencePage.routeName;
     }
     return FlatButton(
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 20.0)),
+      padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+      child: Text("ПОДРОБНЕЕ", style: TextStyle(fontSize: 16.0)),
       onPressed: () {
         Navigator.of(context).pushNamed(routeName, arguments: element.id);
       },
@@ -205,13 +205,10 @@ class DownloadBookButton extends StatelessWidget {
     };
 
     return FlatButton(
-      padding: EdgeInsets.symmetric(
-        vertical: 5,
-        horizontal: 10,
-      ),
+      padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
       child: Text(
         "СКАЧАТЬ",
-        style: TextStyle(fontSize: 20.0),
+        style: TextStyle(fontSize: 16.0),
       ),
       onPressed: book.downloadProgress != null ? null : onPressed,
     );
@@ -242,6 +239,7 @@ class GridCardRow extends StatelessWidget {
       message: rowName,
       preferBelow: false,
       child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 12),
         dense: true,
         leading: showCustomLeading && customLeading != null
             ? customLeading

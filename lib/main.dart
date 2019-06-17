@@ -1,7 +1,7 @@
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
-import './route.dart';
+import 'package:flibusta/route.dart';
 
 main() async {
   LocalStorage().checkVersion();

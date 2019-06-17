@@ -13,8 +13,8 @@ import './pages/help/help_page.dart';
 import './intro.dart';
 
 class FlibustaApp extends StatelessWidget {
-  static const String versionName = '0.2.1';
-  static const int versionCode = 9;
+  static const String versionName = '0.2.2';
+  static const int versionCode = 10;
 
   @override
   Widget build(BuildContext context) {
