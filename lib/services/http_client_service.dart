@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 
 class ProxyHttpClient {
@@ -66,8 +67,16 @@ class ProxyHttpClient {
     return _flibustaHostAddress;
   }
 
-  Future<int> connectionCheck(String hostPort, {CancelToken cancelToken}) async {
-    var dioForConnectionCheck = Dio();
+  Future<int> connectionCheck(
+    String hostPort, {
+    CancelToken cancelToken,
+  }) async {
+    var dioForConnectionCheck = Dio(
+      BaseOptions(
+        connectTimeout: 10000,
+        receiveTimeout: 6000,
+      ),
+    );
     if (hostPort != "") {
       (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {
@@ -91,10 +100,6 @@ class ProxyHttpClient {
     try {
       var request = dioForConnectionCheck.getUri(
         Uri.https(getFlibustaHostAddress(), '/'),
-        options: Options(
-          connectTimeout: 10000,
-          receiveTimeout: 6000,
-        ),
         cancelToken: cancelToken,
       );
 
@@ -118,21 +123,21 @@ class ProxyHttpClient {
   }
 
   Future<List<String>> getNewProxies() async {
-    var dioForGetProxyAPI = Dio();
+    var dioForGetProxyAPI = Dio(
+      BaseOptions(
+        connectTimeout: 5000,
+        receiveTimeout: 3000,
+      ),
+    );
     List<String> result = [];
 
     try {
       var request = dioForGetProxyAPI.getUri(
         _proxyApiUri,
-        options: Options(
-          connectTimeout: 5000,
-          receiveTimeout: 3000,
-        ),
       );
       var response = await request;
 
-      if (response.statusCode != 200 ||
-          response.data == null) {
+      if (response.statusCode != 200 || response.data == null) {
         return [];
       }
 

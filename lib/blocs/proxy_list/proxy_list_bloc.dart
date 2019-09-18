@@ -41,7 +41,6 @@ class ProxyListBloc {
     _proxyListSink.add([..._proxyListController.value]..remove(proxy));
   }
 
-  @override
   void dispose() {
     _actualProxyController.close();
     _proxyListController.close();

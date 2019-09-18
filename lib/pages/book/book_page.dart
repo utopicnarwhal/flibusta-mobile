@@ -39,7 +39,7 @@ class BookPageState extends State<BookPage> {
     _bookBloc.getBookInfo();
   }
 
-  imageStreamListener(ImageInfo info, bool _) {
+  void imageStreamListener(ImageInfo info, bool _) {
     if (mounted) {
       setState(() {
         coverImgHeight = (info.image.height.toDouble() * (MediaQuery.of(context).size.width / info.image.width.toDouble()) - 24);
@@ -63,16 +63,19 @@ class BookPageState extends State<BookPage> {
           if (snapshot.data != null && coverImageLoading && snapshot.data.coverImgSrc != null) {
             var url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), snapshot.data.coverImgSrc);
             
-            _dio.getUri(url, options: Options(
-              connectTimeout: 15000,
-              receiveTimeout: 8000,
-              responseType: ResponseType.bytes,
-            )).then((response) {
+            _dio.getUri(
+              url, 
+              options: Options(
+                sendTimeout: 15000,
+                receiveTimeout: 8000,
+                responseType: ResponseType.bytes,
+              ),
+            ).then((response) {
               if (mounted && coverImageLoading) {
                 setState(() {
                   coverImg = Image.memory(Uint8List.fromList(response.data), fit: BoxFit.fitWidth);
                   coverImageStream = coverImg.image.resolve(new ImageConfiguration());
-                  coverImageStream.addListener(imageStreamListener);
+                  coverImageStream.addListener(ImageStreamListener(imageStreamListener));
                 });
               }
             });

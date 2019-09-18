@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 class Genre extends Equatable {
-  int id;
-  String name;
-  String code;
+  final int id;
+  final String name;
+  final String code;
 
   Genre({
     this.id,

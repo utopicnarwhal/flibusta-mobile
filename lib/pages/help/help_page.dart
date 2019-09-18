@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -42,11 +43,34 @@ class HelpState extends State<Help> {
                       ],
                     ),
                     title: Text('Разработчик'),
-                    subtitle:
-                        Text('Данилов Сергей (@utopicnarwhal)\ngigok@bk.ru'),
+                    subtitle: Text(
+                      'Данилов Сергей (@utopicnarwhal)\ngigok@bk.ru',
+                    ),
                     isThreeLine: true,
                     onTap: () async {
                       launch('mailto:gigok@bk.ru');
+                    },
+                  ),
+                  Divider(
+                    height: 1,
+                  ),
+                  ListTile(
+                    trailing: SvgPicture.asset(
+                      'assets/img/4pda_logo.svg',
+                      color: Colors.grey,
+                      height: 30,
+                      width: 30,
+                    ),
+                    title: Text('Тема на 4PDA'),
+                    subtitle: Text(
+                      'http://4pda.ru/forum/',
+                    ),
+                    onTap: () async {
+                      if (await canLaunch(
+                          'http://4pda.ru/forum/index.php?showtopic=964348')) {
+                        launch(
+                            'http://4pda.ru/forum/index.php?showtopic=964348');
+                      }
                     },
                   ),
                   Divider(

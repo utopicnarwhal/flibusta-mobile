@@ -4,7 +4,6 @@ import 'package:flibusta/services/http_client_service.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GenresListBloc {
-
   var _selectedGenresListController = BehaviorSubject<List<Genre>>.seeded([]);
   //output
   Stream<List<Genre>> get selectedGenresListStream => _selectedGenresListController.stream;
@@ -31,7 +30,6 @@ class GenresListBloc {
     _selectedGenresListSink.add(_selectedGenresListController.value..remove(genre));
   }
 
-  @override
   void dispose() {
     _selectedGenresListController.close();
     _allGenresListController.close();

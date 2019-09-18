@@ -113,7 +113,7 @@ class BookBloc {
         },
         cancelToken: cancelToken,
         options: Options(
-          connectTimeout: 10000,
+          sendTimeout: 10000,
           receiveTimeout: 60000,
           receiveDataWhenStatusError: false,
         ),
@@ -183,7 +183,6 @@ class BookBloc {
     ));
   }
 
-  @override
   void dispose() {
     _bookInfoController.close();
   }

@@ -27,10 +27,11 @@ Future<AdvancedSearchParams> showAdvancedSearchBS(
   persistentBottomSheetController = scaffoldKey.currentState
       .showBottomSheet<AdvancedSearchParams>((BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
+      onWillPop: () async {
         if (persistentBottomSheetController != null) {
           persistentBottomSheetController.close();
         }
+        return false;
       },
       child: Container(
         decoration: BoxDecoration(

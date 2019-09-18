@@ -1,13 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/components/grid_cards.dart';
 import 'package:flibusta/model/authorInfo.dart';
-import 'package:flibusta/pages/book/book_page.dart';
-import 'package:flibusta/pages/home/book_list_builder/show_download_format_mbs.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AuthorPage extends StatefulWidget {
   static const routeName = "/AuthorPage";
@@ -24,8 +20,6 @@ class _AuthorPageState extends State<AuthorPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   AuthorInfo authorInfo;
-
-  final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   void initState() {

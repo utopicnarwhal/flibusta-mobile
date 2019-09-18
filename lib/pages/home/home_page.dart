@@ -64,8 +64,9 @@ class _HomePageState extends State<HomePage>
                       homeGridState is AdvancedSearchResultsState) {
                     return WillPopScope(
                       child: Icon(Icons.arrow_back),
-                      onWillPop: () {
+                      onWillPop: () async {
                         _homeGridBloc.getLatestBooks();
+                        return false;
                       },
                     );
                   }
@@ -273,6 +274,7 @@ class BookSearch extends SearchDelegate<dynamic> {
             },
           );
         }
+        return Container();
       },
     );
   }
