@@ -19,11 +19,6 @@
 9. Ввести в коммандной строке `flutter doctor` и решить указанные проблемы, если они есть. Принять лицензии Android `flutter doctor --android-licenses`  
 10. Попробовать запустить приложение на подключенном устройстве или эмуляторе `F5`.  
 
-## Генерация моделей
-
-1. Запустите в терминале VS Сode `flutter packages pub run build_runner watch --delete-conflicting-outputs` для генерации методов, необходмых для сериализации JSON
-
-
 ### Комманды сборки APK
 
 Prod: `flutter build apk`  
@@ -37,6 +32,7 @@ Bundle: `flutter build appbundle --release`
 
 Версия приложения меняется в файле `pubspec.yaml`.  
 Версия состоит из двух частей. Пример: `0.2.4+55`, где `0.2.4` это название версии, а `55` это номер версии.  
+Также необходимо поменять номер версии в `route.dart`  
 При билде Flutter автоматически обновляет версии в файлах определённой платформы.  
 Для Android в файле `android/local.properties`.  
 Для iOS в файле `ios/Runner/Info.plist`, вроде бы.  

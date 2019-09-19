@@ -31,18 +31,24 @@ class ProxyHttpClient {
   }
 
   void setProxy(String hostPort) {
+    if (_proxyHostPort == hostPort) {
+      return;
+    }
     _proxyHostPort = hostPort;
-    _dio.clear();
+    var newDio = Dio(defaultDioOptions);
 
     if (hostPort == '') {
-      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+      (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
           (HttpClient client) {
         client.findProxy = null;
       };
+      _dio.clear();
+      _dio.close();
+      _dio = newDio;
       return;
     }
 
-    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+    (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
       client.findProxy = (url) {
         return HttpClient.findProxyFromEnvironment(url, environment: {
@@ -53,6 +59,9 @@ class ProxyHttpClient {
         });
       };
     };
+    _dio.clear();
+    _dio.close();
+    _dio = newDio;
   }
 
   String getActualProxy() {
@@ -114,6 +123,7 @@ class ProxyHttpClient {
           result = -1;
       }
       dioForConnectionCheck.clear();
+      dioForConnectionCheck.close();
     } catch (error) {
       stopWatch.stop();
       result = -1;

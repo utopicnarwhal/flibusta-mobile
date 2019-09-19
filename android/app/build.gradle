@@ -19,12 +19,12 @@ if (flutterRoot == null) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '11'
+    flutterVersionCode = '1'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '0.2.3'
+    flutterVersionName = '1.0.0'
 }
 
 apply plugin: 'com.android.application'
@@ -42,8 +42,8 @@ android {
         applicationId "ru.utopicnarwhal.flibusta"
         minSdkVersion 18
         targetSdkVersion 28
-        versionCode 11
-        versionName "0.2.3"
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

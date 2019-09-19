@@ -55,12 +55,7 @@ class HelpState extends State<Help> {
                     height: 1,
                   ),
                   ListTile(
-                    trailing: SvgPicture.asset(
-                      'assets/img/4pda_logo.svg',
-                      color: Colors.grey,
-                      height: 30,
-                      width: 30,
-                    ),
+                    trailing: _FourPDAIcon(),
                     title: Text('Тема на 4PDA'),
                     subtitle: Text(
                       'http://4pda.ru/forum/',
@@ -155,6 +150,25 @@ class HelpState extends State<Help> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _FourPDAIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final IconThemeData iconTheme = Theme.of(context).iconTheme;
+
+    final double iconOpacity = iconTheme.opacity ?? IconTheme.of(context).color.opacity;
+    Color iconColor = iconTheme.color;
+    if (iconOpacity != null && iconOpacity != 1.0)
+      iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity * 0.7);
+
+    return SvgPicture.asset(
+      'assets/img/4pda_logo.svg',
+      color: iconColor,
+      height: 30,
+      width: 30,
     );
   }
 }
