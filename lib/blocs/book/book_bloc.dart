@@ -5,11 +5,12 @@ import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
+import 'package:flibusta/utils/snack_bar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission/permission.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class BookBloc {
   BookBloc(this._bookId);
@@ -42,9 +43,21 @@ class BookBloc {
     GlobalKey<ScaffoldState> _scaffoldKey,
     void Function(double) downloadProgressCallback,
   ) async {
+    if ((await Permission.getPermissionsStatus([PermissionName.Storage])).every(
+        (permission) =>
+            permission.permissionStatus != PermissionStatus.allow)) {
+      var permissionNames =
+          await Permission.requestPermissions([PermissionName.Storage]);
 
-    if ((await PermissionHandler().checkPermissionStatus(PermissionGroup.contacts)) != PermissionStatus.granted) {
-      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+      if (permissionNames.every((permission) =>
+          permission.permissionStatus != PermissionStatus.allow)) {
+        SnackBarUtils.showSnackBar(
+          _scaffoldKey,
+          'Не удалось сохранить файл, так как доступ к памяти не предоставлен',
+          type: SnackBarType.error,
+        );
+        return;
+      }
     }
 
     Directory saveDocDir = await getExternalStorageDirectory();
@@ -79,7 +92,7 @@ class BookBloc {
     try {
       var response = await _dio.downloadUri(
         url,
-        (HttpHeaders responseHeaders) {
+        (Headers responseHeaders) {
           alertsCallback(_scaffoldKey, "", Duration(seconds: 0));
 
           var contentDisposition = responseHeaders["content-disposition"];
