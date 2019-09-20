@@ -84,6 +84,7 @@ class ProxyHttpClient {
       BaseOptions(
         connectTimeout: 10000,
         receiveTimeout: 6000,
+        responseType: ResponseType.plain,
       ),
     );
     if (hostPort != "") {
@@ -122,13 +123,13 @@ class ProxyHttpClient {
         default:
           result = -1;
       }
-      dioForConnectionCheck.clear();
-      dioForConnectionCheck.close();
     } catch (error) {
       stopWatch.stop();
       result = -1;
       print(error);
     }
+    dioForConnectionCheck.clear();
+    dioForConnectionCheck.close();
     return result;
   }
 
@@ -159,7 +160,7 @@ class ProxyHttpClient {
     } catch (error) {
       print(error);
     }
-    dioForGetProxyAPI.clear();
+    dioForGetProxyAPI.close();
     return result;
   }
 }

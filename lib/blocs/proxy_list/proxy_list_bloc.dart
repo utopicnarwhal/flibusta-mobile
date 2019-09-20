@@ -36,8 +36,11 @@ class ProxyListBloc {
     _proxyListSink.add(newProxyList);
   }
 
-  removeFromProxyList(String proxy) {
-    LocalStorage().deleteProxy(proxy);
+  removeFromProxyList(String proxy) async {
+    await LocalStorage().deleteProxy(proxy);
+    if (proxy == await LocalStorage().getActualProxy()) {
+      LocalStorage().setActualProxy('');
+    }
     _proxyListSink.add([..._proxyListController.value]..remove(proxy));
   }
 

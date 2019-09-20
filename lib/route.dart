@@ -13,7 +13,7 @@ import './pages/help/help_page.dart';
 import './intro.dart';
 
 class FlibustaApp extends StatelessWidget {
-  static const String versionName = '0.2.5';
+  static const String versionName = '0.2.6';
   static const int versionCode = 13;
 
   @override

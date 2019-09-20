@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ProxyRadioListTile extends StatelessWidget {
   final String _title;
@@ -28,39 +29,45 @@ class ProxyRadioListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioListTile(
-      title: Text(_title),
-      subtitle: FutureBuilder(
-        future: ProxyHttpClient().connectionCheck(_value, cancelToken: _cancelToken),
-        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-          var subtitleText = "";
-          var subtitleColor;
-          if (snapshot.data != null &&
-              snapshot.connectionState != ConnectionState.waiting) {
-            if (snapshot.data >= 0) {
-              subtitleText = "доступно (пинг: ${snapshot.data.toString()}мс)";
-              subtitleColor = Colors.green;
+    return GestureDetector(
+      onLongPress: () {
+        Clipboard.setData(ClipboardData(text: _title));
+      },
+      child: RadioListTile(
+        title: Text(_title),
+        subtitle: FutureBuilder(
+          future: ProxyHttpClient()
+              .connectionCheck(_value, cancelToken: _cancelToken),
+          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+            var subtitleText = "";
+            var subtitleColor;
+            if (snapshot.data != null &&
+                snapshot.connectionState != ConnectionState.waiting) {
+              if (snapshot.data >= 0) {
+                subtitleText = "доступно (пинг: ${snapshot.data.toString()}мс)";
+                subtitleColor = Colors.green;
+              } else {
+                subtitleText = "ошибка";
+                subtitleColor = Colors.red;
+              }
             } else {
-              subtitleText = "ошибка";
-              subtitleColor = Colors.red;
+              subtitleText = "проверка...";
+              subtitleColor = Colors.grey[400];
             }
-          } else {
-            subtitleText = "проверка...";
-            subtitleColor = Colors.grey[400];
-          }
-          return Text(subtitleText, style: TextStyle(color: subtitleColor));
-        },
+            return Text(subtitleText, style: TextStyle(color: subtitleColor));
+          },
+        ),
+        groupValue: _groupValue,
+        value: _value,
+        onChanged: _onChanged,
+        secondary: _onDelete != null
+            ? IconButton(
+                icon: Icon(Icons.delete),
+                tooltip: 'Удалить прокси',
+                onPressed: () => _onDelete(_value),
+              )
+            : null,
       ),
-      groupValue: _groupValue,
-      value: _value,
-      onChanged: _onChanged,
-      secondary: _onDelete != null
-          ? IconButton(
-              icon: Icon(Icons.delete),
-              tooltip: 'Удалить прокси',
-              onPressed: () => _onDelete(_value),
-            )
-          : null,
     );
   }
 }

@@ -151,19 +151,36 @@ class BookBloc {
       switch (e.type) {
         case DioErrorType.CONNECT_TIMEOUT:
           print(e.request.path);
-          alertsCallback(_scaffoldKey, "Время ожидания соединения истекло",
-              Duration(seconds: 5));
+          alertsCallback(
+            _scaffoldKey,
+            "Время ожидания соединения истекло",
+            Duration(seconds: 5),
+          );
           break;
         case DioErrorType.RECEIVE_TIMEOUT:
           print(e);
-          alertsCallback(_scaffoldKey, "Время ожидания загрузки истекло",
-              Duration(seconds: 5));
+          alertsCallback(
+            _scaffoldKey,
+            "Время ожидания загрузки истекло",
+            Duration(seconds: 5),
+          );
           break;
         default:
+          alertsCallback(
+            _scaffoldKey,
+            e.toString(),
+            Duration(seconds: 5),
+          );
           print(e);
       }
+      cancelToken.cancel("");
     } catch (e) {
       print(e);
+      alertsCallback(
+        _scaffoldKey,
+        e.toString(),
+        Duration(seconds: 5),
+      );
       cancelToken.cancel("");
     }
 

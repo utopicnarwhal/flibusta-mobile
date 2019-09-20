@@ -10,3 +10,4 @@ pubspec.lock
 build/
 
 .flutter-plugins
+android/app/flibusta.jks
