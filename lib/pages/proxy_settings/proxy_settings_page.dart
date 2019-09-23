@@ -26,6 +26,14 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text('Настройки Proxy'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(

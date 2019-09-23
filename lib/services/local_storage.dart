@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flibusta/route.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -121,11 +123,28 @@ class LocalStorage {
     return prefs.setString('FlibustaHostAddress', hostAddress);
   }
 
+  Future<Directory> getBooksDirectory() async {
+    var prefs = await _prefs;
+    try {
+      var booksDirectoryPath = prefs.getString('BooksDirectoryPath');
+      var booksDirectory = Directory(booksDirectoryPath);
+      return booksDirectory;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> setBooksDirectory(Directory booksDirectory) async {
+    var prefs = await _prefs;
+    return prefs.setString('BooksDirectoryPath', booksDirectory?.path);
+  }
+
   Future<void> checkVersion() async {
     var prefs = await _prefs;
-    if (prefs.getString('VersionCode') != FlibustaApp.versionName) {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    if (prefs.getString('VersionCode') != packageInfo.buildNumber) {
       // _clearPrefs(prefs);
-      prefs.setString('VersionCode', FlibustaApp.versionName);
+      prefs.setString('VersionCode', packageInfo.buildNumber);
     }
   }
 

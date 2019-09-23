@@ -101,10 +101,6 @@ class FlibustaDrawer extends StatelessWidget {
               // AboutListTile(icon: Icon(Icons.info_outline),)
             ],
           ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Text('Версия приложения ${FlibustaApp.versionName}'),
-          ),
         ],
       ),
     );

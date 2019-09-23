@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flibusta/utils/snack_bar_utils.dart';
@@ -60,7 +61,7 @@ class BookBloc {
       }
     }
 
-    Directory saveDocDir = await getExternalStorageDirectory();
+    Directory saveDocDir = await LocalStorage().getBooksDirectory();
     saveDocDir = Directory(saveDocDir.path + "/Flibusta");
     if (!saveDocDir.existsSync()) {
       saveDocDir.createSync(recursive: true);

@@ -3,7 +3,7 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
-import 'package:flibusta/pages/home/book_list_builder/show_download_format_mbs.dart';
+import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
 import 'package:flibusta/pages/home/components/no_results.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flibusta/utils/text_to_icons.dart';
