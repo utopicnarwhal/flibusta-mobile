@@ -88,7 +88,7 @@ class BookPageState extends State<BookPage> {
           return CustomScrollView(
             slivers: <Widget>[
               SliverAppBar(
-                backgroundColor: coverImageLoading ? Theme.of(context).primaryColorDark : null,
+                backgroundColor: coverImageLoading ? Theme.of(context).disabledColor : null,
                 pinned: true,
                 snap: false,
                 floating: false,
@@ -190,8 +190,7 @@ class BookPageState extends State<BookPage> {
                                 ),
                               ),
                               RaisedButton(
-                                color: Colors.blue,
-                                child: Text("Скачать" , style: TextStyle(color: Colors.white),),
+                                child: Text('Скачать'),
                                 onPressed: formatForDownload != null && snapshot.data.downloadProgress == null ? () {
                                   _bookBloc.downloadBook(formatForDownload,
                                     _scaffoldKey,

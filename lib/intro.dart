@@ -6,7 +6,7 @@ import 'package:intro_views_flutter/Models/page_view_model.dart';
 import 'package:intro_views_flutter/intro_views_flutter.dart';
 
 class IntroPage extends StatefulWidget {
-  static const routeName = "/Intro";
+  static const routeName = '/Intro';
   @override
   createState() => IntroPageState();
 }
@@ -134,7 +134,7 @@ class IntroPageState extends State<IntroPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: Text(
                   """
-Если Ваш интернет-провайдер заблокировал интернет-ресурс 'flibusta.is', то Вы можете воспользоваться сервисом PubProxy API на странице 'Настройки прокси' c ограничением 50 запросов в день. Добавляйте прокси-сервера, пока не найдёте оптимальный для Вас вариант. Чем меньше пинг - тем лучше!
+Если Ваш интернет-провайдер заблокировал интернет-ресурс 'flibusta.is', то Вы можете воспользоваться моим прокси-сервером, созданным специально для этого приложения, а также сервисом PubProxy API c ограничением 50 запросов в день, но найти там хороший прокси бывает проблематично.
                   """,
                   style: TextStyle(color: Colors.white, fontSize: 16.0),
                   textAlign: TextAlign.justify,
@@ -233,7 +233,7 @@ class IntroPageState extends State<IntroPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: Text(
                   """
-Данное приложение было, есть и будет бесплатным и в нём никогда не появится реклама. Если Вам вдруг захотелось поддержать разработчика отзывом, помощью в разработке или деньгами, то все ссылки находятся во вкладке 'О приложении'.
+Данное приложение было, есть и будет бесплатным, и в нём никогда не появится реклама. Если Вам вдруг захотелось поддержать разработчика отзывом, помощью в разработке или деньгами, то все ссылки находятся во вкладке 'О приложении'.
 
 Приятного пользования тестовой версией!
                       """,

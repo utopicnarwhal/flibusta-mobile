@@ -1,6 +1,5 @@
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
-import 'package:flibusta/pages/proxy_settings/proxy_settings_page.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
@@ -20,8 +19,6 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => Login());
     case IntroPage.routeName:
       return MaterialPageRoute(builder: (context) => IntroPage());
-    case ProxySettingsPage.routeName:
-      return MaterialPageRoute(builder: (context) => ProxySettingsPage());
     case Help.routeName:
       return MaterialPageRoute(builder: (context) => Help());
     case BookPage.routeName:

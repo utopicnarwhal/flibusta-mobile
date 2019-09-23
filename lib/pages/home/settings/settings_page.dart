@@ -66,21 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                       onTap: hasData
-                          ? () async {
-                              var externalDirectory =
-                                  await getExternalStorageDirectory();
-                              Directory newDirectory =
-                                  await DirectoryPicker.pick(
-                                context: context,
-                                rootDirectory: externalDirectory,
-                              );
-
-                              if (newDirectory != null) {
-                                await LocalStorage()
-                                    .setBooksDirectory(newDirectory);
-                                setState(() {});
-                              }
-                            }
+                          ? () => _openSaveBooksDirectoryPicker(context)
                           : null,
                     );
                   },
@@ -118,12 +104,49 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
-        index: 1,
+        index: 2,
         onTap: (index) {
           widget.selectedNavItemController.add(index);
         },
       ),
     );
+  }
+
+  void _openSaveBooksDirectoryPicker(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text('Учтите'),
+          contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 16),
+          children: <Widget>[
+            Text(
+              'Внутри выбранной Вами папки будет создана подпапка с названием "Flibusta", в которую будут скачиваться книги. \nЕсли у Вас Android 4.4 или ниже, то не стоит менять этот параметр.',
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: FlatButton(
+                child: Text('Понятно'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    var currentSaveBooksDir = await LocalStorage().getBooksDirectory();
+    Directory newDirectory = await DirectoryPicker.pick(
+      context: context,
+      rootDirectory: currentSaveBooksDir,
+    );
+
+    if (newDirectory != null) {
+      await LocalStorage().setBooksDirectory(newDirectory);
+      setState(() {});
+    }
   }
 }
 

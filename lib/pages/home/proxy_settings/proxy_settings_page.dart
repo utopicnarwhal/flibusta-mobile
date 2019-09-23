@@ -1,10 +1,21 @@
+import 'dart:async';
+
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
-import 'package:flibusta/pages/proxy_settings/components/get_new_proxy_tile.dart';
-import 'package:flibusta/pages/proxy_settings/components/proxy_radio_list_tile.dart';
+import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
+import 'package:flibusta/pages/home/proxy_settings/components/get_new_proxy_tile.dart';
+import 'package:flibusta/pages/home/proxy_settings/components/proxy_radio_list_tile.dart';
 import 'package:flutter/material.dart';
 
 class ProxySettingsPage extends StatefulWidget {
   static const routeName = '/ProxySettings';
+
+  final StreamController<int> selectedNavItemController;
+
+  const ProxySettingsPage({
+    Key key,
+    @required this.selectedNavItemController,
+  }) : super(key: key);
+
   @override
   createState() => _ProxySettingsPageState();
 }
@@ -29,6 +40,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.refresh),
+            tooltip: 'Проверить прокси повторно',
             onPressed: () {
               setState(() {});
             },
@@ -79,6 +91,16 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                       ProxyRadioListTile(
                         title: 'Без прокси',
                         value: '',
+                        groupValue: actualProxySnapshot.data,
+                        onChanged: _proxyListBloc.setActualProxy,
+                        cancelToken: _proxyListBloc.cancelToken,
+                      ),
+                      Divider(
+                        height: 1,
+                      ),
+                      ProxyRadioListTile(
+                        title: 'Прокси создателя приложения',
+                        value: 'flibustauser:ilovebooks@35.228.73.110:3128',
                         groupValue: actualProxySnapshot.data,
                         onChanged: _proxyListBloc.setActualProxy,
                         cancelToken: _proxyListBloc.cancelToken,
@@ -167,6 +189,13 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
             SizedBox(height: 14.0),
           ],
         ),
+      ),
+      bottomNavigationBar: HomeBottomNavBar(
+        key: Key('HomeBottomNavBar'),
+        index: 1,
+        onTap: (index) {
+          widget.selectedNavItemController.add(index);
+        },
       ),
     );
   }

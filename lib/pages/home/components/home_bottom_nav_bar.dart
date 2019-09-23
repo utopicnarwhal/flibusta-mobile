@@ -1,6 +1,5 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeBottomNavBar extends StatelessWidget {
   final void Function(int) onTap;
@@ -21,6 +20,16 @@ class HomeBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.view_list),
           title: Text('Последние книги'),
+        ),
+        BottomNavigationBarItem(
+          icon: Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: Icon(
+              FontAwesomeIcons.projectDiagram,
+              size: 18,
+            ),
+          ),
+          title: Text('Прокси'),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),

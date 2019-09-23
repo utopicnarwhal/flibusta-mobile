@@ -60,7 +60,6 @@ final ThemeData kFlibustaDarkTheme = ThemeData(
   brightness: Brightness.dark,
   primarySwatch: kFlibustaLightBlueColor,
   primaryColorDark: kFlibustaLightBlueColor,
-  iconTheme: IconThemeData(color: Color(0xFFDDDDDD)),
   accentColor: kFlibustaLightBlueColor,
   toggleableActiveColor: kFlibustaLightBlueColor,
   inputDecorationTheme: InputDecorationTheme(

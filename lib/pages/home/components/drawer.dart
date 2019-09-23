@@ -1,7 +1,5 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flibusta/pages/help/help_page.dart';
-import 'package:flibusta/pages/proxy_settings/proxy_settings_page.dart';
-import 'package:flibusta/route.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -61,19 +59,19 @@ class FlibustaDrawer extends StatelessWidget {
               //     Navigator.of(context).pushNamed("/Profile");
               //   },
               // ),
-              ListTile(
-                leading: Icon(
-                  FontAwesomeIcons.projectDiagram,
-                  size: 22.0,
-                ),
-                title: Text(
-                  'Настройки Proxy',
-                  style: _biggerFont,
-                ),
-                onTap: () {
-                  Navigator.of(context).popAndPushNamed(ProxySettingsPage.routeName);
-                },
-              ),
+              // ListTile(
+              //   leading: Icon(
+              //     FontAwesomeIcons.projectDiagram,
+              //     size: 22.0,
+              //   ),
+              //   title: Text(
+              //     'Настройки Proxy',
+              //     style: _biggerFont,
+              //   ),
+              //   onTap: () {
+              //     Navigator.of(context).popAndPushNamed(ProxySettingsPage.routeName);
+              //   },
+              // ),
               // ListTile(
               //   leading: Icon(FontAwesomeIcons.cog),
               //   title: Text('Настройки', style: _biggerFont,),

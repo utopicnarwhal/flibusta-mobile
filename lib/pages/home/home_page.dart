@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flibusta/blocs/home_grid/bloc.dart';
 import 'package:flibusta/intro.dart';
 import 'package:flibusta/pages/home/books.dart';
-import 'package:flibusta/pages/settings/settings_page.dart';
+import 'package:flibusta/pages/home/proxy_settings/proxy_settings_page.dart';
+import 'package:flibusta/pages/home/settings/settings_page.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,6 +51,10 @@ class _HomePageState extends State<HomePage> {
                 selectedNavItemController: _selectedNavItemController,
               );
             case 1:
+              return ProxySettingsPage(
+                selectedNavItemController: _selectedNavItemController,
+              );
+            case 2:
               return SettingsPage(
                 selectedNavItemController: _selectedNavItemController,
               );
