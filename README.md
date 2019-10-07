@@ -1,6 +1,6 @@
-# FlibustaApp
+# Мобильное приложение Флибуста (Android)
 
-<a href='https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibusta&hl=ru&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Доступно в Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png'/></a>
+<a href='https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibusta&hl=ru&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Доступно в Google Play'  width="30%" src='https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png'/></a>
 
 Данное приложение позволит вам находить по названию и скачивать книги с сайта "flibusta.is".  
 Если данный сайт заблокирован в вашей стране, приложение может найти бесплатный прокси сервер, через который вы сможете получить доступ к сайту. Также есть прокси-сервер разработчика приложения.
