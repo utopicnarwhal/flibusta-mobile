@@ -1,23 +1,24 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:directory_picker/directory_picker.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:flibusta/components/directory_picker/directory_picker.dart';
 import 'package:flibusta/pages/help/help_page.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   static const routeName = "/Settings";
 
   final StreamController<int> selectedNavItemController;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   const SettingsPage({
     Key key,
+    @required this.scaffoldKey,
     @required this.selectedNavItemController,
   }) : super(key: key);
 
@@ -26,12 +27,11 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: widget.scaffoldKey,
       appBar: AppBar(
         centerTitle: false,
         title: Text("Настройки"),
@@ -57,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       title: Text('Папка для загрузки книг'),
                       isThreeLine: true,
                       subtitle: Text(
-                        hasData ? (saveBooksDir.data.path + '/Flibusta') : '',
+                        hasData ? (saveBooksDir.data.path) : '',
                       ),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -104,7 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
-        index: 2,
+        index: 4,
         onTap: (index) {
           widget.selectedNavItemController.add(index);
         },
@@ -113,6 +113,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _openSaveBooksDirectoryPicker(BuildContext context) async {
+    var currentSaveBooksDir = await LocalStorage().getBooksDirectory();
+
     await showDialog(
       context: context,
       builder: (context) {
@@ -121,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
           contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 16),
           children: <Widget>[
             Text(
-              'Внутри выбранной Вами папки будет создана подпапка с названием "Flibusta", в которую будут скачиваться книги. \nЕсли у Вас Android 4.4 или ниже, то не стоит менять этот параметр.',
+              'В следующем окне с выбором папки будут отображаться ТОЛЬКО папки (без каких-либо файлов). \nА также, если у Вас Android 4.4 или ниже, то не стоит менять этот параметр.',
             ),
             Padding(
               padding: const EdgeInsets.only(top: 12.0),
@@ -137,8 +139,8 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
 
-    var currentSaveBooksDir = await LocalStorage().getBooksDirectory();
     Directory newDirectory = await DirectoryPicker.pick(
+      allowFolderCreation: true,
       context: context,
       rootDirectory: currentSaveBooksDir,
     );

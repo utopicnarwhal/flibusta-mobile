@@ -11,9 +11,11 @@ class BooksPage extends StatefulWidget {
   static const routeName = "/Books";
 
   final StreamController<int> selectedNavItemController;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   const BooksPage({
     Key key,
+    @required this.scaffoldKey,
     @required this.selectedNavItemController,
   }) : super(key: key);
 
@@ -23,7 +25,6 @@ class BooksPage extends StatefulWidget {
 
 class _BooksPageState extends State<BooksPage>
     with SingleTickerProviderStateMixin {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TabController _tabController;
 
   @override
@@ -41,7 +42,7 @@ class _BooksPageState extends State<BooksPage>
             homeGridState is AdvancedSearchResultsState;
             
         return Scaffold(
-          key: _scaffoldKey,
+          key: widget.scaffoldKey,
           appBar: AppBar(
             centerTitle: false,
             leading: showBackButton
@@ -109,7 +110,7 @@ class _BooksPageState extends State<BooksPage>
                 : null,
           ),
           body: HomeGridScreen(
-            scaffoldKey: _scaffoldKey,
+            scaffoldKey: widget.scaffoldKey,
             homeGridBloc: BlocProvider.of<HomeGridBloc>(context),
             tabController: _tabController,
           ),

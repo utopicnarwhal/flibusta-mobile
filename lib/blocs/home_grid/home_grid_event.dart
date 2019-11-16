@@ -9,7 +9,10 @@ import 'package:meta/meta.dart';
 
 @immutable
 abstract class HomeGridEvent extends Equatable {
-  HomeGridEvent([List props = const []]) : super(props);
+  HomeGridEvent([List props = const []]);
+
+  @override
+  List<Object> get props => props;
 
   Future<HomeGridState> applyAsync(
       {HomeGridState currentState, HomeGridBloc bloc});

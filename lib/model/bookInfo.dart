@@ -1,34 +1,35 @@
 import 'package:flibusta/model/bookCard.dart';
 
-class BookInfo {
-  int id;
-  String title;
+class BookInfo extends BookCard {
   String coverImgSrc;
   String addedToLibraryDate;
   String lemma;
   String publishYear;
-  Genres genres;
-  int sequenceId;
-  String sequenceTitle;
-  String size;
-  DownloadFormats downloadFormats;
-  Authors authors;
-  Translators translators;
-  double downloadProgress;
 
   BookInfo({
-    this.id,
-    this.title,
+    id,
+    title,
     this.coverImgSrc,
     this.addedToLibraryDate,
     this.lemma,
     this.publishYear,
-    this.genres,
-    this.sequenceId,
-    this.sequenceTitle,
-    this.size,
-    this.downloadFormats,
-    this.authors,
-    this.translators,
-  }): assert(id != null);
+    genres,
+    sequenceId,
+    sequenceTitle,
+    size,
+    downloadFormats,
+    authors,
+    translators,
+  })  : assert(id != null),
+        super(
+          id: id,
+          title: title,
+          genres: genres,
+          sequenceId: sequenceId,
+          sequenceTitle: sequenceTitle,
+          size: size,
+          downloadFormats: downloadFormats,
+          authors: authors,
+          translators: translators,
+        );
 }

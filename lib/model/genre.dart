@@ -9,5 +9,8 @@ class Genre extends Equatable {
     this.id,
     this.name,
     this.code,
-  }) : assert(id != null), super([id]);
+  }) : assert(id != null);
+
+  @override
+  List<Object> get props => [id];
 }

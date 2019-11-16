@@ -2,17 +2,19 @@ import 'dart:async';
 
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
-import 'package:flibusta/pages/home/proxy_settings/components/get_new_proxy_tile.dart';
-import 'package:flibusta/pages/home/proxy_settings/components/proxy_radio_list_tile.dart';
+import 'package:flibusta/pages/home/views/proxy_settings/components/get_new_proxy_tile.dart';
+import 'package:flibusta/pages/home/views/proxy_settings/components/proxy_radio_list_tile.dart';
 import 'package:flutter/material.dart';
 
 class ProxySettingsPage extends StatefulWidget {
   static const routeName = '/ProxySettings';
 
   final StreamController<int> selectedNavItemController;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   const ProxySettingsPage({
     Key key,
+    @required this.scaffoldKey,
     @required this.selectedNavItemController,
   }) : super(key: key);
 
@@ -21,7 +23,6 @@ class ProxySettingsPage extends StatefulWidget {
 }
 
 class _ProxySettingsPageState extends State<ProxySettingsPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   ProxyListBloc _proxyListBloc;
 
   @override
@@ -33,7 +34,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: widget.scaffoldKey,
       appBar: AppBar(
         centerTitle: false,
         title: Text('Настройки Proxy'),
@@ -95,9 +96,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                         onChanged: _proxyListBloc.setActualProxy,
                         cancelToken: _proxyListBloc.cancelToken,
                       ),
-                      Divider(
-                        height: 1,
-                      ),
+                      Divider(),
                       ProxyRadioListTile(
                         title: 'Прокси создателя приложения',
                         value: 'flibustauser:ilovebooks@35.228.73.110:3128',
@@ -105,9 +104,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                         onChanged: _proxyListBloc.setActualProxy,
                         cancelToken: _proxyListBloc.cancelToken,
                       ),
-                      Divider(
-                        height: 1,
-                      ),
+                      Divider(),
                       StreamBuilder(
                         stream: _proxyListBloc.proxyListStream,
                         builder:
@@ -132,16 +129,14 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                   ),
                               ],
                             ).toList()
-                              ..add(Divider(height: 1)),
+                              ..add(Divider()),
                           );
                         },
                       ),
                       GetNewProxyTile(
                         callback: _proxyListBloc.addToProxyList,
                       ),
-                      Divider(
-                        height: 1,
-                      ),
+                      Divider(),
                       ListTile(
                         enabled: true,
                         leading: Padding(
@@ -192,7 +187,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
       ),
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
-        index: 1,
+        index: 3,
         onTap: (index) {
           widget.selectedNavItemController.add(index);
         },

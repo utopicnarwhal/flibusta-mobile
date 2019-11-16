@@ -8,8 +8,6 @@ import 'package:flibusta/utils/html_parsers.dart';
 import 'dart:async';
 
 class HomeGridRepository {
-  Dio _dio = ProxyHttpClient().getDio();
-
   Future<SearchResults> bookSearch(String searchQuery) async {
     Map<String, String> queryParams = {
       "page": "0",
@@ -21,7 +19,7 @@ class HomeGridRepository {
     Uri url = Uri.https(
         ProxyHttpClient().getFlibustaHostAddress(), "/booksearch", queryParams);
     try {
-      var response = await _dio.getUri(url);
+      var response = await ProxyHttpClient().getDio().getUri(url);
       var result = parseHtmlFromBookSearch(response.data);
       return result;
     } on TimeoutException catch (timeoutError) {
@@ -56,7 +54,7 @@ class HomeGridRepository {
     Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(), "/makebooklist", queryParams);
 
     try {
-      var response = await _dio.getUri(url);
+      var response = await ProxyHttpClient().getDio().getUri(url);
       var result = parseHtmlFromMakeBookList(response.data);
       return result;
     } on TimeoutException catch(timeoutError) {

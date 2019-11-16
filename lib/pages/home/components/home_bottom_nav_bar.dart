@@ -15,11 +15,22 @@ class HomeBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       key: Key('HomeBottomNavBar'),
+      type: BottomNavigationBarType.fixed,
+      showUnselectedLabels: false,
+      showSelectedLabels: false,
       currentIndex: index,
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.view_list),
           title: Text('Последние книги'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.americanSignLanguageInterpreting),
+          title: Text('Жанры'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.fileDownload),
+          title: Text('Скачанные'),
         ),
         BottomNavigationBarItem(
           icon: Padding(

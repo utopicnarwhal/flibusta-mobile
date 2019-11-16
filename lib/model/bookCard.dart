@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'bookCard.g.dart';
+
+@JsonSerializable()
 class BookCard {
   int id;
   Genres genres;
@@ -12,6 +16,7 @@ class BookCard {
   Authors authors;
   Translators translators;
   double downloadProgress;
+  String localPath;
 
   BookCard({
     this.id,
@@ -23,9 +28,15 @@ class BookCard {
     this.downloadFormats,
     this.authors,
     this.translators,
-  }): assert(id != null);
+    this.localPath,
+  }) : assert(id != null);
+
+  factory BookCard.fromJson(Map<String, dynamic> json) =>
+      _$BookCardFromJson(json);
+  Map<String, dynamic> toJson() => _$BookCardToJson(this);
 }
 
+@JsonSerializable()
 class DownloadFormats {
   DownloadFormats(this.list);
 
@@ -70,13 +81,18 @@ class DownloadFormats {
         return FontAwesomeIcons.book;
     }
   }
+
+  factory DownloadFormats.fromJson(Map<String, dynamic> json) =>
+      _$DownloadFormatsFromJson(json);
+  Map<String, dynamic> toJson() => _$DownloadFormatsToJson(this);
 }
 
+@JsonSerializable()
 class Authors {
   Authors(this.list);
-  
+
   List<Map<int, String>> list;
-  
+
   bool get isNotEmpty {
     return list != null ? list.isNotEmpty : false;
   }
@@ -99,13 +115,18 @@ class Authors {
     });
     return result;
   }
+
+  factory Authors.fromJson(Map<String, dynamic> json) =>
+      _$AuthorsFromJson(json);
+  Map<String, dynamic> toJson() => _$AuthorsToJson(this);
 }
 
+@JsonSerializable()
 class Translators {
   Translators(this.list);
-  
+
   List<Map<int, String>> list;
-  
+
   bool get isNotEmpty {
     return list != null ? list.isNotEmpty : false;
   }
@@ -128,13 +149,18 @@ class Translators {
     });
     return result;
   }
+  
+  factory Translators.fromJson(Map<String, dynamic> json) =>
+      _$TranslatorsFromJson(json);
+  Map<String, dynamic> toJson() => _$TranslatorsToJson(this);
 }
 
+@JsonSerializable()
 class Genres {
   Genres(this.list);
-  
+
   List<Map<int, String>> list;
-  
+
   bool get isNotEmpty {
     return list != null ? list.isNotEmpty : false;
   }
@@ -157,4 +183,8 @@ class Genres {
     });
     return result.replaceAll(RegExp(r'(\[|\])'), "");
   }
+  
+  factory Genres.fromJson(Map<String, dynamic> json) =>
+      _$GenresFromJson(json);
+  Map<String, dynamic> toJson() => _$GenresToJson(this);
 }

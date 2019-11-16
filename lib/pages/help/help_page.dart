@@ -51,9 +51,7 @@ class HelpState extends State<Help> {
                       launch('mailto:gigok@bk.ru');
                     },
                   ),
-                  Divider(
-                    height: 1,
-                  ),
+                  Divider(),
                   ListTile(
                     trailing: _FourPDAIcon(),
                     title: Text('Тема на 4PDA'),
@@ -68,9 +66,7 @@ class HelpState extends State<Help> {
                       }
                     },
                   ),
-                  Divider(
-                    height: 1,
-                  ),
+                  Divider(),
                   ListTile(
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -125,9 +121,7 @@ class HelpState extends State<Help> {
                       size: 30.0,
                     ),
                   ),
-                  Divider(
-                    height: 1,
-                  ),
+                  Divider(),
                   ListTile(
                     title: Text('Рокетбанк'),
                     subtitle: Text('5321 3045 5409 9306'),

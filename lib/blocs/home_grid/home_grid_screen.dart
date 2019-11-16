@@ -1,9 +1,10 @@
 import 'package:flibusta/blocs/home_grid/bloc.dart';
-import 'package:flibusta/components/grid_cards.dart';
+import 'package:flibusta/blocs/home_grid/components/grid_cards.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeGridScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey;
@@ -23,10 +24,10 @@ class HomeGridScreen extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () {
         return Future.microtask(() {
-          if (_homeGridBloc.currentState is LatestBooksState) {
+          if (_homeGridBloc.state is LatestBooksState) {
             _homeGridBloc.getLatestBooks();
           }
-          if (_homeGridBloc.currentState is GlobalSearchResultsState) {
+          if (_homeGridBloc.state is GlobalSearchResultsState) {
             _homeGridBloc.globalSearch();
           }
         });
@@ -55,6 +56,12 @@ class HomeGridScreen extends StatelessWidget {
                         _homeGridBloc.globalSearch();
                       if (_homeGridState is AdvancedSearchErrorHomeGridState)
                         _homeGridBloc.advancedSearch();
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Перейти на сайт'),
+                    onPressed: () async {
+                      await launch('https://flibusta.appspot.com');
                     },
                   ),
                 ],
@@ -104,7 +111,33 @@ class HomeGridScreen extends StatelessWidget {
           }
 
           return Center(
-            child: Text('Ошибка в ${_homeGridState.toString()}'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Ошибка ${_homeGridState.toString()}',
+                  textAlign: TextAlign.center,
+                ),
+                RaisedButton(
+                  child: Text('Попробовать ещё раз'),
+                  onPressed: () {
+                    if (_homeGridState is LatestBooksErrorHomeGridState)
+                      _homeGridBloc.getLatestBooks();
+                    if (_homeGridState is GlobalSearchErrorHomeGridState)
+                      _homeGridBloc.globalSearch();
+                    if (_homeGridState is AdvancedSearchErrorHomeGridState)
+                      _homeGridBloc.advancedSearch();
+                  },
+                ),
+                RaisedButton(
+                  child: Text('Перейти на сайт'),
+                  onPressed: () async {
+                    await launch('https://flibusta.appspot.com');
+                  },
+                ),
+              ],
+            ),
           );
         },
       ),

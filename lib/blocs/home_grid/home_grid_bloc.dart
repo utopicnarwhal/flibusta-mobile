@@ -9,15 +9,15 @@ class HomeGridBloc extends Bloc<HomeGridEvent, HomeGridState> {
 
   /// If searchQuery == null then repeat revious query
   void globalSearch({String searchQuery}) {
-    this.dispatch(GlobalSearchEvent(searchQuery));
+    this.add(GlobalSearchEvent(searchQuery));
   }
 
   void getLatestBooks() {
-    this.dispatch(GetLatestBooksEvent());
+    this.add(GetLatestBooksEvent());
   }
 
   void advancedSearch({AdvancedSearchParams advancedSearchParams}) {
-    this.dispatch(AdvancedSearchEvent(advancedSearchParams: advancedSearchParams));
+    this.add(AdvancedSearchEvent(advancedSearchParams: advancedSearchParams));
   }
 
   @override
@@ -25,10 +25,10 @@ class HomeGridBloc extends Bloc<HomeGridEvent, HomeGridState> {
     HomeGridEvent event,
   ) async* {
     yield LoadingHomeGridState(
-      latestBooks: currentState.latestBooks,
-      searchResults: currentState.searchResults,
-      searchQuery: currentState.searchQuery,
+      latestBooks: state.latestBooks,
+      searchResults: state.searchResults,
+      searchQuery: state.searchQuery,
     );
-    yield await event.applyAsync(currentState: currentState, bloc: this);
+    yield await event.applyAsync(currentState: state, bloc: this);
   }
 }

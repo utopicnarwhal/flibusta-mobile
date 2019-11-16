@@ -21,6 +21,11 @@
 9. Ввести в коммандной строке `flutter doctor` и решить указанные проблемы, если они есть. Принять лицензии Android `flutter doctor --android-licenses`  
 10. Попробовать запустить приложение на подключенном устройстве или эмуляторе `F5`.  
 
+## Генерация сериализации моделей
+
+1. Запустите в терминале VS Сode `flutter packages pub run build_runner watch --delete-conflicting-outputs`
+
+## Сборка
 ### Комманды сборки APK
 
 Prod: `flutter build apk`  

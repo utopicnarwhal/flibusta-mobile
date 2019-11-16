@@ -16,8 +16,8 @@ class BookSearch extends StatelessWidget {
       onPressed: () async {
         var previousBookSearches =
             await LocalStorage().getPreviousBookSearches();
-        var homeGridBloc = BlocProvider.of<HomeGridBloc>(context);
-        var currentSearchString = homeGridBloc.currentState.searchQuery ?? '';
+        var currentSearchString =
+            BlocProvider.of<HomeGridBloc>(context).state.searchQuery ?? '';
 
         var searchQuery = await showSearch(
           context: context,
@@ -41,8 +41,8 @@ class BookSearch extends StatelessWidget {
           if (advancedSearchParams == null) {
             return;
           }
-          homeGridBloc.advancedSearch(
-              advancedSearchParams: advancedSearchParams);
+          BlocProvider.of<HomeGridBloc>(context)
+              .advancedSearch(advancedSearchParams: advancedSearchParams);
           return;
         }
         if (searchQuery is String && searchQuery.trim() != '') {
@@ -51,7 +51,8 @@ class BookSearch extends StatelessWidget {
             previousBookSearches.add(searchQuery);
             LocalStorage().setPreviousBookSearches(previousBookSearches);
           }
-          homeGridBloc.globalSearch(searchQuery: searchQuery);
+          BlocProvider.of<HomeGridBloc>(context)
+              .globalSearch(searchQuery: searchQuery);
         }
       },
     );
@@ -65,14 +66,14 @@ class _BookSearchDelegate extends SearchDelegate<dynamic> {
 
   @override
   List<Widget> buildActions(BuildContext context) {
-    return [
+    return query.isNotEmpty == true ? [
       IconButton(
         icon: Icon(Icons.clear),
         onPressed: () {
           query = '';
         },
-      )
-    ];
+      ),
+    ] : null;
   }
 
   @override
@@ -150,57 +151,59 @@ class _SearchSuggestionBuilderState extends State<_SearchSuggestionBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<String>>(
-      stream: _previousGridSearchesController.stream,
-      builder: (context, previousSearchesSnapshot) {
-        var filteredSuggestions = widget.previousGridSearches
-            ?.where((suggestion) =>
-                suggestion.startsWith(widget.query.trim().toLowerCase()))
-            ?.toList();
+    return Column(
+      children: <Widget>[
+        Material(
+          elevation: 4.0,
+          color: Theme.of(context).backgroundColor,
+          child: ListTile(
+            dense: true,
+            title: Center(
+              child: Text(
+                'Расширенный поиск',
+                style: Theme.of(context).textTheme.button,
+              ),
+            ),
+            onTap: () {
+              widget.close(context, AdvancedSearchParams());
+            },
+          ),
+        ),
+        StreamBuilder<List<String>>(
+          stream: _previousGridSearchesController.stream,
+          builder: (context, previousSearchesSnapshot) {
+            var filteredSuggestions = widget.previousGridSearches
+                ?.where((suggestion) =>
+                    suggestion.startsWith(widget.query.trim().toLowerCase()))
+                ?.toList();
 
-        return ListView.builder(
-          itemCount: (filteredSuggestions?.length ?? 0) + 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return Material(
-                elevation: 4.0,
-                color: Theme.of(context).backgroundColor,
-                child: ListTile(
-                  dense: true,
-                  title: Center(
-                    child: Text(
-                      'Расширенный поиск',
-                      style: Theme.of(context).textTheme.button,
-                    ),
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: filteredSuggestions?.length ?? 0,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  leading: Icon(Icons.history),
+                  title: Text(filteredSuggestions.elementAt(index)),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      previousSearchesSnapshot.data
+                          .remove(filteredSuggestions.elementAt(index));
+                      LocalStorage().setPreviousBookSearches(
+                          previousSearchesSnapshot.data);
+                      _previousGridSearchesController
+                          .add(previousSearchesSnapshot.data);
+                    },
                   ),
                   onTap: () {
-                    widget.close(context, AdvancedSearchParams());
+                    widget.close(context, filteredSuggestions.elementAt(index));
                   },
-                ),
-              );
-            }
-            return ListTile(
-              leading: Icon(Icons.history),
-              title: Text(previousSearchesSnapshot.data.elementAt(index)),
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  previousSearchesSnapshot.data
-                      .remove(previousSearchesSnapshot.data.elementAt(index));
-                  LocalStorage()
-                      .setPreviousBookSearches(previousSearchesSnapshot.data);
-                  _previousGridSearchesController
-                      .add(previousSearchesSnapshot.data);
-                },
-              ),
-              onTap: () {
-                widget.close(
-                    context, previousSearchesSnapshot.data.elementAt(index));
+                );
               },
             );
           },
-        );
-      },
+        ),
+      ],
     );
   }
 

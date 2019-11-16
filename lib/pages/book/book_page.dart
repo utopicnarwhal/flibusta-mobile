@@ -6,6 +6,7 @@ import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/components/loading_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BookPage extends StatefulWidget {
   static const routeName = "/BookPage";
@@ -94,6 +95,14 @@ class BookPageState extends State<BookPage> {
                 floating: false,
                 expandedHeight: coverImageLoading ? MediaQuery.of(context).size.width - 100 : coverImgHeight,
                 title: !coverImageLoading && coverImg == null ? Text("Нет обложки") : Container(),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.open_in_browser),
+                    onPressed: () async {
+                      await launch('https://flibusta.appspot.com/b/' + widget.bookId.toString());
+                    },
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: coverImageLoading ? LoadingIndicator() : coverImg,
                 ),
@@ -192,13 +201,15 @@ class BookPageState extends State<BookPage> {
                               RaisedButton(
                                 child: Text('Скачать'),
                                 onPressed: formatForDownload != null && snapshot.data.downloadProgress == null ? () {
-                                  _bookBloc.downloadBook(formatForDownload,
+                                  _bookBloc.downloadBook(
+                                    snapshot.data,
+                                    formatForDownload,
                                     _scaffoldKey,
                                     (downloadProgress) {
                                       setState(() {
                                         snapshot.data.downloadProgress = downloadProgress;
                                       });
-                                    }
+                                    },
                                   );
                                 } : null,
                               )

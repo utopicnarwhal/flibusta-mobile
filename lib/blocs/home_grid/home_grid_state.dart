@@ -18,7 +18,10 @@ abstract class HomeGridState extends Equatable {
     this.searchResults,
     this.searchQuery,
     this.advancedSearchParams,
-  }) : super([searchResults]);
+  });
+
+  @override
+  List<Object> get props => [searchResults];
 }
 
 class LatestBooksState extends HomeGridState {

@@ -1,16 +1,15 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
-import 'package:flibusta/utils/snack_bar_utils.dart';
+import 'package:flibusta/utils/permissions.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission/permission.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BookBloc {
@@ -22,14 +21,12 @@ class BookBloc {
   Stream<BookInfo> get outBookInfo => _bookInfoController.stream;
   Sink<BookInfo> get _inBookInfo => _bookInfoController.sink;
 
-  Dio _dio = ProxyHttpClient().getDio();
-
   Future<Null> getBookInfo() async {
     var bookInfo = BookInfo(id: _bookId);
     try {
       Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
           "/b/" + _bookId.toString());
-      var response = await _dio.getUri(url);
+      var response = await ProxyHttpClient().getDio().getUri(url);
 
       bookInfo = parseHtmlFromBookInfo(response.data, _bookId);
     } catch (e) {
@@ -40,32 +37,21 @@ class BookBloc {
   }
 
   Future<Null> downloadBook(
+    BookCard bookCard,
     Map<String, String> downloadFormat,
-    GlobalKey<ScaffoldState> _scaffoldKey,
+    GlobalKey<ScaffoldState> scaffoldKey,
     void Function(double) downloadProgressCallback,
   ) async {
-    if ((await Permission.getPermissionsStatus([PermissionName.Storage])).every(
-        (permission) =>
-            permission.permissionStatus != PermissionStatus.allow)) {
-      var permissionNames =
-          await Permission.requestPermissions([PermissionName.Storage]);
-
-      if (permissionNames.every((permission) =>
-          permission.permissionStatus != PermissionStatus.allow)) {
-        SnackBarUtils.showSnackBar(
-          _scaffoldKey,
-          'Не удалось сохранить файл, так как доступ к памяти не предоставлен',
-          type: SnackBarType.error,
-        );
-        return;
-      }
-    }
+    PermissionsUtils.requestStorageAccess(
+      scaffoldKey: scaffoldKey,
+      context: scaffoldKey.currentContext,
+    );
 
     Directory saveDocDir = await LocalStorage().getBooksDirectory();
-    saveDocDir = Directory(saveDocDir.path + "/Flibusta");
+    saveDocDir = Directory(saveDocDir.path);
     if (!saveDocDir.existsSync()) {
       saveDocDir.createSync(recursive: true);
-      await NativeMethods.rescanFolder(saveDocDir.path + "/Flibusta");
+      await NativeMethods.rescanFolder(saveDocDir.path);
     }
 
     Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
@@ -74,12 +60,12 @@ class BookBloc {
     CancelToken cancelToken = CancelToken();
     cancelToken.whenCancel.whenComplete(() {
       alertsCallback(
-          _scaffoldKey, cancelToken.cancelError.message, Duration(seconds: 5));
+          scaffoldKey, cancelToken.cancelError.message, Duration(seconds: 5));
     });
 
     downloadProgressCallback(0.0);
     alertsCallback(
-      _scaffoldKey,
+      scaffoldKey,
       "Подготовка к загрузке",
       Duration(minutes: 1),
       action: SnackBarAction(
@@ -91,10 +77,10 @@ class BookBloc {
     );
 
     try {
-      var response = await _dio.downloadUri(
+      var response = await ProxyHttpClient().getDio().downloadUri(
         url,
         (Headers responseHeaders) {
-          alertsCallback(_scaffoldKey, "", Duration(seconds: 0));
+          alertsCallback(scaffoldKey, "", Duration(seconds: 0));
 
           var contentDisposition = responseHeaders["content-disposition"];
           if (contentDisposition == null) {
@@ -119,10 +105,11 @@ class BookBloc {
           var myFile = File(fileUri);
           if (myFile.existsSync()) {
             downloadProgressCallback(null);
-            cancelToken.cancel("Файл с таким именем уже есть в папке Flibusta");
+            cancelToken.cancel("Файл с таким именем уже есть");
             return fileUri;
           }
 
+          bookCard.localPath = fileUri;
           return fileUri;
         },
         cancelToken: cancelToken,
@@ -143,17 +130,18 @@ class BookBloc {
       if (response == null || response.statusCode != 200) {
         downloadProgressCallback(null);
         alertsCallback(
-            _scaffoldKey, "Не удалось загрузить", Duration(seconds: 5));
+            scaffoldKey, "Не удалось загрузить", Duration(seconds: 5));
         return;
       }
 
       await NativeMethods.rescanFolder(fileUri);
+      LocalStorage().addDownloadedBook(bookCard);
     } on DioError catch (e) {
       switch (e.type) {
         case DioErrorType.CONNECT_TIMEOUT:
           print(e.request.path);
           alertsCallback(
-            _scaffoldKey,
+            scaffoldKey,
             "Время ожидания соединения истекло",
             Duration(seconds: 5),
           );
@@ -161,14 +149,14 @@ class BookBloc {
         case DioErrorType.RECEIVE_TIMEOUT:
           print(e);
           alertsCallback(
-            _scaffoldKey,
+            scaffoldKey,
             "Время ожидания загрузки истекло",
             Duration(seconds: 5),
           );
           break;
         default:
           alertsCallback(
-            _scaffoldKey,
+            scaffoldKey,
             e.toString(),
             Duration(seconds: 5),
           );
@@ -178,7 +166,7 @@ class BookBloc {
     } catch (e) {
       print(e);
       alertsCallback(
-        _scaffoldKey,
+        scaffoldKey,
         e.toString(),
         Duration(seconds: 5),
       );
@@ -188,7 +176,7 @@ class BookBloc {
     downloadProgressCallback(null);
     if (!cancelToken.isCancelled) {
       alertsCallback(
-        _scaffoldKey,
+        scaffoldKey,
         "Файл скачан",
         Duration(seconds: 5),
         action: SnackBarAction(

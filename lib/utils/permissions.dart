@@ -1,0 +1,77 @@
+import 'package:flibusta/utils/snack_bar_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+class PermissionsUtils {
+  static Future<bool> requestStorageAccess({
+    GlobalKey<ScaffoldState> scaffoldKey,
+    BuildContext context,
+  }) async {
+    var permissionStatus = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
+
+    switch (permissionStatus) {
+      case PermissionStatus.restricted:
+      case PermissionStatus.disabled:
+        if (scaffoldKey != null) {
+          SnackBarUtils.showSnackBar(
+            scaffoldKey,
+            'На вашем устройстве отключена возможность работы с памятью',
+            type: SnackBarType.error,
+          );
+        }
+        break;
+      case PermissionStatus.granted:
+        return true;
+        break;
+      case PermissionStatus.denied:
+      case PermissionStatus.unknown:
+        var permissionNames = await PermissionHandler()
+            .requestPermissions([PermissionGroup.storage]);
+
+        if (permissionNames[PermissionGroup.storage] ==
+            PermissionStatus.granted) {
+          return true;
+        }
+
+        bool result;
+        if (context != null) {
+          result = await showDialog<bool>(
+            context: context,
+            barrierDismissible: true,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Нет доступа к памяти'),
+                content: Text(
+                    'Перейти в настройки, чтобы предоставить доступ к памяти?'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Нет'),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                  FlatButton(
+                    child: Text('Да'),
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+        if (result == true) {
+          await PermissionHandler().openAppSettings();
+          return false;
+        }
+
+        if (scaffoldKey != null) {
+          SnackBarUtils.showSnackBar(
+            scaffoldKey,
+            'Не удалось сохранить файл, так как доступ к памяти не предоставлен',
+            type: SnackBarType.error,
+          );
+        }
+        break;
+    }
+    return false;
+  }
+}

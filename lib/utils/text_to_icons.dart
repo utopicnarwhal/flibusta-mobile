@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -20,6 +19,8 @@ IconData gridRowNameToIcon(String rowName) {
       return Icons.data_usage;
     case 'Форматы файлов':
       return Icons.file_download;
+    case 'Путь к файлу':
+      return FontAwesomeIcons.folder;
     case 'Количество книг':
     case 'Количество книг в серии':
       return Icons.confirmation_number;

@@ -13,7 +13,6 @@ const MaterialColor kFlibustaBlueColor = MaterialColor(0xff56789b, const {
   900: const Color(0xff2b486d),
 });
 
-
 const MaterialColor kFlibustaLightBlueColor = MaterialColor(0xffa2c0dc, const {
   50: const Color(0xffe6eff6),
   100: const Color(0xffc3d8eb),
@@ -54,6 +53,10 @@ final ThemeData kFlibustaLightTheme = ThemeData(
     ),
   ),
   dividerColor: Colors.grey.shade600,
+  dividerTheme: DividerThemeData(
+    thickness: 1,
+    space: 1,
+  ),
 );
 
 final ThemeData kFlibustaDarkTheme = ThemeData(
@@ -87,6 +90,10 @@ final ThemeData kFlibustaDarkTheme = ThemeData(
     ),
   ),
   dividerColor: Colors.grey.shade100,
+  dividerTheme: DividerThemeData(
+    thickness: 1,
+    space: 1,
+  ),
 );
 
 const double kCardBorderRadius = 7;

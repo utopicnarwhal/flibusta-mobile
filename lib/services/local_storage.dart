@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flibusta/route.dart';
+import 'dart:convert';
+
+import 'package:flibusta/model/bookCard.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,10 +20,12 @@ class LocalStorage {
     }
   }
 
-  Future<bool> setPreviousBookSearches(List<String> previousBookSearches) async {
+  Future<bool> setPreviousBookSearches(
+      List<String> previousBookSearches) async {
     var prefs = await _prefs;
     try {
-      return prefs.setStringList('previousBookSearches', previousBookSearches ?? []);
+      return prefs.setStringList(
+          'previousBookSearches', previousBookSearches ?? []);
     } catch (e) {
       print('setPreviousBookSearches Error: ' + e);
       return false;
@@ -86,9 +90,8 @@ class LocalStorage {
   Future<bool> addProxy(String proxy) async {
     var prefs = await _prefs;
     var proxies = await getProxies();
-    if (proxies.contains(proxy))
-      return true;
-    
+    if (proxies.contains(proxy)) return true;
+
     proxies.add(proxy);
     return prefs.setStringList('Proxies', proxies);
   }
@@ -96,8 +99,7 @@ class LocalStorage {
   Future<bool> deleteProxy(String proxy) async {
     var prefs = await _prefs;
     var proxies = await getProxies();
-    if (!proxies.contains(proxy))
-      return true;
+    if (!proxies.contains(proxy)) return true;
 
     proxies.remove(proxy);
     return prefs.setStringList('Proxies', proxies);
@@ -137,6 +139,68 @@ class LocalStorage {
   Future<bool> setBooksDirectory(Directory booksDirectory) async {
     var prefs = await _prefs;
     return prefs.setString('BooksDirectoryPath', booksDirectory?.path);
+  }
+
+  Future<List<String>> getfavoriteGenreCodes() async {
+    var prefs = await _prefs;
+    try {
+      var favoriteGenreCodes = prefs.getStringList('FavoriteGenreCodes');
+      if (favoriteGenreCodes == null) {
+        prefs.setStringList('FavoriteGenreCodes', List<String>());
+        favoriteGenreCodes = List<String>();
+      }
+      return favoriteGenreCodes;
+    } catch (e) {
+      prefs.setStringList('FavoriteGenreCodes', List<String>());
+      return List<String>();
+    }
+  }
+
+  Future<bool> addFavoriteGenre(String favoriteGenreCode) async {
+    var prefs = await _prefs;
+    var favoriteGenreCodes = await getfavoriteGenreCodes();
+    if (favoriteGenreCodes.contains(favoriteGenreCode)) return true;
+
+    favoriteGenreCodes.add(favoriteGenreCode);
+    return prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
+  }
+
+  Future<bool> deleteFavoriteGenre(String favoriteGenreCode) async {
+    var prefs = await _prefs;
+    var favoriteGenreCodes = await getfavoriteGenreCodes();
+    if (!favoriteGenreCodes.contains(favoriteGenreCode)) return true;
+
+    favoriteGenreCodes.remove(favoriteGenreCode);
+    return prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
+  }
+
+  Future<List<BookCard>> getDownloadedBooks() async {
+    var prefs = await _prefs;
+    try {
+      var downloadedBooksJsonStrings = prefs.getStringList('DownloadedBooks');
+      if (downloadedBooksJsonStrings.isEmpty != false) {
+        prefs.setStringList('DownloadedBooks', List<String>());
+        return List<BookCard>();
+      }
+      var downloadedBooks = downloadedBooksJsonStrings.map((jsonBookString) {
+        return BookCard.fromJson(json.decode(jsonBookString));
+      });
+      return downloadedBooks;
+    } catch (e) {
+      prefs.setStringList('DownloadedBooks', List<String>());
+      return List<BookCard>();
+    }
+  }
+
+  Future<bool> addDownloadedBook(BookCard favoriteGenreCode) async {
+    var prefs = await _prefs;
+    var downloadedBooks = await getDownloadedBooks();
+    downloadedBooks.add(favoriteGenreCode);
+
+    return prefs.setStringList(
+      'DownloadedBooks',
+      downloadedBooks.map((book) => json.encode(book.toJson())).toList(),
+    );
   }
 
   Future<void> checkVersion() async {
