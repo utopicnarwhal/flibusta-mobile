@@ -83,8 +83,11 @@ class GetLatestBooksEvent extends HomeGridEvent {
           break;
         case DioErrorType.RESPONSE:
         case DioErrorType.DEFAULT:
-          if (dioError.error is SocketException) {
-            errorMessage =  '''Время ожидания подключения к серверу истекло.
+          if (dioError.response?.statusCode == 502) {
+            errorMessage = '''Сайт flibusta.is не работает. Попробуйте зайти в приложение позже или воспользуйтесь кнопкой "Перейти на сайт" ниже.''';
+          }
+          else if (dioError.error is SocketException) {
+            errorMessage = '''Время ожидания подключения к серверу истекло.
 Возможные проблемы:
 1. Нет подключения к интернету
 2. Выбранный прокси сервер не работает, поменяйте на работающий в настройках прокси
@@ -99,7 +102,7 @@ class GetLatestBooksEvent extends HomeGridEvent {
         latestBooks: currentState.latestBooks,
         searchResults: currentState.searchResults,
         searchQuery: currentState.searchQuery,
-      ); 
+      );
     } catch (e) {
       return LatestBooksErrorHomeGridState(
         errorMessage: this.toString() + ' error: ' + e.toString(),

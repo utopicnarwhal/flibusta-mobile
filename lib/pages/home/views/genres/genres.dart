@@ -46,27 +46,10 @@ class GenresView extends StatelessWidget {
               child: StreamBuilder<List<String>>(
                 stream: favoriteGenreCodesController.stream,
                 builder: (context, favoriteGenreCodesSnapshot) {
-                  genresListSnapshot.data.sort((genre1, genre2) {
-                    var isFavorite1 = favoriteGenreCodesSnapshot.data
-                            ?.any((favoriteGenreCode) {
-                          return favoriteGenreCode == genre1.code;
-                        }) ??
-                        false;
-
-                    var isFavorite2 = favoriteGenreCodesSnapshot.data
-                            ?.any((favoriteGenreCode) {
-                          return favoriteGenreCode == genre2.code;
-                        }) ??
-                        false;
-
-                    if (isFavorite1 && isFavorite2)
-                      return 0;
-                    else if (isFavorite1)
-                      return -1;
-                    else if (isFavorite2)
-                      return 1;
-                    return 0;
-                  });
+                  genresListSnapshot.data.sort(
+                    (genre1, genre2) => _genreSorting(
+                        favoriteGenreCodesSnapshot?.data, genre1, genre2),
+                  );
 
                   return ListView.separated(
                     itemCount: genresListSnapshot.data.length,
@@ -147,5 +130,27 @@ class GenresView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  int _genreSorting(
+      List<String> favoriteGenreCodes, Genre genre1, Genre genre2) {
+    var isFavorite1 = favoriteGenreCodes?.any((favoriteGenreCode) {
+          return favoriteGenreCode == genre1.code;
+        }) ??
+        false;
+
+    var isFavorite2 = favoriteGenreCodes?.any((favoriteGenreCode) {
+          return favoriteGenreCode == genre2.code;
+        }) ??
+        false;
+
+    if (isFavorite1 && isFavorite2)
+      return genre1.name.compareTo(genre2.name);
+    else if (isFavorite1)
+      return -1;
+    else if (isFavorite2)
+      return 1;
+    else
+      return genre1.name.compareTo(genre2.name);
   }
 }

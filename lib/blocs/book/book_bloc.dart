@@ -78,54 +78,54 @@ class BookBloc {
 
     try {
       var response = await ProxyHttpClient().getDio().downloadUri(
-        url,
-        (Headers responseHeaders) {
-          alertsCallback(scaffoldKey, "", Duration(seconds: 0));
+            url,
+            (Headers responseHeaders) {
+              alertsCallback(scaffoldKey, "", Duration(seconds: 0));
 
-          var contentDisposition = responseHeaders["content-disposition"];
-          if (contentDisposition == null) {
-            downloadProgressCallback(null);
-            cancelToken
-                .cancel("Доступ к книге ограничен по требованию правоторговца");
-            return fileUri;
-          }
+              var contentDisposition = responseHeaders["content-disposition"];
+              if (contentDisposition == null) {
+                downloadProgressCallback(null);
+                cancelToken.cancel(
+                    "Доступ к книге ограничен по требованию правоторговца");
+                return fileUri;
+              }
 
-          try {
-            fileUri = saveDocDir.path +
-                "/" +
-                contentDisposition[0]
-                    .split("filename=")[1]
-                    .replaceAll("\"", "");
-          } catch (e) {
-            downloadProgressCallback(null);
-            cancelToken.cancel("Не удалось получить имя файла");
-            return fileUri;
-          }
+              try {
+                fileUri = saveDocDir.path +
+                    "/" +
+                    contentDisposition[0]
+                        .split("filename=")[1]
+                        .replaceAll("\"", "");
+              } catch (e) {
+                downloadProgressCallback(null);
+                cancelToken.cancel("Не удалось получить имя файла");
+                return fileUri;
+              }
 
-          var myFile = File(fileUri);
-          if (myFile.existsSync()) {
-            downloadProgressCallback(null);
-            cancelToken.cancel("Файл с таким именем уже есть");
-            return fileUri;
-          }
+              var myFile = File(fileUri);
+              if (myFile.existsSync()) {
+                downloadProgressCallback(null);
+                cancelToken.cancel("Файл с таким именем уже есть");
+                return fileUri;
+              }
 
-          bookCard.localPath = fileUri;
-          return fileUri;
-        },
-        cancelToken: cancelToken,
-        options: Options(
-          sendTimeout: 10000,
-          receiveTimeout: 60000,
-          receiveDataWhenStatusError: false,
-        ),
-        onReceiveProgress: (int count, int total) {
-          if (cancelToken.isCancelled) {
-            downloadProgressCallback(null);
-          } else {
-            downloadProgressCallback(count / total);
-          }
-        },
-      );
+              bookCard.localPath = fileUri;
+              return fileUri;
+            },
+            cancelToken: cancelToken,
+            options: Options(
+              sendTimeout: 10000,
+              receiveTimeout: 60000,
+              receiveDataWhenStatusError: false,
+            ),
+            onReceiveProgress: (int count, int total) {
+              if (cancelToken.isCancelled) {
+                downloadProgressCallback(null);
+              } else {
+                downloadProgressCallback(count / total);
+              }
+            },
+          );
 
       if (response == null || response.statusCode != 200) {
         downloadProgressCallback(null);
@@ -135,7 +135,17 @@ class BookBloc {
       }
 
       await NativeMethods.rescanFolder(fileUri);
-      LocalStorage().addDownloadedBook(bookCard);
+      await LocalStorage().addDownloadedBook(bookCard);
+
+      alertsCallback(
+        scaffoldKey,
+        "Файл скачан",
+        Duration(seconds: 5),
+        action: SnackBarAction(
+          label: "Открыть",
+          onPressed: () => OpenFile.open(fileUri),
+        ),
+      );
     } on DioError catch (e) {
       switch (e.type) {
         case DioErrorType.CONNECT_TIMEOUT:
@@ -174,17 +184,6 @@ class BookBloc {
     }
 
     downloadProgressCallback(null);
-    if (!cancelToken.isCancelled) {
-      alertsCallback(
-        scaffoldKey,
-        "Файл скачан",
-        Duration(seconds: 5),
-        action: SnackBarAction(
-          label: "Открыть",
-          onPressed: () => OpenFile.open(fileUri),
-        ),
-      );
-    }
   }
 
   alertsCallback(GlobalKey<ScaffoldState> _scaffoldKey, String alertText,

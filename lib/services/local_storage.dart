@@ -184,7 +184,7 @@ class LocalStorage {
       }
       var downloadedBooks = downloadedBooksJsonStrings.map((jsonBookString) {
         return BookCard.fromJson(json.decode(jsonBookString));
-      });
+      }).toList();
       return downloadedBooks;
     } catch (e) {
       prefs.setStringList('DownloadedBooks', List<String>());
@@ -192,10 +192,10 @@ class LocalStorage {
     }
   }
 
-  Future<bool> addDownloadedBook(BookCard favoriteGenreCode) async {
+  Future<bool> addDownloadedBook(BookCard book) async {
     var prefs = await _prefs;
     var downloadedBooks = await getDownloadedBooks();
-    downloadedBooks.add(favoriteGenreCode);
+    downloadedBooks.add(book);
 
     return prefs.setStringList(
       'DownloadedBooks',

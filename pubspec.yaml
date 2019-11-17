@@ -7,7 +7,7 @@ description: Mobile application for site https://flibusta.is
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 0.3.1+17
+version: 0.3.2+18
 
 environment:
   sdk: ">2.4.0 <3.0.0"

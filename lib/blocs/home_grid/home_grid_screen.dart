@@ -43,9 +43,12 @@ class HomeGridScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    'Ошибка ${_homeGridState.message}',
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      'Ошибка.\n${_homeGridState.message}',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   RaisedButton(
                     child: Text('Попробовать ещё раз'),

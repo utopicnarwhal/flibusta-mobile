@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';

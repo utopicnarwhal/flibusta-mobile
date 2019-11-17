@@ -113,9 +113,8 @@ class _DownloadedBooksViewState extends State<DownloadedBooksView> {
                             ),
                           ),
                           ButtonTheme.bar(
-                            padding: EdgeInsets.all(0),
                             child: ButtonBar(
-                              alignment: MainAxisAlignment.end,
+                              alignment: MainAxisAlignment.center,
                               children: [
                                 FutureBuilder(
                                   future: File(bookCardData.localPath).exists(),
@@ -151,5 +150,11 @@ class _DownloadedBooksViewState extends State<DownloadedBooksView> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    downloadedBooksController?.close();
+    super.dispose();
   }
 }
