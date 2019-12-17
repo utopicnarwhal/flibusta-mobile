@@ -112,7 +112,10 @@ class _DownloadedBooksViewState extends State<DownloadedBooksView> {
                               ],
                             ),
                           ),
-                          ButtonTheme.bar(
+                          ButtonBarTheme(
+                            data: ButtonBarThemeData(
+                              layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                            ),
                             child: ButtonBar(
                               alignment: MainAxisAlignment.center,
                               children: [

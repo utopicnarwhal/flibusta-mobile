@@ -10,6 +10,8 @@ import 'package:flibusta/utils/text_to_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../services/local_storage.dart';
+
 class GridCards<T> extends StatefulWidget {
   final List<T> data;
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -20,10 +22,26 @@ class GridCards<T> extends StatefulWidget {
 }
 
 class _GridCardsState extends State<GridCards> {
+  bool _showAdditionalBookInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    LocalStorage().getShowAdditionalBookInfo().then((showAdditionalBookInfo) {
+      setState(() {
+        _showAdditionalBookInfo = showAdditionalBookInfo;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.data != null && widget.data.length == 0) {
       return NoResults();
+    }
+    
+    if (_showAdditionalBookInfo == null) {
+      return Container();
     }
 
     return Scrollbar(
@@ -32,62 +50,58 @@ class _GridCardsState extends State<GridCards> {
         itemCount: widget.data == null ? 0 : widget.data.length,
         itemBuilder: (context, index) {
           return Card(
+            elevation: _showAdditionalBookInfo ? 0 : null,
+            margin: _showAdditionalBookInfo ? EdgeInsets.zero : null,
+            shape: _showAdditionalBookInfo
+                ? RoundedRectangleBorder(borderRadius: BorderRadius.zero)
+                : null,
             child: Column(
               children: [
                 if (widget.data[index] is BookCard)
-                  Theme(
-                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                    child: ExpansionTile(
-                      title: Column(
-                        children: [
-                          GridCardRow(
-                            rowName: 'Название произведения',
-                            value: widget.data[index].title,
-                          ),
-                          GridCardRow(
-                            rowName: 'Автор(-ы)',
-                            value: widget.data[index].authors,
-                          ),
-                        ],
-                      ),
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            children: <Widget>[
-                              GridCardRow(
-                                rowName: 'Перевод',
-                                value: widget.data[index].translators,
-                              ),
-                              GridCardRow(
-                                rowName: 'Жанр произведения',
-                                value: widget.data[index].genres,
-                              ),
-                              GridCardRow(
-                                rowName: 'Из серии произведений',
-                                value: widget.data[index].sequenceTitle,
-                              ),
-                              GridCardRow(
-                                rowName: 'Размер книги',
-                                value: widget.data[index].size,
-                              ),
-                              GridCardRow(
-                                rowName: 'Форматы файлов',
-                                value: widget.data[index].downloadFormats,
-                                showCustomLeading:
-                                    widget.data[index].downloadProgress != null,
-                                customLeading: CircularProgressIndicator(
-                                  value:
-                                      widget.data[index].downloadProgress == 0.0
-                                          ? null
-                                          : widget.data[index].downloadProgress,
-                                ),
-                              ),
-                            ],
+                  Builder(
+                    builder: (context) {
+                      var expansionTileTitle = [
+                        GridCardRow(
+                          rowName: 'Название произведения',
+                          value: widget.data[index].title,
+                        ),
+                        GridCardRow(
+                          rowName: 'Автор(-ы)',
+                          value: widget.data[index].authors,
+                        ),
+                      ];
+                      var expansionTileChildren = [
+                        GridCardRow(
+                          rowName: 'Перевод',
+                          value: widget.data[index].translators,
+                        ),
+                        GridCardRow(
+                          rowName: 'Жанр произведения',
+                          value: widget.data[index].genres,
+                        ),
+                        GridCardRow(
+                          rowName: 'Из серии произведений',
+                          value: widget.data[index].sequenceTitle,
+                        ),
+                        GridCardRow(
+                          rowName: 'Размер книги',
+                          value: widget.data[index].size,
+                        ),
+                        GridCardRow(
+                          rowName: 'Форматы файлов',
+                          value: widget.data[index].downloadFormats,
+                          showCustomLeading:
+                              widget.data[index].downloadProgress != null,
+                          customLeading: CircularProgressIndicator(
+                            value: widget.data[index].downloadProgress == 0.0
+                                ? null
+                                : widget.data[index].downloadProgress,
                           ),
                         ),
-                        ButtonTheme.bar(
-                          padding: EdgeInsets.all(0),
+                        ButtonBarTheme(
+                          data: ButtonBarThemeData(
+                            layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                          ),
                           child: ButtonBar(
                             alignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -109,8 +123,38 @@ class _GridCardsState extends State<GridCards> {
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      ];
+                      if (_showAdditionalBookInfo) {
+                        return ListTile(
+                          title: Column(
+                            children: <Widget>[
+                              ...expansionTileTitle,
+                              ...expansionTileChildren,
+                            ],
+                          ),
+                        );
+                      }
+                      return Theme(
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          initiallyExpanded: _showAdditionalBookInfo,
+                          title: Column(
+                            children: expansionTileTitle,
+                          ),
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Column(
+                                children: [
+                                  ...expansionTileChildren,
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 if (widget.data[index] is AuthorCard) ...[
                   GridCardRow(
@@ -121,8 +165,10 @@ class _GridCardsState extends State<GridCards> {
                     rowName: 'Количество книг',
                     value: widget.data[index].booksCount,
                   ),
-                  ButtonTheme.bar(
-                    padding: EdgeInsets.symmetric(vertical: 0),
+                  ButtonBarTheme(
+                    data: ButtonBarThemeData(
+                      layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                    ),
                     child: ButtonBar(
                       alignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -154,8 +200,10 @@ class _GridCardsState extends State<GridCards> {
                     rowName: 'Количество книг в серии',
                     value: widget.data[index].booksCount,
                   ),
-                  ButtonTheme.bar(
-                    padding: EdgeInsets.symmetric(vertical: 0),
+                  ButtonBarTheme(
+                    data: ButtonBarThemeData(
+                      layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                    ),
                     child: ButtonBar(
                       alignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -178,6 +226,8 @@ class _GridCardsState extends State<GridCards> {
                     ),
                   ),
                 ],
+                if (index != widget.data.length - 1 && _showAdditionalBookInfo)
+                  Divider(),
               ],
             ),
           );

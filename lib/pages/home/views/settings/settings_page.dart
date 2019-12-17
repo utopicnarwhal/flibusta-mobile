@@ -10,6 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info/package_info.dart';
 
+import '../../../../services/local_storage.dart';
+import '../../../../services/local_storage.dart';
+import '../../../../services/local_storage.dart';
+
 class SettingsPage extends StatefulWidget {
   static const routeName = "/Settings";
 
@@ -27,7 +31,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               children: [
                 ThemeSwitcher(),
+                Divider(indent: 70),
                 FutureBuilder<Directory>(
                   future: LocalStorage().getBooksDirectory(),
                   builder: (context, saveBooksDir) {
@@ -71,6 +75,24 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
+                Divider(indent: 70),
+                FutureBuilder<bool>(
+                  future: LocalStorage().getShowAdditionalBookInfo(),
+                  builder: (context, showAdditionalBookInfo) {
+                    return SwitchListTile(
+                      title: Text(
+                        "Показывать информацию о книге полностью",
+                      ),
+                      secondary: Icon(FontAwesomeIcons.bookOpen),
+                      value: showAdditionalBookInfo?.data ?? false,
+                      onChanged: (value) async {
+                        await LocalStorage().setShowAdditionalBookInfo(value);
+                        setState(() {});
+                      },
+                    );
+                  },
+                ),
+                Divider(indent: 70),
                 FutureBuilder<PackageInfo>(
                   future: PackageInfo.fromPlatform(),
                   builder: (context, packageInfo) {

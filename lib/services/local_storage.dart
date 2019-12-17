@@ -24,7 +24,7 @@ class LocalStorage {
       List<String> previousBookSearches) async {
     var prefs = await _prefs;
     try {
-      return prefs.setStringList(
+      return await prefs.setStringList(
           'previousBookSearches', previousBookSearches ?? []);
     } catch (e) {
       print('setPreviousBookSearches Error: ' + e);
@@ -37,19 +37,39 @@ class LocalStorage {
     try {
       var introCompleted = prefs.getBool('IntroCompleted');
       if (introCompleted == null) {
-        prefs.setBool('IntroCompleted', false);
+        await prefs.setBool('IntroCompleted', false);
         introCompleted = false;
       }
       return introCompleted;
     } catch (e) {
-      prefs.setBool('IntroCompleted', false);
+      await prefs.setBool('IntroCompleted', false);
       return false;
     }
   }
 
   Future<bool> setIntroCompleted() async {
     var prefs = await _prefs;
-    return prefs.setBool('IntroCompleted', true);
+    return await prefs.setBool('IntroCompleted', true);
+  }
+
+  Future<bool> getShowAdditionalBookInfo() async {
+    var prefs = await _prefs;
+    try {
+      var showAdditionalBookInfo = prefs.getBool('ShowAdditionalBookInfo');
+      if (showAdditionalBookInfo == null) {
+        await prefs.setBool('ShowAdditionalBookInfo', true);
+        showAdditionalBookInfo = true;
+      }
+      return showAdditionalBookInfo;
+    } catch (e) {
+      await prefs.setBool('ShowAdditionalBookInfo', true);
+      return true;
+    }
+  }
+
+  Future<bool> setShowAdditionalBookInfo(bool showAdditionalBookInfo) async {
+    var prefs = await _prefs;
+    return await prefs.setBool('ShowAdditionalBookInfo', showAdditionalBookInfo ?? true);
   }
 
   Future<String> getActualProxy() async {
@@ -57,19 +77,19 @@ class LocalStorage {
     try {
       var actualProxy = prefs.getString('ActualProxy');
       if (actualProxy == null) {
-        prefs.setString('ActualProxy', '');
+        await prefs.setString('ActualProxy', '');
         actualProxy = '';
       }
       return actualProxy;
     } catch (e) {
-      prefs.setString('ActualProxy', '');
+      await prefs.setString('ActualProxy', '');
       return '';
     }
   }
 
   Future<bool> setActualProxy(String ipPort) async {
     var prefs = await _prefs;
-    return prefs.setString('ActualProxy', ipPort);
+    return await prefs.setString('ActualProxy', ipPort);
   }
 
   Future<List<String>> getProxies() async {
@@ -77,12 +97,12 @@ class LocalStorage {
     try {
       var proxies = prefs.getStringList('Proxies');
       if (proxies == null) {
-        prefs.setStringList('Proxies', List<String>());
+        await prefs.setStringList('Proxies', List<String>());
         proxies = List<String>();
       }
       return proxies;
     } catch (e) {
-      prefs.setStringList('Proxies', List<String>());
+      await prefs.setStringList('Proxies', List<String>());
       return List<String>();
     }
   }
@@ -102,7 +122,7 @@ class LocalStorage {
     if (!proxies.contains(proxy)) return true;
 
     proxies.remove(proxy);
-    return prefs.setStringList('Proxies', proxies);
+    return await prefs.setStringList('Proxies', proxies);
   }
 
   Future<String> getFlibustaHostAddress() async {
@@ -110,19 +130,19 @@ class LocalStorage {
     try {
       var flibustaHostAddress = prefs.getString('FlibustaHostAddress');
       if (flibustaHostAddress == null) {
-        prefs.setString('FlibustaHostAddress', 'flibusta.is');
+        await prefs.setString('FlibustaHostAddress', 'flibusta.is');
         flibustaHostAddress = 'flibusta.is';
       }
       return flibustaHostAddress;
     } catch (e) {
-      prefs.setString('FlibustaHostAddress', 'flibusta.is');
+      await prefs.setString('FlibustaHostAddress', 'flibusta.is');
       return '';
     }
   }
 
   Future<bool> setFlibustaHostAddress(String hostAddress) async {
     var prefs = await _prefs;
-    return prefs.setString('FlibustaHostAddress', hostAddress);
+    return await prefs.setString('FlibustaHostAddress', hostAddress);
   }
 
   Future<Directory> getBooksDirectory() async {
@@ -138,7 +158,7 @@ class LocalStorage {
 
   Future<bool> setBooksDirectory(Directory booksDirectory) async {
     var prefs = await _prefs;
-    return prefs.setString('BooksDirectoryPath', booksDirectory?.path);
+    return await prefs.setString('BooksDirectoryPath', booksDirectory?.path);
   }
 
   Future<List<String>> getfavoriteGenreCodes() async {
@@ -146,12 +166,12 @@ class LocalStorage {
     try {
       var favoriteGenreCodes = prefs.getStringList('FavoriteGenreCodes');
       if (favoriteGenreCodes == null) {
-        prefs.setStringList('FavoriteGenreCodes', List<String>());
+        await prefs.setStringList('FavoriteGenreCodes', List<String>());
         favoriteGenreCodes = List<String>();
       }
       return favoriteGenreCodes;
     } catch (e) {
-      prefs.setStringList('FavoriteGenreCodes', List<String>());
+      await prefs.setStringList('FavoriteGenreCodes', List<String>());
       return List<String>();
     }
   }
@@ -162,7 +182,7 @@ class LocalStorage {
     if (favoriteGenreCodes.contains(favoriteGenreCode)) return true;
 
     favoriteGenreCodes.add(favoriteGenreCode);
-    return prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
+    return await prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
   }
 
   Future<bool> deleteFavoriteGenre(String favoriteGenreCode) async {
@@ -171,7 +191,7 @@ class LocalStorage {
     if (!favoriteGenreCodes.contains(favoriteGenreCode)) return true;
 
     favoriteGenreCodes.remove(favoriteGenreCode);
-    return prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
+    return await prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
   }
 
   Future<List<BookCard>> getDownloadedBooks() async {
@@ -179,7 +199,7 @@ class LocalStorage {
     try {
       var downloadedBooksJsonStrings = prefs.getStringList('DownloadedBooks');
       if (downloadedBooksJsonStrings.isEmpty != false) {
-        prefs.setStringList('DownloadedBooks', List<String>());
+        await prefs.setStringList('DownloadedBooks', List<String>());
         return List<BookCard>();
       }
       var downloadedBooks = downloadedBooksJsonStrings.map((jsonBookString) {
@@ -187,7 +207,7 @@ class LocalStorage {
       }).toList();
       return downloadedBooks;
     } catch (e) {
-      prefs.setStringList('DownloadedBooks', List<String>());
+      await prefs.setStringList('DownloadedBooks', List<String>());
       return List<BookCard>();
     }
   }
@@ -197,7 +217,7 @@ class LocalStorage {
     var downloadedBooks = await getDownloadedBooks();
     downloadedBooks.add(book);
 
-    return prefs.setStringList(
+    return await prefs.setStringList(
       'DownloadedBooks',
       downloadedBooks.map((book) => json.encode(book.toJson())).toList(),
     );
@@ -208,7 +228,7 @@ class LocalStorage {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     if (prefs.getString('VersionCode') != packageInfo.buildNumber) {
       // _clearPrefs(prefs);
-      prefs.setString('VersionCode', packageInfo.buildNumber);
+      await prefs.setString('VersionCode', packageInfo.buildNumber);
     }
   }
 

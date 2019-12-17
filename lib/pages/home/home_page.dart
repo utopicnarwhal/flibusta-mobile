@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<HomeGridBloc>(
-      builder: (context) => _homeGridBloc,
+      create: (context) => _homeGridBloc,
       child: StreamBuilder<int>(
         initialData: 0,
         stream: _selectedNavItemController.stream,

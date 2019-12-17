@@ -18,6 +18,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Флибуста"
+        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round">
         <activity

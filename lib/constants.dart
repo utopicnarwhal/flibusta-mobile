@@ -28,6 +28,7 @@ const MaterialColor kFlibustaLightBlueColor = MaterialColor(0xffa2c0dc, const {
 
 final ThemeData kFlibustaLightTheme = ThemeData(
   primarySwatch: kFlibustaBlueColor,
+  scaffoldBackgroundColor: Color(0xFFF8F8F8),
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -52,10 +53,10 @@ final ThemeData kFlibustaLightTheme = ThemeData(
       borderRadius: BorderRadius.circular(5.0),
     ),
   ),
-  dividerColor: Colors.grey.shade600,
+  dividerColor: Colors.grey.shade300,
   dividerTheme: DividerThemeData(
-    thickness: 1,
-    space: 1,
+    thickness: 0.5,
+    space: 0.5,
   ),
 );
 
@@ -89,10 +90,10 @@ final ThemeData kFlibustaDarkTheme = ThemeData(
       borderRadius: BorderRadius.circular(5.0),
     ),
   ),
-  dividerColor: Colors.grey.shade100,
+  dividerColor: Colors.grey.shade600,
   dividerTheme: DividerThemeData(
-    thickness: 1,
-    space: 1,
+    thickness: 0.5,
+    space: 0.5,
   ),
 );
 

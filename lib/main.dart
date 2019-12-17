@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   var preparationFutures = List<Future>();
   preparationFutures.add(LocalStorage().checkVersion());
   preparationFutures.add(LocalStorage().getActualProxy());
