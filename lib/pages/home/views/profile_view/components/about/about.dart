@@ -25,7 +25,7 @@ class AboutPage extends StatelessWidget {
             addSemanticIndexes: false,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(vertical: 60, horizontal: 40),
+                padding: EdgeInsets.symmetric(vertical: 30, horizontal: 40),
                 child: Column(
                   children: [
                     FlibustaLogo(isIconLike: true),
@@ -88,7 +88,7 @@ class AboutPage extends StatelessWidget {
                         children: [
                           Icon(
                             FontAwesomeIcons.github,
-                            size: 30.0,
+                            size: 34.0,
                           ),
                         ],
                       ),

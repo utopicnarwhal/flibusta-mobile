@@ -12,6 +12,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'utils/file_utils.dart';
+
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -48,7 +50,7 @@ main() async {
   if (preparationResults.length > 3 &&
       preparationResults.elementAt(3) == null) {
     var externalStorageDownloadDirectories =
-        await getExternalStorageDirectory();
+        await FileUtils.getStorageDir();
     await LocalStorage().setBooksDirectory(externalStorageDownloadDirectories);
   }
   runApp(FlibustaApp());

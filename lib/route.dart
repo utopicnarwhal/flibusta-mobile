@@ -8,7 +8,6 @@ import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
 import './pages/login/login_page.dart';
-import './pages/profile/profile_page.dart';
 import './intro.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -24,8 +23,6 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         case '/':
         case HomePage.routeName:
           return HomePage();
-        case Profile.routeName:
-          return Profile();
         case Login.routeName:
           return Login();
         case IntroPage.routeName:

@@ -20,11 +20,17 @@ class GenresListBloc {
   Sink<List<Genre>> get _allGenresListSink => _allGenresListController.sink;
 
   GenresListBloc() {
-    _getAllGenres().then((genresList) => _allGenresListSink.add(genresList));
+    _getAllGenres().then((genresList) {
+      if (_allGenresListController.isClosed) return;
+      _allGenresListSink.add(genresList);
+    });
   }
 
   refreshGenresList() {
-    _getAllGenres().then((genresList) => _allGenresListSink.add(genresList));
+    _getAllGenres().then((genresList) {
+      if (_allGenresListController.isClosed) return;
+      _allGenresListSink.add(genresList);
+    });
   }
 
   addToGenresList(Genre genre) {
