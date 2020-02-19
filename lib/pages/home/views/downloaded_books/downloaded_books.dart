@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:flibusta/blocs/home_grid/components/grid_cards.dart';
 import 'package:flibusta/components/loading_indicator.dart';
+import 'package:flibusta/constants.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/utils/file_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
 
 class DownloadedBooksView extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -37,120 +38,136 @@ class _DownloadedBooksViewState extends State<DownloadedBooksView> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> children = [
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.0),
+        child: Text(
+          'Скачанные книги',
+          style: Theme.of(context).textTheme.display1.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).textTheme.body1.color,
+              ),
+        ),
+      ),
+      SizedBox(height: 8),
+    ];
+
     return Scaffold(
       key: widget.scaffoldKey,
-      appBar: AppBar(
-        title: Text('Скачанные книги'),
-      ),
-      body: StreamBuilder<List<BookCard>>(
-        stream: downloadedBooksController.stream,
-        builder: (context, downloadedBooksSnapshot) {
-          if (!downloadedBooksSnapshot.hasData) {
-            return LoadingIndicator();
-          }
-          if (downloadedBooksSnapshot.data.isEmpty) {
-            return Center(
-              child: Text(
-                'Пусто',
-                style: Theme.of(context).textTheme.display1,
-              ),
-            );
-          }
-          return RefreshIndicator(
-            onRefresh: () async {
-              var downloadedBooks = await LocalStorage().getDownloadedBooks();
-              downloadedBooksController.add(downloadedBooks);
-            },
-            child: Scrollbar(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(vertical: 4),
-                itemCount: downloadedBooksSnapshot.data.length,
-                itemBuilder: (context, index) {
-                  var bookCardData = downloadedBooksSnapshot.data[index];
-                  return Card(
-                    child: Theme(
-                      data: Theme.of(context)
-                          .copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        title: Column(
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            var downloadedBooks = await LocalStorage().getDownloadedBooks();
+            downloadedBooksController.add(downloadedBooks);
+          },
+          child: StreamBuilder<List<BookCard>>(
+            stream: downloadedBooksController.stream,
+            builder: (context, downloadedBooksSnapshot) {
+              if (!downloadedBooksSnapshot.hasData) {
+                return LoadingIndicator();
+              }
+              if (downloadedBooksSnapshot.data.isEmpty) {
+                return Center(
+                  child: Text(
+                    'Пусто',
+                    style: Theme.of(context).textTheme.display1,
+                  ),
+                );
+              }
+              return Scrollbar(
+                child: ListView.builder(
+                  physics: kBouncingAlwaysScrollableScrollPhysics,
+                  addSemanticIndexes: false,
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 42),
+                  itemCount: downloadedBooksSnapshot.data.length,
+                  itemBuilder: (context, index) {
+                    var bookCardData = downloadedBooksSnapshot.data[index];
+                    return Card(
+                      child: Theme(
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          title: Column(
+                            children: [
+                              GridCardRow(
+                                rowName: 'Название произведения',
+                                value: bookCardData.title,
+                              ),
+                              GridCardRow(
+                                rowName: 'Автор(-ы)',
+                                value: bookCardData.authors,
+                              ),
+                            ],
+                          ),
                           children: [
-                            GridCardRow(
-                              rowName: 'Название произведения',
-                              value: bookCardData.title,
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Column(
+                                children: <Widget>[
+                                  GridCardRow(
+                                    rowName: 'Перевод',
+                                    value: bookCardData.translators,
+                                  ),
+                                  GridCardRow(
+                                    rowName: 'Жанр произведения',
+                                    value: bookCardData.genres,
+                                  ),
+                                  GridCardRow(
+                                    rowName: 'Из серии произведений',
+                                    value: bookCardData.sequenceTitle,
+                                  ),
+                                  GridCardRow(
+                                    rowName: 'Размер книги',
+                                    value: bookCardData.size,
+                                  ),
+                                  GridCardRow(
+                                    rowName: 'Путь к файлу',
+                                    value: bookCardData.localPath,
+                                  ),
+                                ],
+                              ),
                             ),
-                            GridCardRow(
-                              rowName: 'Автор(-ы)',
-                              value: bookCardData.authors,
+                            ButtonBarTheme(
+                              data: ButtonBarThemeData(
+                                layoutBehavior:
+                                    ButtonBarLayoutBehavior.constrained,
+                              ),
+                              child: ButtonBar(
+                                alignment: MainAxisAlignment.center,
+                                children: [
+                                  FutureBuilder(
+                                    future:
+                                        File(bookCardData.localPath).exists(),
+                                    builder: (context, bookFileExistsSnapshot) {
+                                      if (bookFileExistsSnapshot.data != true) {
+                                        return Container();
+                                      }
+                                      return FlatButton(
+                                        child: Text('Открыть'),
+                                        onPressed: () => FileUtils.openFile(
+                                          bookCardData.localPath,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Column(
-                              children: <Widget>[
-                                GridCardRow(
-                                  rowName: 'Перевод',
-                                  value: bookCardData.translators,
-                                ),
-                                GridCardRow(
-                                  rowName: 'Жанр произведения',
-                                  value: bookCardData.genres,
-                                ),
-                                GridCardRow(
-                                  rowName: 'Из серии произведений',
-                                  value: bookCardData.sequenceTitle,
-                                ),
-                                GridCardRow(
-                                  rowName: 'Размер книги',
-                                  value: bookCardData.size,
-                                ),
-                                GridCardRow(
-                                  rowName: 'Путь к файлу',
-                                  value: bookCardData.localPath,
-                                ),
-                              ],
-                            ),
-                          ),
-                          ButtonBarTheme(
-                            data: ButtonBarThemeData(
-                              layoutBehavior: ButtonBarLayoutBehavior.constrained,
-                            ),
-                            child: ButtonBar(
-                              alignment: MainAxisAlignment.center,
-                              children: [
-                                FutureBuilder(
-                                  future: File(bookCardData.localPath).exists(),
-                                  builder: (context, bookFileExistsSnapshot) {
-                                    if (bookFileExistsSnapshot.data != true) {
-                                      return Container();
-                                    }
-                                    return FlatButton(
-                                      child: Text('Открыть'),
-                                      onPressed: () =>
-                                          OpenFile.open(bookCardData.localPath),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        },
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
       ),
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
         index: 2,
-        onTap: (index) {
-          widget.selectedNavItemController.add(index);
-        },
+        selectedNavItemController: widget.selectedNavItemController,
       ),
     );
   }

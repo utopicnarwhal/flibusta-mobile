@@ -99,54 +99,6 @@ class IntroPageState extends State<IntroPage> {
       body: Text(''),
     ),
     PageViewModel(
-      pageColor: Colors.deepPurple,
-      bubble: Padding(
-        padding: const EdgeInsets.only(top: 2.0),
-        child: Icon(
-          FontAwesomeIcons.projectDiagram,
-          color: Colors.lightBlue,
-          size: 18.0,
-        ),
-      ),
-      title: Text(
-        'Прокси',
-        style: TextStyle(
-          fontSize: 32.0,
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-        textAlign: TextAlign.center,
-        maxLines: 1,
-        softWrap: false,
-        overflow: TextOverflow.fade,
-      ),
-      bubbleBackgroundColor: Colors.white,
-      mainImage: Scrollbar(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black12,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  """
-Если Ваш интернет-провайдер заблокировал интернет-ресурс 'flibusta.is', то Вы можете воспользоваться моим прокси-сервером, созданным специально для этого приложения, а также сервисом PubProxy API c ограничением 50 запросов в день, но найти там хороший прокси бывает проблематично.
-                  """,
-                  style: TextStyle(color: Colors.white, fontSize: 16.0),
-                  textAlign: TextAlign.justify,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      body: Text(''),
-    ),
-    PageViewModel(
       pageColor: Colors.cyan,
       bubble: Padding(
         padding: const EdgeInsets.only(bottom: 1.0, left: 1.0),

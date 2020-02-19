@@ -3,6 +3,7 @@ import 'package:flibusta/blocs/home_grid/components/grid_cards.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
+import 'package:flibusta/utils/toast_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -56,8 +57,8 @@ class _SequencePageState extends State<SequencePage> {
 
       sequenceInfo = parseHtmlFromSequenceInfo(response.data, sequenceId);
     } catch (e) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Не удалось получить данные о серии"),
+      ToastUtils.showToast(
+        'Не удалось получить данные о серии',
         action: SnackBarAction(
           label: "Попробовать ещё раз",
           onPressed: () {
@@ -68,7 +69,7 @@ class _SequencePageState extends State<SequencePage> {
             });
           },
         ),
-      ));
+      );
       print(e);
     }
 

@@ -125,9 +125,7 @@ class GenresView extends StatelessWidget {
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
         index: 1,
-        onTap: (index) {
-          selectedNavItemController.add(index);
-        },
+        selectedNavItemController: selectedNavItemController,
       ),
     );
   }

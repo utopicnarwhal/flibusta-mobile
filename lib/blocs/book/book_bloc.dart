@@ -5,11 +5,12 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
-import 'package:flibusta/utils/permissions.dart';
+import 'package:flibusta/utils/permissions_utils.dart';
+import 'package:flibusta/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BookBloc {
@@ -42,8 +43,7 @@ class BookBloc {
     GlobalKey<ScaffoldState> scaffoldKey,
     void Function(double) downloadProgressCallback,
   ) async {
-    PermissionsUtils.requestStorageAccess(
-      scaffoldKey: scaffoldKey,
+    PermissionsUtils.storageAccess(
       context: scaffoldKey.currentContext,
     );
 
@@ -139,11 +139,11 @@ class BookBloc {
 
       alertsCallback(
         scaffoldKey,
-        "Файл скачан",
+        'Файл скачан',
         Duration(seconds: 5),
         action: SnackBarAction(
-          label: "Открыть",
-          onPressed: () => OpenFile.open(fileUri),
+          label: 'Открыть',
+          onPressed: () => FileUtils.openFile(fileUri),
         ),
       );
     } on DioError catch (e) {
@@ -152,7 +152,7 @@ class BookBloc {
           print(e.request.path);
           alertsCallback(
             scaffoldKey,
-            "Время ожидания соединения истекло",
+            'Время ожидания соединения истекло',
             Duration(seconds: 5),
           );
           break;
@@ -194,11 +194,11 @@ class BookBloc {
       return;
     }
 
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text(alertText),
+    ToastUtils.showToast(
+      alertText,
       duration: alertDuration,
       action: action,
-    ));
+    );
   }
 
   void dispose() {

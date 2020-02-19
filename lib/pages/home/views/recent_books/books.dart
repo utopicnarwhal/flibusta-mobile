@@ -40,7 +40,7 @@ class _BooksPageState extends State<BooksPage>
       builder: (context, homeGridState) {
         var showBackButton = homeGridState is GlobalSearchResultsState ||
             homeGridState is AdvancedSearchResultsState;
-            
+
         return Scaffold(
           key: widget.scaffoldKey,
           appBar: AppBar(
@@ -117,9 +117,7 @@ class _BooksPageState extends State<BooksPage>
           bottomNavigationBar: HomeBottomNavBar(
             key: Key('HomeBottomNavBar'),
             index: 0,
-            onTap: (index) {
-              widget.selectedNavItemController.add(index);
-            },
+            selectedNavItemController: widget.selectedNavItemController,
           ),
         );
       },

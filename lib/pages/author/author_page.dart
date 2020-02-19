@@ -3,6 +3,7 @@ import 'package:flibusta/blocs/home_grid/components/grid_cards.dart';
 import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
+import 'package:flibusta/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
 
 class AuthorPage extends StatefulWidget {
@@ -55,8 +56,8 @@ class _AuthorPageState extends State<AuthorPage> {
 
       authorInfo = parseHtmlFromAuthorInfo(response.data, authorId);
     } catch (e) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Не удалось получить данные об авторе"),
+      ToastUtils.showToast(
+        'Не удалось получить данные об авторе',
         action: SnackBarAction(
           label: "Попробовать ещё раз",
           onPressed: () {
@@ -67,7 +68,7 @@ class _AuthorPageState extends State<AuthorPage> {
             });
           },
         ),
-      ));
+      );
       print(e);
     }
 

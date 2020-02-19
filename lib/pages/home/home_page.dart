@@ -1,13 +1,11 @@
-import 'dart:async';
-
 import 'package:flibusta/blocs/genres_list/genres_list_bloc.dart';
 import 'package:flibusta/blocs/home_grid/bloc.dart';
 import 'package:flibusta/intro.dart';
 import 'package:flibusta/pages/home/views/downloaded_books/downloaded_books.dart';
 import 'package:flibusta/pages/home/views/genres/genres.dart';
+import 'package:flibusta/pages/home/views/profile_view/profile_view.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/proxy_settings_page.dart';
 import 'package:flibusta/pages/home/views/recent_books/books.dart';
-import 'package:flibusta/pages/home/views/settings/settings_page.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   HomeGridBloc _homeGridBloc = HomeGridBloc();
-  StreamController<int> _selectedNavItemController = StreamController<int>();
+  BehaviorSubject<int> _selectedNavItemController = BehaviorSubject<int>();
   GenresListBloc _genresListBloc = GenresListBloc();
   BehaviorSubject<List<String>> _favoriteGenreCodesController = BehaviorSubject<List<String>>();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -81,7 +79,7 @@ class _HomePageState extends State<HomePage> {
                 selectedNavItemController: _selectedNavItemController,
               );
             case 4:
-              return SettingsPage(
+              return ProfileView(
                 scaffoldKey: _scaffoldKey,
                 selectedNavItemController: _selectedNavItemController,
               );
