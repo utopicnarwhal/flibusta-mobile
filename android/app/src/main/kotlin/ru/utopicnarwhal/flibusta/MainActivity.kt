@@ -1,6 +1,5 @@
 package ru.utopicnarwhal.flibusta
 
-import android.content.Context
 import android.media.MediaScannerConnection
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -32,7 +31,7 @@ class MainActivity: FlutterFragmentActivity() {
 
     private fun rescanFolder(dir: String): Int {
         try {
-            MediaScannerConnection.scanFile(this, arrayOf(dir), null, null)
+            MediaScannerConnection.scanFile(this@MainActivity, arrayOf(dir), null, null)
         } catch (e: Exception) {
             return -1
         }
