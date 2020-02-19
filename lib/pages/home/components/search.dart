@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:flibusta/blocs/home_grid/home_grid_bloc.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/pages/home/advanced_search/advanced_search_bs.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 class BookSearch extends StatelessWidget {
   @override
@@ -141,7 +140,7 @@ class _SearchSuggestionBuilder extends StatefulWidget {
 }
 
 class _SearchSuggestionBuilderState extends State<_SearchSuggestionBuilder> {
-  var _previousGridSearchesController = StreamController<List<String>>();
+  var _previousGridSearchesController = BehaviorSubject<List<String>>();
 
   @override
   void initState() {
@@ -170,7 +169,7 @@ class _SearchSuggestionBuilderState extends State<_SearchSuggestionBuilder> {
           ),
         ),
         StreamBuilder<List<String>>(
-          stream: _previousGridSearchesController.stream,
+          stream: _previousGridSearchesController,
           builder: (context, previousSearchesSnapshot) {
             var filteredSuggestions = widget.previousGridSearches
                 ?.where((suggestion) =>

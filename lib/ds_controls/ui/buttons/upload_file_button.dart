@@ -20,7 +20,7 @@ class DsUploadFileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<double>(
-      stream: uploadProgressController.stream,
+      stream: uploadProgressController,
       builder: (context, progressSnapshot) {
         return DashedRect(
           color: Theme.of(context).dividerColor,

@@ -9,6 +9,7 @@ import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class DownloadedBooksView extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -25,12 +26,12 @@ class DownloadedBooksView extends StatefulWidget {
 }
 
 class _DownloadedBooksViewState extends State<DownloadedBooksView> {
-  StreamController<List<BookCard>> downloadedBooksController;
+  BehaviorSubject<List<BookCard>> downloadedBooksController;
 
   @override
   void initState() {
     super.initState();
-    downloadedBooksController = StreamController<List<BookCard>>();
+    downloadedBooksController = BehaviorSubject<List<BookCard>>();
     LocalStorage().getDownloadedBooks().then((downloadedBooks) {
       downloadedBooksController.add(downloadedBooks);
     });
@@ -61,7 +62,7 @@ class _DownloadedBooksViewState extends State<DownloadedBooksView> {
             downloadedBooksController.add(downloadedBooks);
           },
           child: StreamBuilder<List<BookCard>>(
-            stream: downloadedBooksController.stream,
+            stream: downloadedBooksController,
             builder: (context, downloadedBooksSnapshot) {
               if (!downloadedBooksSnapshot.hasData) {
                 return LoadingIndicator();

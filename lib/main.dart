@@ -10,7 +10,6 @@ import 'package:flibusta/route.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'utils/file_utils.dart';
 

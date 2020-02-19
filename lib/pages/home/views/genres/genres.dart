@@ -44,7 +44,7 @@ class GenresView extends StatelessWidget {
             },
             child: Scrollbar(
               child: StreamBuilder<List<String>>(
-                stream: favoriteGenreCodesController.stream,
+                stream: favoriteGenreCodesController,
                 builder: (context, favoriteGenreCodesSnapshot) {
                   genresListSnapshot.data.sort(
                     (genre1, genre2) => _genreSorting(

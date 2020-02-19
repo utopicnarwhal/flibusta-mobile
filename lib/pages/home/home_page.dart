@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       create: (context) => _homeGridBloc,
       child: StreamBuilder<int>(
         initialData: 0,
-        stream: _selectedNavItemController.stream,
+        stream: _selectedNavItemController,
         builder: (context, selectedNavigationItemSnapshot) {
           if (!selectedNavigationItemSnapshot.hasData) {
             return Container();
