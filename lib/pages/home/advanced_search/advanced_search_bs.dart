@@ -1,4 +1,5 @@
 import 'package:flibusta/blocs/genres_list/genres_list_bloc.dart';
+import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flutter/material.dart';
@@ -240,7 +241,7 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: DsAppBar(
         title: Text(
           'Параметры расширенного поиска',
           overflow: TextOverflow.fade,

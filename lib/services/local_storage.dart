@@ -52,6 +52,26 @@ class LocalStorage {
     return await prefs.setBool('IntroCompleted', true);
   }
 
+  Future<bool> putLatestHomeViewNum(int latestHomeView) async {
+    try {
+      var prefs = await _prefs;
+      return await prefs.setInt('latestHomeView', latestHomeView);
+    } catch (e) {
+      print(e);
+      return true;
+    }
+  }
+
+  Future<int> getLatestHomeViewNum() async {
+    try {
+      var prefs = await _prefs;
+      return prefs.getInt('latestHomeView') ?? 0;
+    } catch (e) {
+      print(e);
+      return 0;
+    }
+  }
+
   Future<bool> getShowAdditionalBookInfo() async {
     var prefs = await _prefs;
     try {

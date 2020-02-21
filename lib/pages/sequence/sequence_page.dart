@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flibusta/blocs/home_grid/components/grid_cards.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:flibusta/services/http_client_service.dart';
 import 'package:flibusta/utils/html_parsers.dart';
@@ -41,10 +40,10 @@ class _SequencePageState extends State<SequencePage> {
       appBar: AppBar(
         title: Text(sequenceInfo.title ?? 'Загрузка...'),
       ),
-      body: GridCards(
-        scaffoldKey: _scaffoldKey,
-        data: sequenceInfo.books,
-      ),
+      // body: GridCards(
+      //   scaffoldKey: _scaffoldKey,
+      //   data: sequenceInfo.books,
+      // ),
     );
   }
 

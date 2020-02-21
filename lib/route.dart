@@ -7,7 +7,6 @@ import 'package:flibusta/pages/home/views/profile_view/components/settings/setti
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
-import './pages/login/login_page.dart';
 import './intro.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -23,8 +22,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         case '/':
         case HomePage.routeName:
           return HomePage();
-        case Login.routeName:
-          return Login();
+        // case Login.routeName:
+        //   return Login();
         case IntroPage.routeName:
           return IntroPage();
         case AboutPage.routeName:
@@ -35,8 +34,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           return SettingsPage();
         case BookPage.routeName:
           return BookPage(bookId: settings.arguments);
-        case AuthorPage.routeName:
-          return AuthorPage(authorId: settings.arguments);
+        // case AuthorPage.routeName:
+        //   return AuthorPage(authorId: settings.arguments);
         case SequencePage.routeName:
           return SequencePage(sequenceId: settings.arguments);
         default:
