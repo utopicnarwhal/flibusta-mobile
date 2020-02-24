@@ -21,7 +21,10 @@ class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
     super.initState();
 
     LocalStorage().getLastOpenBooks().then((lastOpenBooks) {
-      this.lastOpenBooks = lastOpenBooks;
+      if (!mounted) return;
+      setState(() {
+        this.lastOpenBooks = lastOpenBooks;
+      });
     });
   }
 

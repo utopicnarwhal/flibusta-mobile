@@ -202,9 +202,9 @@ class BookPageState extends State<BookPage> {
                                 child: Text('Скачать'),
                                 onPressed: formatForDownload != null && snapshot.data.downloadProgress == null ? () {
                                   _bookBloc.downloadBook(
+                                    context,
                                     snapshot.data,
                                     formatForDownload,
-                                    _scaffoldKey,
                                     (downloadProgress) {
                                       setState(() {
                                         snapshot.data.downloadProgress = downloadProgress;

@@ -77,7 +77,7 @@ class LocalStorage {
     var prefs = await _prefs;
     try {
       var lastOpenBooksJsonStrings = prefs.getStringList('LastOpenBooks');
-      if (lastOpenBooksJsonStrings.isEmpty != false) {
+      if (lastOpenBooksJsonStrings?.isEmpty != false) {
         await prefs.setStringList('LastOpenBooks', List<String>());
         return List<BookCard>();
       }

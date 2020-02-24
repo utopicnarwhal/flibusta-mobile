@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
+import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
@@ -7,11 +10,15 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
+import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
+import 'package:flibusta/model/searchResults.dart';
+import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class GridTilesBuilder extends StatefulWidget {
+class GridTilesBuilder extends StatelessWidget {
   final GridDataState gridDataState;
   final String errorMessage;
 
@@ -27,24 +34,11 @@ class GridTilesBuilder extends StatefulWidget {
         super(key: key);
 
   @override
-  _GridTilesBuilderState createState() => _GridTilesBuilderState();
-}
-
-class _GridTilesBuilderState extends State<GridTilesBuilder> {
-  bool uploadingMore = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    var gridDataState = widget.gridDataState;
     List<GridData> gridData;
 
     gridData = gridDataState?.gridData;
-    uploadingMore = gridDataState?.uploadingMore;
+    var uploadingMore = gridDataState?.uploadingMore;
 
     Widget gridListView;
 
@@ -124,8 +118,42 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
                 isLast: index == gridData.length - 1,
                 title: gridData[index].tileTitle,
                 subtitle: gridData[index].tileSubtitle,
-                onTap: () async {},
-                onLongPress: () {},
+                onTap: () {
+                  if (gridData is BookCard) {
+                    Navigator.of(context).pushNamed(
+                      BookPage.routeName,
+                      arguments: gridData[index].id,
+                    );
+                    return;
+                  }
+                  if (gridData is AuthorCard) {
+                    // Navigator.of(context).pushNamed(
+                    //   AuthorPage.routeName,
+                    //   arguments: gridData[index].id,
+                    // );
+                    return;
+                  }
+                  if (gridData is SequenceCard) {
+                    // Navigator.of(context).pushNamed(
+                    //   SequencePage.routeName,
+                    //   arguments: gridData[index].id,
+                    // );
+                    return;
+                  }
+                },
+                onLongPress: () {
+                  showCupertinoModalPopup(
+                    filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                    context: context,
+                    builder: (context) {
+                      return Center(
+                        child: FullInfoCard<GridData>(
+                          data: gridData[index],
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ],
           );
@@ -137,7 +165,8 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
     }
 
     return NotificationListener<ScrollNotification>(
-      onNotification: _handleScrollNotification,
+      onNotification: (scrollNotification) =>
+          _handleScrollNotification(context, scrollNotification),
       child: RefreshIndicator(
         onRefresh: () async {
           try {
@@ -176,10 +205,13 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
     );
   }
 
-  bool _handleScrollNotification(ScrollNotification notification) {
+  bool _handleScrollNotification(
+    BuildContext context,
+    ScrollNotification notification,
+  ) {
     if (notification.depth != 0) return false;
 
-    var gridDataState = widget.gridDataState;
+    var uploadingMore = gridDataState?.uploadingMore;
 
     if (gridDataState?.hasReachedMax != false ||
         uploadingMore ||
@@ -195,17 +227,10 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
             gridDataState?.stateCode == GridDataStateCode.Error) &&
         isScrollingDown &&
         maxScroll - currentScroll <= delta) {
-      uploadingMore = true;
-
       BlocProvider.of<GridDataBloc>(context).uploadMore(
         ((gridDataState.gridData?.length ?? 0) ~/ HomeGridConsts.kPageSize) + 1,
       );
     }
     return false;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-Future<void> showDsModalBottomSheet({
+Future<T> showDsModalBottomSheet<T>({
   @required BuildContext context,
   @required Widget Function(BuildContext) builder,
   String title,
 }) async {
-  await showModalBottomSheet(
+  return await showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
     builder: (context) {
@@ -19,7 +19,7 @@ Future<void> showDsModalBottomSheet({
             Padding(
               padding: EdgeInsets.fromLTRB(8, 4, 8, 8),
               child: Text(
-                title,
+                title ?? '',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.title.copyWith(
                       fontWeight: FontWeight.w600,

@@ -38,14 +38,12 @@ class BookBloc {
   }
 
   Future<Null> downloadBook(
+    BuildContext context,
     BookCard bookCard,
     Map<String, String> downloadFormat,
-    GlobalKey<ScaffoldState> scaffoldKey,
     void Function(double) downloadProgressCallback,
   ) async {
-    PermissionsUtils.storageAccess(
-      context: scaffoldKey.currentContext,
-    );
+    PermissionsUtils.storageAccess(context: context);
 
     Directory saveDocDir = await LocalStorage().getBooksDirectory();
     saveDocDir = Directory(saveDocDir.path);
@@ -59,19 +57,17 @@ class BookBloc {
     String fileUri = "";
     CancelToken cancelToken = CancelToken();
     cancelToken.whenCancel.whenComplete(() {
-      alertsCallback(
-          scaffoldKey, cancelToken.cancelError.message, Duration(seconds: 5));
+      alertsCallback(cancelToken.cancelError.message, Duration(seconds: 5));
     });
 
     downloadProgressCallback(0.0);
     alertsCallback(
-      scaffoldKey,
-      "Подготовка к загрузке",
+      'Подготовка к загрузке',
       Duration(minutes: 1),
       action: SnackBarAction(
-        label: "Отменить",
+        label: 'Отменить',
         onPressed: () {
-          cancelToken.cancel("Загрузка отменена");
+          cancelToken.cancel('Загрузка отменена');
         },
       ),
     );
@@ -80,7 +76,7 @@ class BookBloc {
       var response = await ProxyHttpClient().getDio().downloadUri(
             url,
             (Headers responseHeaders) {
-              alertsCallback(scaffoldKey, "", Duration(seconds: 0));
+              alertsCallback('', Duration(seconds: 0));
 
               var contentDisposition = responseHeaders["content-disposition"];
               if (contentDisposition == null) {
@@ -94,18 +90,18 @@ class BookBloc {
                 fileUri = saveDocDir.path +
                     "/" +
                     contentDisposition[0]
-                        .split("filename=")[1]
-                        .replaceAll("\"", "");
+                        .split('filename=')[1]
+                        .replaceAll('\"', '');
               } catch (e) {
                 downloadProgressCallback(null);
-                cancelToken.cancel("Не удалось получить имя файла");
+                cancelToken.cancel('Не удалось получить имя файла');
                 return fileUri;
               }
 
               var myFile = File(fileUri);
               if (myFile.existsSync()) {
                 downloadProgressCallback(null);
-                cancelToken.cancel("Файл с таким именем уже есть");
+                cancelToken.cancel('Файл с таким именем уже есть');
                 return fileUri;
               }
 
@@ -129,8 +125,7 @@ class BookBloc {
 
       if (response == null || response.statusCode != 200) {
         downloadProgressCallback(null);
-        alertsCallback(
-            scaffoldKey, "Не удалось загрузить", Duration(seconds: 5));
+        alertsCallback('Не удалось загрузить', Duration(seconds: 5));
         return;
       }
 
@@ -138,7 +133,6 @@ class BookBloc {
       await LocalStorage().addDownloadedBook(bookCard);
 
       alertsCallback(
-        scaffoldKey,
         'Файл скачан',
         Duration(seconds: 5),
         action: SnackBarAction(
@@ -151,7 +145,6 @@ class BookBloc {
         case DioErrorType.CONNECT_TIMEOUT:
           print(e.request.path);
           alertsCallback(
-            scaffoldKey,
             'Время ожидания соединения истекло',
             Duration(seconds: 5),
           );
@@ -159,14 +152,12 @@ class BookBloc {
         case DioErrorType.RECEIVE_TIMEOUT:
           print(e);
           alertsCallback(
-            scaffoldKey,
             "Время ожидания загрузки истекло",
             Duration(seconds: 5),
           );
           break;
         default:
           alertsCallback(
-            scaffoldKey,
             e.toString(),
             Duration(seconds: 5),
           );
@@ -176,7 +167,6 @@ class BookBloc {
     } catch (e) {
       print(e);
       alertsCallback(
-        scaffoldKey,
         e.toString(),
         Duration(seconds: 5),
       );
@@ -186,10 +176,9 @@ class BookBloc {
     downloadProgressCallback(null);
   }
 
-  alertsCallback(GlobalKey<ScaffoldState> _scaffoldKey, String alertText,
+  alertsCallback(String alertText,
       Duration alertDuration,
       {SnackBarAction action}) {
-    _scaffoldKey.currentState.hideCurrentSnackBar();
     if (alertText.isEmpty) {
       return;
     }

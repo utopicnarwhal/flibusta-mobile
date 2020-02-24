@@ -12,8 +12,6 @@ const Widget kIconArrowForward = const Icon(
   size: 20,
 );
 
-const double kCardBorderRadius = 7;
-
 class HomeGridConsts {
   static const int kPageSize = 50; // default
   static const double kMaxCardWidth = 320.0;

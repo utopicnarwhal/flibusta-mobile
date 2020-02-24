@@ -32,12 +32,11 @@ class GridDataTile extends StatelessWidget {
             onTap: onTap,
             splashColor: Theme.of(context).accentColor.withOpacity(0.4),
             child: ListTile(
-              isThreeLine: true,
               title: Text(title ?? ''),
               subtitle: Text(subtitle ?? ''),
             ),
           ),
-          if (!isLast || isFirst) Divider(indent: 80),
+          if (!isLast || isFirst) Divider(indent: 16),
         ],
       ),
     );
