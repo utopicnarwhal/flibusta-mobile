@@ -32,14 +32,14 @@ BookCard _$BookCardFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$BookCardToJson(BookCard instance) => <String, dynamic>{
       'id': instance.id,
-      'genres': instance.genres,
+      'genres': instance.genres?.toJson(),
       'sequenceId': instance.sequenceId,
       'sequenceTitle': instance.sequenceTitle,
       'title': instance.title,
       'size': instance.size,
-      'downloadFormats': instance.downloadFormats,
-      'authors': instance.authors,
-      'translators': instance.translators,
+      'downloadFormats': instance.downloadFormats?.toJson(),
+      'authors': instance.authors?.toJson(),
+      'translators': instance.translators?.toJson(),
       'downloadProgress': instance.downloadProgress,
       'localPath': instance.localPath,
     };

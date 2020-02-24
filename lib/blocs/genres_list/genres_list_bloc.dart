@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/genre.dart';
-import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/http_client.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GenresListBloc {

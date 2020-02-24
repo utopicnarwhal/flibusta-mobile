@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:flibusta/constants.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,6 +73,41 @@ class LocalStorage {
     }
   }
 
+  Future<List<BookCard>> getLastOpenBooks() async {
+    var prefs = await _prefs;
+    try {
+      var lastOpenBooksJsonStrings = prefs.getStringList('LastOpenBooks');
+      if (lastOpenBooksJsonStrings.isEmpty != false) {
+        await prefs.setStringList('LastOpenBooks', List<String>());
+        return List<BookCard>();
+      }
+      var lastOpenBooks = lastOpenBooksJsonStrings.map((jsonBookString) {
+        return BookCard.fromJson(json.decode(jsonBookString));
+      }).toList();
+      return lastOpenBooks;
+    } catch (e) {
+      await prefs.setStringList('LastOpenBooks', List<String>());
+      return List<BookCard>();
+    }
+  }
+
+  Future<bool> addToLastOpenBooks(BookCard book) async {
+    var prefs = await _prefs;
+    var lastOpenBooks = await getLastOpenBooks();
+    lastOpenBooks.add(book);
+    if (lastOpenBooks.length > 3) {
+      lastOpenBooks = lastOpenBooks.sublist(
+        lastOpenBooks.length - 3,
+        lastOpenBooks.length,
+      );
+    }
+
+    return await prefs.setStringList(
+      'LastOpenBooks',
+      lastOpenBooks.map((book) => json.encode(book.toJson())).toList(),
+    );
+  }
+
   Future<bool> getShowAdditionalBookInfo() async {
     var prefs = await _prefs;
     try {
@@ -89,7 +125,8 @@ class LocalStorage {
 
   Future<bool> setShowAdditionalBookInfo(bool showAdditionalBookInfo) async {
     var prefs = await _prefs;
-    return await prefs.setBool('ShowAdditionalBookInfo', showAdditionalBookInfo ?? true);
+    return await prefs.setBool(
+        'ShowAdditionalBookInfo', showAdditionalBookInfo ?? true);
   }
 
   Future<String> getActualProxy() async {
@@ -214,13 +251,20 @@ class LocalStorage {
     return await prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
   }
 
-  Future<List<BookCard>> getDownloadedBooks() async {
+  Future<List<BookCard>> getDownloadedBooks([int page]) async {
     var prefs = await _prefs;
     try {
       var downloadedBooksJsonStrings = prefs.getStringList('DownloadedBooks');
       if (downloadedBooksJsonStrings.isEmpty != false) {
         await prefs.setStringList('DownloadedBooks', List<String>());
         return List<BookCard>();
+      }
+      if (page != null &&
+          downloadedBooksJsonStrings.length > HomeGridConsts.kPageSize) {
+        downloadedBooksJsonStrings = downloadedBooksJsonStrings.sublist(
+          (page - 1) * HomeGridConsts.kPageSize,
+          page * HomeGridConsts.kPageSize,
+        );
       }
       var downloadedBooks = downloadedBooksJsonStrings.map((jsonBookString) {
         return BookCard.fromJson(json.decode(jsonBookString));

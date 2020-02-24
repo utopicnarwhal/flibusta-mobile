@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
-import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/html_parsers.dart';

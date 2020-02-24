@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
-import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/toast_utils.dart';
 import 'package:flutter/cupertino.dart';

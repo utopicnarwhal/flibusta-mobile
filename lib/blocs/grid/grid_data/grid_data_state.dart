@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flutter/material.dart';
 
 enum GridDataStateCode {

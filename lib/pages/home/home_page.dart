@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   void _initGridData() {
     _gridDataBlocsList = [];
     for (var gridViewType in GridViewType.values) {
-      _gridDataBlocsList.add(GridDataBloc(gridViewType.index));
+      _gridDataBlocsList.add(GridDataBloc(gridViewType));
     }
 
     _selectedViewTypeSubscription =

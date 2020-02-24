@@ -2,12 +2,16 @@ import 'dart:io';
 import 'dart:async';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 
 class ProxyHttpClient {
-  static final ProxyHttpClient proxyDio = ProxyHttpClient._internal();
+  static final ProxyHttpClient _httpClientSingleton =
+      ProxyHttpClient._internal();
 
   factory ProxyHttpClient() {
-    return proxyDio;
+    _httpClientSingleton?._init();
+    return _httpClientSingleton;
   }
   ProxyHttpClient._internal();
 
@@ -16,6 +20,7 @@ class ProxyHttpClient {
     receiveTimeout: 6000,
   );
   Dio _dio = Dio(defaultDioOptions);
+
   String _proxyHostPort = '';
   Uri _proxyApiUri = Uri.http('pubproxy.com', '/api/proxy', {
     'https': 'true',
@@ -30,6 +35,26 @@ class ProxyHttpClient {
     return _dio;
   }
 
+  void _init() {
+    if (_dio.interceptors.isNotEmpty) {
+      return;
+    }
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (RequestOptions options) async {
+          if (kReleaseMode == false) {
+            print('Send request：path = ${options.path}');
+            print('data: ${options.data}');
+          }
+        },
+        onError: (dioError) {
+          return DsError.fromDioError(dioError: dioError);
+        },
+      ),
+    );
+  }
+
   void setProxy(String hostPort) {
     if (_proxyHostPort == hostPort) {
       return;
@@ -37,19 +62,12 @@ class ProxyHttpClient {
     _proxyHostPort = hostPort;
     var newDio = Dio(defaultDioOptions);
 
-    if (hostPort == '') {
-      (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-          (HttpClient client) {
-        client.findProxy = null;
-      };
-      _dio.clear();
-      _dio.close();
-      _dio = newDio;
-      return;
-    }
-
     (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
+      if (hostPort == '') {
+        client.findProxy = null;
+        return;
+      }
       client.findProxy = (url) {
         return HttpClient.findProxyFromEnvironment(url, environment: {
           'HTTPS_PROXY': hostPort,

@@ -95,7 +95,7 @@ class ProfileView extends StatelessWidget {
       ),
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
-        index: 4,
+        index: 3,
         selectedNavItemController: selectedNavItemController,
       ),
     );

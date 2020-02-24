@@ -1,5 +1,6 @@
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
+import 'package:flibusta/pages/home/views/general_view/components/last_open_books.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -26,6 +27,8 @@ class GeneralView extends StatelessWidget {
               ),
         ),
       ),
+      SizedBox(height: 8),
+      LastOpenBooksCard(),
       SizedBox(height: 8),
     ];
 

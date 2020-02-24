@@ -5,7 +5,9 @@ import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
+import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
+import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -98,11 +100,8 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
         ),
       );
     } else if (gridDataState?.stateCode == GridDataStateCode.Loading) {
-      gridListView = ShimmerLeadList(
-        listCount: shimmerListCount,
-        hasFirst: true,
-      );
-    } else if (gridData != null && widget.selectedleadIds != null) {
+      gridListView = ShimmerListTile();
+    } else if (gridData != null) {
       gridListView = ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -112,10 +111,7 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
             return Column(
               children: <Widget>[
                 Divider(indent: 80),
-                ShimmerLeadList(
-                  listCount: 1,
-                  hasFirst: false,
-                ),
+                ShimmerListTile(),
               ],
             );
           }
@@ -126,12 +122,10 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
                 index: index,
                 isFirst: index == 0,
                 isLast: index == gridData.length - 1,
-                onTap: () async {
-                  
-                },
-                onLongPress: () {
-                  
-                },
+                title: gridData[index].tileTitle,
+                subtitle: gridData[index].tileSubtitle,
+                onTap: () async {},
+                onLongPress: () {},
               ),
             ],
           );
@@ -139,10 +133,7 @@ class _GridTilesBuilderState extends State<GridTilesBuilder> {
         itemCount: uploadingMore ? (gridData.length + 1) : gridData.length,
       );
     } else {
-      gridListView = ShimmerLeadList(
-        listCount: shimmerListCount,
-        hasFirst: true,
-      );
+      gridListView = ShimmerListTile();
     }
 
     return NotificationListener<ScrollNotification>(

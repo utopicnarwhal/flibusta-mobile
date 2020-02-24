@@ -1,4 +1,7 @@
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
+import 'package:flibusta/model/bookCard.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class LastOpenBooksCard extends StatefulWidget {
@@ -11,11 +14,15 @@ class LastOpenBooksCard extends StatefulWidget {
 }
 
 class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
-  int notSentToWorkGridLength;
+  List<BookCard> lastOpenBooks;
 
   @override
   void initState() {
     super.initState();
+
+    LocalStorage().getLastOpenBooks().then((lastOpenBooks) {
+      this.lastOpenBooks = lastOpenBooks;
+    });
   }
 
   @override
@@ -36,13 +43,18 @@ class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
         SizedBox(height: 8),
         Card(
           margin: EdgeInsets.zero,
-          child: notSentToWorkGridLength == 0
-              ? Column(
+          child: Builder(
+            builder: (context) {
+              if (lastOpenBooks == null) {
+                return ShimmerListTile();
+              }
+              if (lastOpenBooks.length == 0) {
+                return Column(
                   children: [
                     Container(
                       padding: EdgeInsets.all(20.0),
                       child: Text(
-                        'Нет неотправленных заявок',
+                        'Здесь будут последние три книги, которые вы открыли.',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
@@ -50,37 +62,30 @@ class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
                       ),
                     ),
                   ],
-                )
-              : Column(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        '',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: kIconArrowForward,
-                      onTap: () {},
+                );
+              }
+              return ListView.separated(
+                shrinkWrap: true,
+                addSemanticIndexes: false,
+                physics: NeverScrollableScrollPhysics(),
+                separatorBuilder: (context, index) {
+                  return Divider(indent: 16);
+                },
+                itemCount: lastOpenBooks.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(
+                      lastOpenBooks[index].tileTitle,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Divider(indent: 16),
-                    ListTile(
-                      title: Text(
-                        '',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: kIconArrowForward,
-                      onTap: () {},
-                    ),
-                    Divider(indent: 16),
-                    ListTile(
-                      title: Text(
-                        '',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: kIconArrowForward,
-                      onTap: () {},
-                    ),
-                  ],
-                ),
+                    subtitle: Text(lastOpenBooks[index].tileSubtitle),
+                    trailing: kIconArrowForward,
+                    onTap: () {},
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );

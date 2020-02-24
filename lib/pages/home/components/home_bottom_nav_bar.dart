@@ -39,12 +39,8 @@ class HomeBottomNavBar extends StatelessWidget {
             title: Text('Главная'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.americanSignLanguageInterpreting),
-            title: Text('Жанры'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.fileDownload),
-            title: Text('Скачанные'),
+            icon: Icon(FontAwesomeIcons.book),
+            title: Text('Книги'),
           ),
           BottomNavigationBarItem(
             icon: Padding(

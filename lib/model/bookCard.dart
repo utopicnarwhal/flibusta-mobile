@@ -1,3 +1,4 @@
+import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -5,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'bookCard.g.dart';
 
 @JsonSerializable()
-class BookCard {
+class BookCard extends GridData {
   int id;
   Genres genres;
   int sequenceId;
@@ -17,6 +18,14 @@ class BookCard {
   Translators translators;
   double downloadProgress;
   String localPath;
+
+  String get tileTitle {
+    return title;
+  }
+
+  String get tileSubtitle {
+    return authors?.toString();
+  }
 
   BookCard({
     this.id,

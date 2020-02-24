@@ -1,6 +1,6 @@
-import 'package:equatable/equatable.dart';
+import 'package:flibusta/model/grid_data/grid_data.dart';
 
-class Genre extends Equatable {
+class Genre extends GridData {
   final int id;
   final String name;
   final String code;
@@ -12,5 +12,8 @@ class Genre extends Equatable {
   }) : assert(id != null);
 
   @override
-  List<Object> get props => [id];
+  String get tileSubtitle => this.code;
+
+  @override
+  String get tileTitle => this.name;
 }

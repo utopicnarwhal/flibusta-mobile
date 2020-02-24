@@ -1,5 +1,4 @@
 import 'package:flibusta/ds_controls/ui/splash_screen.dart';
-import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/donate.dart';

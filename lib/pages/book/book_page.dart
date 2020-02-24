@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/model/bookInfo.dart';
-import 'package:flibusta/services/http_client_service.dart';
+import 'package:flibusta/services/http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/components/loading_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';

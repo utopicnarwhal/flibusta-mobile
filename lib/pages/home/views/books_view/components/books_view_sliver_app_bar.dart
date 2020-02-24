@@ -42,9 +42,9 @@ class BooksViewSliverAppBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.fromLTRB(12, 24, 12, 8),
+                  padding: EdgeInsets.fromLTRB(16, 28, 16, 8),
                   child: Text(
-                    'Заявки',
+                    'Книги',
                     style: Theme.of(context).textTheme.display1.copyWith(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).textTheme.body1.color,

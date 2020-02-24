@@ -1,23 +1,19 @@
 import 'package:dio/dio.dart';
 
-class DsError {
-  final String userMessage;
-  final DioError dioError;
+class DsError extends DioError {
+  String userMessage;
 
   DsError({
     this.userMessage,
-    this.dioError,
   });
 
-  @override
-  String toString() {
-    return userMessage;
-  }
-}
-
-extension DioErrorExtension on DioError {
-  DsError handleHttpError() {
+  DsError.fromDioError({DioError dioError}) {
     var userMessage = '';
+    this.error = dioError.error;
+    this.request = dioError.request;
+    this.response = dioError.response;
+    this.type = dioError.type;
+
     switch (this.type) {
       case DioErrorType.RESPONSE:
         switch (this.response.statusCode) {
@@ -30,11 +26,14 @@ extension DioErrorExtension on DioError {
                 this.response.data['Message'] != null) {
               userMessage = '${this.response.data['Message'].toString()}';
             } else {
-              userMessage = 'Ошибка подключения к серверу';
+              userMessage = 'Ошибка подключения к серверу Росбанк ДомPro';
             }
             break;
+          case 500:
+            userMessage = 'Произошла внутренняя ошибка сервера Росбанк ДомPro';
+            break;
           default:
-            userMessage = 'Ошибка подключения к серверу';
+            userMessage = 'Ошибка подключения к серверу Росбанк ДомPro';
             break;
         }
         break;
@@ -58,9 +57,11 @@ extension DioErrorExtension on DioError {
         userMessage = 'Ошибка подключения к серверу';
         break;
     }
-    return DsError(
-      userMessage: userMessage,
-      dioError: this,
-    );
+    this.userMessage = userMessage;
+  }
+
+  @override
+  String toString() {
+    return userMessage;
   }
 }
