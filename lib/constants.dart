@@ -5,7 +5,7 @@ const kBouncingAlwaysScrollableScrollPhysics = BouncingScrollPhysics(
   parent: AlwaysScrollableScrollPhysics(),
 );
 
-const kSplashsceenToLoginTransitionDuration = Duration(milliseconds: 500);
+const kFromSplashsceenTransitionDuration = Duration(milliseconds: 1000);
 
 const Widget kIconArrowForward = const Icon(
   EvaIcons.arrowIosForward,

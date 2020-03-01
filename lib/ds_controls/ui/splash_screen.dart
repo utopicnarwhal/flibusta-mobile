@@ -1,15 +1,19 @@
 import 'dart:ui';
 
+import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
+import 'package:flibusta/intro.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flare_flutter/flare_cache.dart';
 import 'package:flare_flutter/provider/asset_flare.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const _filesToWarmup = [
   'assets/animations/empty_state.flr',
+  'assets/animations/agreement.flr',
 ];
 
 class SplashScreen extends StatefulWidget {
@@ -35,6 +39,17 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     // if (isUserAlreadyAuthorized == true) {
+
+    if (!await LocalStorage().getIntroCompleted()) {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          transitionDuration: kFromSplashsceenTransitionDuration,
+          pageBuilder: (context, __, ___) => IntroPage(),
+        ),
+      );
+      return;
+    }
+
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         transitionDuration: Duration(milliseconds: 0),

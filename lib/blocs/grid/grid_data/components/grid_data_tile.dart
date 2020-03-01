@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class GridDataTile extends StatelessWidget {
   final String title;
   final String subtitle;
+  final List<String> genres;
   final GestureTapCallback onTap;
   final GestureLongPressCallback onLongPress;
   final bool isFirst;
@@ -13,6 +14,7 @@ class GridDataTile extends StatelessWidget {
   GridDataTile({
     @required this.title,
     @required this.subtitle,
+    this.genres,
     this.onTap,
     this.onLongPress,
     this.isFirst = false,
@@ -33,12 +35,49 @@ class GridDataTile extends StatelessWidget {
             splashColor: Theme.of(context).accentColor.withOpacity(0.4),
             child: ListTile(
               title: Text(title ?? ''),
-              subtitle: Text(subtitle ?? ''),
+              subtitle: Column(
+                children: <Widget>[
+                  Text(
+                    subtitle ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                  ),
+                  if (genres?.isNotEmpty == true) _genresBuilder(genres),
+                ],
+              ),
+              isThreeLine: genres?.isNotEmpty == true,
             ),
           ),
           if (!isLast || isFirst) Divider(indent: 16),
         ],
       ),
+    );
+  }
+
+  Widget _genresBuilder(List<String> genres) {
+    return Row(
+      children: genres?.map((genre) {
+        return Container(
+          margin: EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 6,
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 6,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: Colors.green,
+          ),
+          child: Text(
+            genre,
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        );
+      })?.toList(),
     );
   }
 }

@@ -33,15 +33,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _initIntro();
     _initNavItemController();
     _initGridData();
-  }
-
-  void _initIntro() async {
-    if (!await LocalStorage().getIntroCompleted()) {
-      Navigator.of(context).pushReplacementNamed(IntroPage.routeName);
-    }
   }
 
   void _initNavItemController() async {

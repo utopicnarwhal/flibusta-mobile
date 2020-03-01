@@ -109,6 +109,14 @@ class GridTilesBuilder extends StatelessWidget {
               ],
             );
           }
+          List<String> genresStrings;
+          if (gridData[index] is BookCard) {
+            genresStrings =
+                (gridData[index] as BookCard)?.genres?.list?.map((genre) {
+              return genre.values?.first;
+            });
+          }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -118,6 +126,7 @@ class GridTilesBuilder extends StatelessWidget {
                 isLast: index == gridData.length - 1,
                 title: gridData[index].tileTitle,
                 subtitle: gridData[index].tileSubtitle,
+                genres: genresStrings,
                 onTap: () {
                   if (gridData is BookCard) {
                     Navigator.of(context).pushNamed(

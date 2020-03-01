@@ -10,17 +10,17 @@ dependencies:
   flutter:
     sdk: flutter
 
-  dio: ^3.0.8
+  dio: ^3.0.9
 
   flutter_typeahead: ^1.8.0
   mask_text_input_formatter: ^1.0.6
 
   flutter_secure_storage: ^3.3.1+1
-  shared_preferences: ^0.5.6+1
+  shared_preferences: ^0.5.6+2
 
-  url_launcher: ^5.4.1
+  url_launcher: ^5.4.2
 
-  font_awesome_flutter: ^8.6.0
+  font_awesome_flutter: ^8.7.0
   eva_icons_flutter: ^2.0.0
 
   flutter_bloc: ^3.2.0
@@ -30,28 +30,28 @@ dependencies:
   equatable: ^1.1.0
   provider: ^4.0.4
 
-  path_provider: ^1.6.0
+  path_provider: ^1.6.1
   open_file: ^3.0.1
 
   html: ^0.14.0+3
-  permission_handler: ^4.2.0+hotfix.3
+  permission_handler: ^4.3.0
   
   flutter_slidable: ^0.5.4
-  oktoast: ^2.3.1
+  oktoast: ^2.3.1+1
   shimmer: ^1.0.1
   avatar_glow: ^1.1.0
   flutter_staggered_animations: ^0.1.2
   launch_review: ^2.0.0
-  package_info: ^0.4.0+13
+  package_info: ^0.4.0+14
   flutter_screenutil: ^1.0.2
   flare_flutter: ^2.0.1
 
-  share: ^0.6.3+5
-  connectivity: ^0.4.6+2
+  share: ^0.6.3+6
+  connectivity: ^0.4.8+1
   data_connection_checker: ^0.3.4
   
-  intro_views_flutter: ^2.8.0
-  flutter_svg: ^0.15.0
+  introduction_screen: ^1.0.8
+  flutter_svg: ^0.17.2
   
   json_annotation: ^3.0.1
   intl: ^0.16.0
@@ -73,6 +73,7 @@ flutter:
     - assets/img/flibusta_logo.png
     - assets/img/4pda_logo.svg
     - assets/animations/empty_state.flr
+    - assets/animations/agreement.flr
 
   fonts:
     - family: Inter

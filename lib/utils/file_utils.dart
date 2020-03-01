@@ -149,6 +149,9 @@ class FileUtils {
 
     if (Platform.isAndroid) {
       storageDir = await LocalStorage().getBooksDirectory();
+      if (storageDir == null) {
+        storageDir = await getExternalStorageDirectory();
+      }
       storageDir = Directory(storageDir.path);
       if (!storageDir.existsSync()) {
         storageDir.createSync(recursive: true);

@@ -158,7 +158,7 @@ class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog>
           ));
     } else if (status == PermissionStatus.granted) {
       return DirectoryList();
-    } else if (status == PermissionStatus.disabled) {
+    } else if (status == PermissionStatus.neverAskAgain) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(spacing * 2),

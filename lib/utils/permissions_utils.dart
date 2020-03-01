@@ -11,7 +11,6 @@ class PermissionsUtils {
 
     switch (permissionStatus) {
       case PermissionStatus.restricted:
-      case PermissionStatus.disabled:
         ToastUtils.showToast(
           'На вашем устройстве отключена возможность работы с памятью',
           type: ToastType.error,
@@ -21,6 +20,7 @@ class PermissionsUtils {
         return true;
         break;
       case PermissionStatus.denied:
+      case PermissionStatus.neverAskAgain:
       case PermissionStatus.unknown:
         var permissionNames = await PermissionHandler()
             .requestPermissions([PermissionGroup.storage]);
