@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/blocs/grid/selected_view_type/selected_view_type_bloc.dart';
-import 'package:flibusta/intro.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/pages/home/views/books_view/books_view.dart';
 import 'package:flibusta/pages/home/views/general_view/general_view.dart';

@@ -31,27 +31,20 @@ main() async {
   }
   var preparationFutures = List<Future>();
   preparationFutures.add(LocalStorage().checkVersion());
-  preparationFutures.add(LocalStorage().getActualProxy());
-  preparationFutures.add(LocalStorage().getFlibustaHostAddress());
-  preparationFutures.add(LocalStorage().getBooksDirectory());
+  preparationFutures.add(LocalStorage()
+      .getActualProxy()
+      .then((actualProxy) => ProxyHttpClient().setProxy(actualProxy)));
+  preparationFutures.add(LocalStorage()
+      .getHostAddress()
+      .then((url) => ProxyHttpClient().setHostAddress(url)));
+  preparationFutures.add(LocalStorage().getBooksDirectory().then((dir) async {
+    var externalStorageDownloadDirectories = await FileUtils.getStorageDir();
+    await LocalStorage().setBooksDirectory(externalStorageDownloadDirectories);
+  }));
   preparationFutures.add(PermissionsUtils.storageAccess());
 
-  var preparationResults = await Future.wait(preparationFutures);
+  await Future.wait(preparationFutures);
 
-  ProxyHttpClient().setProxy(
-    preparationResults.length > 1 ? preparationResults.elementAt(1) : '',
-  );
-  ProxyHttpClient().setFlibustaHostAddress(
-    preparationResults.length > 2
-        ? preparationResults.elementAt(2)
-        : 'flibusta.is',
-  );
-  if (preparationResults.length > 3 &&
-      preparationResults.elementAt(3) == null) {
-    var externalStorageDownloadDirectories =
-        await FileUtils.getStorageDir();
-    await LocalStorage().setBooksDirectory(externalStorageDownloadDirectories);
-  }
   runApp(FlibustaApp());
 }
 

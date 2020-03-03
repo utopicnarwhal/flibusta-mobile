@@ -28,7 +28,7 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
   }
 
   void refreshGridData() {
-    this.add(RefreshGridDataEvent());
+    this.add(LoadGridDataEvent());
   }
 
   void uploadMore(int nextPageNumber) {

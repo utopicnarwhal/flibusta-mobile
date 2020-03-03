@@ -204,13 +204,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.9"
-  dots_indicator:
-    dependency: transitive
-    description:
-      name: dots_indicator
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.0"
   easy_debounce:
     dependency: "direct main"
     description:
@@ -399,13 +392,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.0"
-  introduction_screen:
+  intro_slider:
     dependency: "direct main"
     description:
-      name: introduction_screen
+      name: intro_slider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.8"
+    version: "2.2.9"
   io:
     dependency: transitive
     description:

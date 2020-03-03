@@ -50,7 +50,7 @@
 //   Future<AuthorInfo> getAuthorInfo(int authorId) async {
 //     authorInfo = AuthorInfo(id: authorId);
 //     try {
-//       Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
+//       Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
 //           "/a/" + authorId.toString());
 //       var response = await _dio.getUri(url);
 

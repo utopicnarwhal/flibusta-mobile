@@ -57,7 +57,7 @@ class GenresListBloc {
     Map<String, String> queryParams = {
       "op": "getList",
     };
-    Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
+    Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
         "/ajaxro/genre", queryParams);
     try {
       var response = await _dio.getUri(url);

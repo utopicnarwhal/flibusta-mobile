@@ -36,21 +36,21 @@ class LocalStorage {
   Future<bool> getIntroCompleted() async {
     var prefs = await _prefs;
     try {
-      var introCompleted = prefs.getBool('IntroCompleted');
+      var introCompleted = prefs.getBool('Intro2Completed');
       if (introCompleted == null) {
-        await prefs.setBool('IntroCompleted', false);
+        await prefs.setBool('Intro2Completed', false);
         introCompleted = false;
       }
       return introCompleted;
     } catch (e) {
-      await prefs.setBool('IntroCompleted', false);
+      await prefs.setBool('Intro2Completed', false);
       return false;
     }
   }
 
   Future<bool> setIntroCompleted() async {
     var prefs = await _prefs;
-    return await prefs.setBool('IntroCompleted', true);
+    return await prefs.setBool('Intro2Completed', true);
   }
 
   Future<bool> putLatestHomeViewNum(int latestHomeView) async {
@@ -182,22 +182,22 @@ class LocalStorage {
     return await prefs.setStringList('Proxies', proxies);
   }
 
-  Future<String> getFlibustaHostAddress() async {
+  Future<String> getHostAddress() async {
     var prefs = await _prefs;
     try {
       var flibustaHostAddress = prefs.getString('FlibustaHostAddress');
       if (flibustaHostAddress == null) {
-        await prefs.setString('FlibustaHostAddress', 'flibusta.is');
-        flibustaHostAddress = 'flibusta.is';
+        await prefs.setString('FlibustaHostAddress', '');
+        flibustaHostAddress = '';
       }
       return flibustaHostAddress;
     } catch (e) {
-      await prefs.setString('FlibustaHostAddress', 'flibusta.is');
+      await prefs.setString('FlibustaHostAddress', '');
       return '';
     }
   }
 
-  Future<bool> setFlibustaHostAddress(String hostAddress) async {
+  Future<bool> setHostAddress(String hostAddress) async {
     var prefs = await _prefs;
     return await prefs.setString('FlibustaHostAddress', hostAddress);
   }

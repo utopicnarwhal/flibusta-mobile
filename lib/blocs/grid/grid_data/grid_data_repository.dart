@@ -35,7 +35,7 @@ class GridDataRepository {
       queryParams.addAll({"g": advancedSearchParams.genres});
     }
     Uri url = Uri.https(
-      ProxyHttpClient().getFlibustaHostAddress(),
+      ProxyHttpClient().getHostAddress(),
       "/makebooklist",
       queryParams,
     );
@@ -54,7 +54,7 @@ class GridDataRepository {
   //     "chb": "on"
   //   };
   //   Uri url = Uri.https(
-  //       ProxyHttpClient().getFlibustaHostAddress(), "/booksearch", queryParams);
+  //       ProxyHttpClient().getHostAddress(), "/booksearch", queryParams);
   //   try {
   //     var response = await ProxyHttpClient().getDio().getUri(url);
   //     var result = parseHtmlFromBookSearch(response.data);
@@ -76,7 +76,7 @@ class GridDataRepository {
       "op": "getList",
     };
     Uri url = Uri.https(
-      ProxyHttpClient().getFlibustaHostAddress(),
+      ProxyHttpClient().getHostAddress(),
       "/ajaxro/genre",
       queryParams,
     );

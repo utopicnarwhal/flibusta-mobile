@@ -34,15 +34,23 @@ class GridDataTile extends StatelessWidget {
             onTap: onTap,
             splashColor: Theme.of(context).accentColor.withOpacity(0.4),
             child: ListTile(
-              title: Text(title ?? ''),
+              title: Text(
+                title ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.fade,
+                softWrap: false,
+              ),
               subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     subtitle ?? '',
                     maxLines: 1,
                     overflow: TextOverflow.fade,
                   ),
-                  if (genres?.isNotEmpty == true) _genresBuilder(genres),
+                  if (genres?.isNotEmpty == true) ...[
+                    _genresBuilder(context, genres)
+                  ],
                 ],
               ),
               isThreeLine: genres?.isNotEmpty == true,
@@ -54,30 +62,49 @@ class GridDataTile extends StatelessWidget {
     );
   }
 
-  Widget _genresBuilder(List<String> genres) {
-    return Row(
-      children: genres?.map((genre) {
-        return Container(
-          margin: EdgeInsets.symmetric(
-            vertical: 4,
-            horizontal: 6,
-          ),
-          padding: EdgeInsets.symmetric(
-            vertical: 4,
-            horizontal: 6,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: Colors.green,
-          ),
-          child: Text(
-            genre,
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        );
-      })?.toList(),
+  Widget _genresBuilder(BuildContext context, List<String> genres) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 30,
+      child: ShaderMask(
+        shaderCallback: (Rect bounds) {
+          return LinearGradient(
+            tileMode: TileMode.clamp,
+            colors: [
+              Theme.of(context).cardColor,
+              Theme.of(context).cardColor.withOpacity(0),
+            ],
+          ).createShader(
+            Rect.fromLTWH(bounds.width - 20, 0, 20, bounds.height),
+          );
+        },
+        blendMode: BlendMode.dstATop,
+        child: ListView.separated(
+          padding: EdgeInsets.only(top: 6),
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          scrollDirection: Axis.horizontal,
+          itemCount: genres?.length ?? 0,
+          separatorBuilder: (context, index) {
+            return SizedBox(width: 10);
+          },
+          itemBuilder: (context, index) {
+            return Container(
+              padding: EdgeInsets.symmetric(
+                vertical: 4,
+                horizontal: 6,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+              child: Text(
+                genres.elementAt(index),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

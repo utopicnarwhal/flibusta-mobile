@@ -57,7 +57,7 @@ class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
                     Container(
                       padding: EdgeInsets.all(20.0),
                       child: Text(
-                        'Здесь будут последние три книги, которые вы открыли.',
+                        'Здесь будут последние три книги, которые вы открывали.',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,

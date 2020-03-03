@@ -25,7 +25,7 @@ class BookBloc {
   Future<Null> getBookInfo() async {
     var bookInfo = BookInfo(id: _bookId);
     try {
-      Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
+      Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
           "/b/" + _bookId.toString());
       var response = await ProxyHttpClient().getDio().getUri(url);
 
@@ -52,7 +52,7 @@ class BookBloc {
       await NativeMethods.rescanFolder(saveDocDir.path);
     }
 
-    Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
+    Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
         "/b/$_bookId/${downloadFormat.values.first}");
     String fileUri = "";
     CancelToken cancelToken = CancelToken();

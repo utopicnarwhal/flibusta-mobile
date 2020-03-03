@@ -1,5 +1,5 @@
 name: flibusta
-description: Mobile application for site https://flibusta.is
+description: Mobile application
 
 version: 0.3.5+21
 
@@ -50,7 +50,7 @@ dependencies:
   connectivity: ^0.4.8+1
   data_connection_checker: ^0.3.4
   
-  introduction_screen: ^1.0.8
+  intro_slider: ^2.2.9
   flutter_svg: ^0.17.2
   
   json_annotation: ^3.0.1
@@ -73,7 +73,10 @@ flutter:
     - assets/img/flibusta_logo.png
     - assets/img/4pda_logo.svg
     - assets/animations/empty_state.flr
-    - assets/animations/agreement.flr
+    - assets/animations/floating_document.flr
+    - assets/animations/questions.flr
+    - assets/animations/like.flr
+    - assets/animations/roskomnadzor.flr
 
   fonts:
     - family: Inter

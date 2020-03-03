@@ -13,7 +13,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const _filesToWarmup = [
   'assets/animations/empty_state.flr',
-  'assets/animations/agreement.flr',
+  'assets/animations/floating_document.flr',
+  'assets/animations/questions.flr',
+  'assets/animations/like.flr',
+  'assets/animations/roskomnadzor.flr',
 ];
 
 class SplashScreen extends StatefulWidget {

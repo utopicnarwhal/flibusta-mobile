@@ -50,7 +50,7 @@ class _SequencePageState extends State<SequencePage> {
   Future<SequenceInfo> getSequenceInfo(int sequenceId) async {
     sequenceInfo = SequenceInfo(id: sequenceId);
     try {
-      Uri url = Uri.https(ProxyHttpClient().getFlibustaHostAddress(),
+      Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
           "/s/" + sequenceId.toString());
       var response = await _dio.getUri(url);
 

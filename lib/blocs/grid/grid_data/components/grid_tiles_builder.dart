@@ -114,7 +114,7 @@ class GridTilesBuilder extends StatelessWidget {
             genresStrings =
                 (gridData[index] as BookCard)?.genres?.list?.map((genre) {
               return genre.values?.first;
-            });
+            })?.toList();
           }
 
           return Column(
@@ -128,21 +128,21 @@ class GridTilesBuilder extends StatelessWidget {
                 subtitle: gridData[index].tileSubtitle,
                 genres: genresStrings,
                 onTap: () {
-                  if (gridData is BookCard) {
+                  if (gridData[index] is BookCard) {
                     Navigator.of(context).pushNamed(
                       BookPage.routeName,
                       arguments: gridData[index].id,
                     );
                     return;
                   }
-                  if (gridData is AuthorCard) {
+                  if (gridData[index] is AuthorCard) {
                     // Navigator.of(context).pushNamed(
                     //   AuthorPage.routeName,
                     //   arguments: gridData[index].id,
                     // );
                     return;
                   }
-                  if (gridData is SequenceCard) {
+                  if (gridData[index] is SequenceCard) {
                     // Navigator.of(context).pushNamed(
                     //   SequencePage.routeName,
                     //   arguments: gridData[index].id,
@@ -151,17 +151,34 @@ class GridTilesBuilder extends StatelessWidget {
                   }
                 },
                 onLongPress: () {
-                  showCupertinoModalPopup(
-                    filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                    context: context,
-                    builder: (context) {
-                      return Center(
-                        child: FullInfoCard<GridData>(
-                          data: gridData[index],
-                        ),
-                      );
-                    },
-                  );
+                  if (gridData[index] is BookCard) {
+                    showCupertinoModalPopup(
+                      filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      context: context,
+                      builder: (context) {
+                        return Center(
+                          child: FullInfoCard<GridData>(
+                            data: gridData[index],
+                          ),
+                        );
+                      },
+                    );
+                    return;
+                  }
+                  if (gridData[index] is AuthorCard) {
+                    // Navigator.of(context).pushNamed(
+                    //   AuthorPage.routeName,
+                    //   arguments: gridData[index].id,
+                    // );
+                    return;
+                  }
+                  if (gridData[index] is SequenceCard) {
+                    // Navigator.of(context).pushNamed(
+                    //   SequencePage.routeName,
+                    //   arguments: gridData[index].id,
+                    // );
+                    return;
+                  }
                 },
               ),
             ],

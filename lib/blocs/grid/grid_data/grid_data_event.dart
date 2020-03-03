@@ -103,41 +103,6 @@ class SearchGridDataEvent extends GridDataEvent {
   }
 }
 
-class RefreshGridDataEvent extends GridDataEvent {
-  RefreshGridDataEvent();
-
-  @override
-  String toString() => 'RefreshGridDataEvent';
-
-  @override
-  Future<GridDataState> applyAsync(
-      {GridDataState currentState, GridDataBloc bloc}) async {
-    try {
-      // var _gridData = await this._gridDataRepository.getGridData(
-      //     bloc.userViewTypeNum, 1,
-      //     searchString: currentState?.searchString);
-
-      List<GridData> _gridData = [];
-      var hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
-
-      return currentState.copyWith(
-        stateCode: GridDataStateCode.Normal,
-        page: 1,
-        hasReachedMax: hasReachedMax,
-        gridData: _gridData,
-        uploadingMore: false,
-        message: '',
-      );
-    } catch (e) {
-      return currentState.copyWith(
-        stateCode: GridDataStateCode.Error,
-        uploadingMore: false,
-        message: e.toString(),
-      );
-    }
-  }
-}
-
 class UploadMoreGridDataEvent extends GridDataEvent {
   final int pageNumber;
 

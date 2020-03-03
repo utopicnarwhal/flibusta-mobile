@@ -29,7 +29,7 @@ class ProxyHttpClient {
     'format': 'txt',
   });
 
-  String _flibustaHostAddress = 'flibusta.is';
+  String _hostAddress = '';
 
   Dio getDio() {
     return _dio;
@@ -86,12 +86,12 @@ class ProxyHttpClient {
     return _proxyHostPort;
   }
 
-  void setFlibustaHostAddress(String hostAddress) {
-    _flibustaHostAddress = hostAddress;
+  void setHostAddress(String hostAddress) {
+    _hostAddress = hostAddress;
   }
 
-  String getFlibustaHostAddress() {
-    return _flibustaHostAddress;
+  String getHostAddress() {
+    return _hostAddress;
   }
 
   Future<int> connectionCheck(
@@ -127,7 +127,7 @@ class ProxyHttpClient {
 
     try {
       var request = dioForConnectionCheck.getUri(
-        Uri.https(getFlibustaHostAddress(), '/'),
+        Uri.https(getHostAddress(), '/'),
         cancelToken: cancelToken,
       );
 
