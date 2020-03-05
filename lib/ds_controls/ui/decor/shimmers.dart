@@ -1,3 +1,6 @@
+import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
+import 'package:flibusta/constants.dart';
+import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -57,38 +60,107 @@ class ShimmerViewTypes extends StatelessWidget {
   }
 }
 
-class ShimmerListTile extends StatelessWidget {
-  final Widget title;
-  final Widget trailing;
+class ShimmerGridTileBuilder extends StatelessWidget {
+  final int itemCount;
+  final GridViewType gridViewType;
 
-  const ShimmerListTile({
+  const ShimmerGridTileBuilder({
     Key key,
-    this.title,
-    this.trailing,
+    this.itemCount,
+    this.gridViewType,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      addSemanticIndexes: false,
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        return Column(
+          children: <Widget>[
+            FirstGridTile(
+              isFirst: index == 0,
+              child: ShimmerListTile(
+                index: index,
+                gridViewType: gridViewType,
+              ),
+            ),
+            if (index != (itemCount - 1) || index == 0) Divider(indent: 16),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class ShimmerListTile extends StatelessWidget {
+  final Widget title;
+  final GridViewType gridViewType;
+  final int index;
+
+  const ShimmerListTile({
+    Key key,
+    this.title,
+    this.gridViewType,
+    this.index = 0,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isThreeLines = gridViewType == GridViewType.newBooks ||
+        gridViewType == GridViewType.downloaded;
+
     return Shimmer.fromColors(
       baseColor: kShimmerBaseColor,
       highlightColor: kShimmerHighlightColor,
       child: ListTile(
-        title: title ??
+        title: Text(
+          'Название произведения',
+          maxLines: 1,
+          overflow: TextOverflow.fade,
+          textWidthBasis: TextWidthBasis.longestLine,
+          style: TextStyle(backgroundColor: Colors.white),
+        ),
+        isThreeLine: isThreeLines,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
             Text(
-              'Текст внутри ListTile',
+              'Авторы произведения',
               maxLines: 1,
               overflow: TextOverflow.fade,
               textWidthBasis: TextWidthBasis.longestLine,
               style: TextStyle(backgroundColor: Colors.white),
             ),
-        trailing: trailing != null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  trailing,
-                ],
-              )
-            : null,
+            if (isThreeLines) ...[
+              SizedBox(height: 6),
+              SizedBox(
+                height: 22,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Жанры произведения',
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    textWidthBasis: TextWidthBasis.longestLine,
+                    style: TextStyle(backgroundColor: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            kIconArrowForward,
+          ],
+        ),
       ),
     );
   }

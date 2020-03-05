@@ -1,4 +1,5 @@
 import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
+import 'package:flibusta/constants.dart';
 import 'package:flutter/material.dart';
 
 class GridDataTile extends StatelessWidget {
@@ -54,6 +55,12 @@ class GridDataTile extends StatelessWidget {
                 ],
               ),
               isThreeLine: genres?.isNotEmpty == true,
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  kIconArrowForward,
+                ],
+              ),
             ),
           ),
           if (!isLast || isFirst) Divider(indent: 16),

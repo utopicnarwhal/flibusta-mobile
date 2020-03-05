@@ -40,6 +40,9 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
     try {
       var searchString = state?.searchString;
       if (event is SearchGridDataEvent) {
+        if (searchString == event.searchString) {
+          return;
+        }
         searchString = event.searchString;
       }
       if (event is UploadMoreGridDataEvent) {

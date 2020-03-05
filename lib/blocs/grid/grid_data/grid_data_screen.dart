@@ -40,6 +40,7 @@ class GridDataScreen extends StatelessWidget {
           bloc: gridDataBloc,
           builder: (BuildContext context, GridDataState gridDataState) {
             return GridTilesBuilder(
+              gridViewType: gridDataBloc.gridViewType,
               gridDataState: gridDataState,
             );
           },

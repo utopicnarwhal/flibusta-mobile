@@ -11,6 +11,7 @@ import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/model/bookCard.dart';
+import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/book/book_page.dart';
@@ -21,15 +22,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class GridTilesBuilder extends StatelessWidget {
   final GridDataState gridDataState;
   final String errorMessage;
+  final GridViewType gridViewType;
 
   const GridTilesBuilder({
     Key key,
     @required this.gridDataState,
+    @required this.gridViewType,
   })  : errorMessage = null,
         super(key: key);
 
-  const GridTilesBuilder.shimmer({Key key})
-      : gridDataState = null,
+  const GridTilesBuilder.shimmer({
+    Key key,
+    @required this.gridViewType,
+  })  : gridDataState = null,
         errorMessage = null,
         super(key: key);
 
@@ -94,18 +99,25 @@ class GridTilesBuilder extends StatelessWidget {
         ),
       );
     } else if (gridDataState?.stateCode == GridDataStateCode.Loading) {
-      gridListView = ShimmerListTile();
+      gridListView = ShimmerGridTileBuilder(
+        itemCount: shimmerListCount,
+        gridViewType: gridViewType,
+      );
     } else if (gridData != null) {
       gridListView = ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         addSemanticIndexes: false,
+        itemCount: uploadingMore ? (gridData.length + 1) : gridData.length,
         itemBuilder: (context, index) {
           if (index == gridData.length) {
             return Column(
               children: <Widget>[
                 Divider(indent: 80),
-                ShimmerListTile(),
+                ShimmerListTile(
+                  index: index,
+                  gridViewType: gridViewType,
+                ),
               ],
             );
           }
@@ -117,77 +129,74 @@ class GridTilesBuilder extends StatelessWidget {
             })?.toList();
           }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              GridDataTile(
-                index: index,
-                isFirst: index == 0,
-                isLast: index == gridData.length - 1,
-                title: gridData[index].tileTitle,
-                subtitle: gridData[index].tileSubtitle,
-                genres: genresStrings,
-                onTap: () {
-                  if (gridData[index] is BookCard) {
-                    Navigator.of(context).pushNamed(
-                      BookPage.routeName,
-                      arguments: gridData[index].id,
+          return GridDataTile(
+            index: index,
+            isFirst: index == 0,
+            isLast: index == gridData.length - 1,
+            title: gridData[index].tileTitle,
+            subtitle: gridData[index].tileSubtitle,
+            genres: genresStrings,
+            onTap: () {
+              if (gridData[index] is BookCard) {
+                Navigator.of(context).pushNamed(
+                  BookPage.routeName,
+                  arguments: gridData[index].id,
+                );
+                return;
+              }
+              if (gridData[index] is AuthorCard) {
+                // Navigator.of(context).pushNamed(
+                //   AuthorPage.routeName,
+                //   arguments: gridData[index].id,
+                // );
+                return;
+              }
+              if (gridData[index] is SequenceCard) {
+                // Navigator.of(context).pushNamed(
+                //   SequencePage.routeName,
+                //   arguments: gridData[index].id,
+                // );
+                return;
+              }
+            },
+            onLongPress: () {
+              if (gridData[index] is BookCard) {
+                showCupertinoModalPopup(
+                  filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                  context: context,
+                  builder: (context) {
+                    return Center(
+                      child: FullInfoCard<GridData>(
+                        data: gridData[index],
+                      ),
                     );
-                    return;
-                  }
-                  if (gridData[index] is AuthorCard) {
-                    // Navigator.of(context).pushNamed(
-                    //   AuthorPage.routeName,
-                    //   arguments: gridData[index].id,
-                    // );
-                    return;
-                  }
-                  if (gridData[index] is SequenceCard) {
-                    // Navigator.of(context).pushNamed(
-                    //   SequencePage.routeName,
-                    //   arguments: gridData[index].id,
-                    // );
-                    return;
-                  }
-                },
-                onLongPress: () {
-                  if (gridData[index] is BookCard) {
-                    showCupertinoModalPopup(
-                      filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                      context: context,
-                      builder: (context) {
-                        return Center(
-                          child: FullInfoCard<GridData>(
-                            data: gridData[index],
-                          ),
-                        );
-                      },
-                    );
-                    return;
-                  }
-                  if (gridData[index] is AuthorCard) {
-                    // Navigator.of(context).pushNamed(
-                    //   AuthorPage.routeName,
-                    //   arguments: gridData[index].id,
-                    // );
-                    return;
-                  }
-                  if (gridData[index] is SequenceCard) {
-                    // Navigator.of(context).pushNamed(
-                    //   SequencePage.routeName,
-                    //   arguments: gridData[index].id,
-                    // );
-                    return;
-                  }
-                },
-              ),
-            ],
+                  },
+                );
+                return;
+              }
+              if (gridData[index] is AuthorCard) {
+                // Navigator.of(context).pushNamed(
+                //   AuthorPage.routeName,
+                //   arguments: gridData[index].id,
+                // );
+                return;
+              }
+              if (gridData[index] is SequenceCard) {
+                // Navigator.of(context).pushNamed(
+                //   SequencePage.routeName,
+                //   arguments: gridData[index].id,
+                // );
+                return;
+              }
+            },
           );
         },
-        itemCount: uploadingMore ? (gridData.length + 1) : gridData.length,
       );
     } else {
-      gridListView = ShimmerListTile();
+      gridListView = ShimmerGridTileBuilder(
+        itemCount: shimmerListCount,
+        gridViewType: gridViewType,
+      );
     }
 
     return NotificationListener<ScrollNotification>(

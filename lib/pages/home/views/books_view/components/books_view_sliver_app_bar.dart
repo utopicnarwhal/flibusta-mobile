@@ -2,6 +2,7 @@ import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/selected_view_type/selected_view_type_bloc.dart';
 import 'package:flibusta/ds_controls/ui/flexible_space_bar.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
+import 'package:flibusta/pages/home/views/books_view/components/books_view_search.dart';
 import 'package:flibusta/pages/home/views/books_view/components/view_types_tab_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -55,11 +56,11 @@ class BooksViewSliverAppBar extends StatelessWidget {
                   padding: EdgeInsets.symmetric(
                     horizontal: 12.0,
                   ),
-                  // child: ApplicationsSearch(
-                  //   currentGridDataBloc:
-                  //       gridDataBlocsMap[userViewTypeSnapshot.data?.value],
-                  //   searchTextController: searchTextController,
-                  // ),
+                  child: BooksViewSearch(
+                    currentGridDataBloc:
+                        gridDataBlocsList[userViewTypeSnapshot.data?.index],
+                    searchTextController: searchTextController,
+                  ),
                 ),
                 SizedBox(height: 48),
               ],
