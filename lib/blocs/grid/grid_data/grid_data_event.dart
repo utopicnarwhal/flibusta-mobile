@@ -37,7 +37,7 @@ class LoadGridDataEvent extends GridDataEvent {
         case GridViewType.authors:
           break;
         case GridViewType.genres:
-          _gridData = await _gridDataRepository.getAllGenres();
+          _gridData = await _gridDataRepository.getAllGenres(1);
           break;
         case GridViewType.sequences:
           break;
@@ -130,6 +130,41 @@ class UploadMoreGridDataEvent extends GridDataEvent {
         page: pageNumber,
         hasReachedMax: hasReachedMax,
         gridData: gridData,
+        uploadingMore: false,
+        message: '',
+      );
+    } catch (e) {
+      return currentState.copyWith(
+        stateCode: GridDataStateCode.Error,
+        uploadingMore: false,
+        message: e.toString(),
+      );
+    }
+  }
+}
+
+class RefreshGridDataEvent extends GridDataEvent {
+  RefreshGridDataEvent();
+
+  @override
+  String toString() => 'RefreshGridDataEvent';
+
+  @override
+  Future<GridDataState> applyAsync(
+      {GridDataState currentState, GridDataBloc bloc}) async {
+    try {
+      // var _gridData = await this._gridDataRepository.getGridData(
+      //     bloc.userViewTypeNum, 1,
+      //     searchString: currentState?.searchString);
+
+      List<GridData> _gridData = [];
+      var hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+
+      return currentState.copyWith(
+        stateCode: GridDataStateCode.Normal,
+        page: 1,
+        hasReachedMax: hasReachedMax,
+        gridData: _gridData,
         uploadingMore: false,
         message: '',
       );

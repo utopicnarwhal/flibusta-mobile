@@ -10,6 +10,8 @@ class GridDataRepository {
     return LocalStorage().getDownloadedBooks(page);
   }
 
+  List<Genre> cachedGenreList;
+
   Future<List<GridData>> makeBookList(
     int page, {
     AdvancedSearchParams advancedSearchParams,
@@ -68,7 +70,7 @@ class GridDataRepository {
   //   }
   // }
 
-  Future<List<GridData>> getAllGenres() async {
+  Future<List<GridData>> getAllGenres(int page) async {
     var _dio = ProxyHttpClient().getDio();
 
     var result = List<Genre>();
@@ -82,6 +84,7 @@ class GridDataRepository {
     );
 
     var response = await _dio.getUri(url);
+
     response.data.forEach((headIndex, headGenre) {
       headGenre.forEach((genre) {
         result.add(Genre(
@@ -91,6 +94,8 @@ class GridDataRepository {
         ));
       });
     });
+    cachedGenreList = result;
+
     return result;
   }
 }
