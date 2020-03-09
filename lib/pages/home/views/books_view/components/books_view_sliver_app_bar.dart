@@ -7,12 +7,14 @@ import 'package:flibusta/pages/home/views/books_view/components/view_types_tab_b
 import 'package:flutter/material.dart';
 
 class BooksViewSliverAppBar extends StatelessWidget {
+  final GlobalKey<ScaffoldState> scafffoldKey;
   final SelectedViewTypeBloc selectedViewTypeBloc;
   final List<GridDataBloc> gridDataBlocsList;
   final bool forceElevated;
   final TextEditingController searchTextController;
 
   const BooksViewSliverAppBar({
+    @required this.scafffoldKey,
     @required this.selectedViewTypeBloc,
     this.forceElevated,
     @required this.gridDataBlocsList,
@@ -57,6 +59,7 @@ class BooksViewSliverAppBar extends StatelessWidget {
                     horizontal: 12.0,
                   ),
                   child: BooksViewSearch(
+                    scafffoldKey: scafffoldKey,
                     currentGridDataBloc:
                         gridDataBlocsList[userViewTypeSnapshot.data?.index],
                     searchTextController: searchTextController,

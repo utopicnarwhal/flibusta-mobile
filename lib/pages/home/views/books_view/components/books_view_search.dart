@@ -1,25 +1,25 @@
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/pages/home/views/books_view/components/advanced_search_bs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-class BooksViewSearch extends StatefulWidget {
+const _kAdvancedSearchString = '@!&*%AdvencedSearch%*&!@';
+
+class BooksViewSearch extends StatelessWidget {
+  final GlobalKey<ScaffoldState> scafffoldKey;
   final GridDataBloc currentGridDataBloc;
   final TextEditingController searchTextController;
 
   const BooksViewSearch({
     Key key,
+    @required this.scafffoldKey,
     @required this.currentGridDataBloc,
     @required this.searchTextController,
   }) : super(key: key);
 
-  @override
-  _BooksViewSearchState createState() => _BooksViewSearchState();
-}
-
-class _BooksViewSearchState extends State<BooksViewSearch> {
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -27,26 +27,40 @@ class _BooksViewSearchState extends State<BooksViewSearch> {
           inputDecorationTheme: Theme.of(context)
               .inputDecorationTheme
               .copyWith(isCollapsed: true)),
-      child: TypeAheadField(
-        itemBuilder: (context, _) {
-          return Text('123');
+      child: TypeAheadField<String>(
+        itemBuilder: (context, suggestion) {
+          var text = suggestion;
+          if (suggestion == _kAdvancedSearchString) {
+            text = 'Расширенный поиск';
+          }
+          return ListTile(
+            title: Text(text),
+          );
         },
-        onSuggestionSelected: (suggestion) {
-          print(suggestion);
+        onSuggestionSelected: (suggestion) async {
+          if (suggestion == _kAdvancedSearchString) {
+            await showAdvancedSearchBS(scafffoldKey, null);
+          }
+          currentGridDataBloc?.searchByString(suggestion);
         },
         suggestionsCallback: (searchText) {
           return [
-            Text('123'),
+            _kAdvancedSearchString,
           ];
         },
+        getImmediateSuggestions: true,
+        hideOnEmpty: true,
+        hideOnError: true,
+        hideOnLoading: false,
+        hideSuggestionsOnKeyboardHide: true,
         textFieldConfiguration: TextFieldConfiguration(
-          controller: widget.searchTextController,
+          controller: searchTextController,
           textInputAction: TextInputAction.search,
           onChanged: (searchQuery) {
             EasyDebounce.debounce(
               'search-debouncer',
               Duration(milliseconds: 1000),
-              () => widget.currentGridDataBloc?.searchByString(searchQuery),
+              () => currentGridDataBloc?.searchByString(searchQuery),
             );
           },
           decoration: InputDecoration(
@@ -56,7 +70,7 @@ class _BooksViewSearchState extends State<BooksViewSearch> {
             fillColor: Theme.of(context).cardColor,
             filled: true,
             suffixIcon: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: widget.searchTextController,
+              valueListenable: searchTextController,
               builder: (context, textEditingValue, _) {
                 if (textEditingValue?.text?.isEmpty == true) {
                   return SizedBox.shrink();
@@ -70,8 +84,8 @@ class _BooksViewSearchState extends State<BooksViewSearch> {
                   onPressed: () {
                     SchedulerBinding.instance.addPostFrameCallback((_) {
                       FocusScope.of(context).unfocus();
-                      widget.searchTextController?.clear();
-                      widget.currentGridDataBloc?.searchByString('');
+                      searchTextController?.clear();
+                      currentGridDataBloc?.searchByString('');
                     });
                   },
                 );

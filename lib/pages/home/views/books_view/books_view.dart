@@ -50,6 +50,7 @@ class BooksView extends StatelessWidget {
                     context,
                   ),
                   child: BooksViewSliverAppBar(
+                    scafffoldKey: scaffoldKey,
                     selectedViewTypeBloc: selectedViewTypeBloc,
                     gridDataBlocsList: gridDataBlocsList,
                     forceElevated: innerBoxIsScrolled,

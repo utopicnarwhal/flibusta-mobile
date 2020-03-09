@@ -251,20 +251,13 @@ class LocalStorage {
     return await prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
   }
 
-  Future<List<BookCard>> getDownloadedBooks([int page]) async {
+  Future<List<BookCard>> getDownloadedBooks() async {
     var prefs = await _prefs;
     try {
       var downloadedBooksJsonStrings = prefs.getStringList('DownloadedBooks');
       if (downloadedBooksJsonStrings.isEmpty != false) {
         await prefs.setStringList('DownloadedBooks', List<String>());
         return List<BookCard>();
-      }
-      if (page != null &&
-          downloadedBooksJsonStrings.length > HomeGridConsts.kPageSize) {
-        downloadedBooksJsonStrings = downloadedBooksJsonStrings.sublist(
-          (page - 1) * HomeGridConsts.kPageSize,
-          page * HomeGridConsts.kPageSize,
-        );
       }
       var downloadedBooks = downloadedBooksJsonStrings.map((jsonBookString) {
         return BookCard.fromJson(json.decode(jsonBookString));

@@ -11,13 +11,13 @@ Future<AdvancedSearchParams> showAdvancedSearchBS(
     GlobalKey<ScaffoldState> scaffoldKey,
     AdvancedSearchParams advancedSearchParams) async {
   final titleController =
-      TextEditingController(text: advancedSearchParams.title);
+      TextEditingController(text: advancedSearchParams?.title);
   final firstnameController =
-      TextEditingController(text: advancedSearchParams.firstname);
+      TextEditingController(text: advancedSearchParams?.firstname);
   final lastnameController =
-      TextEditingController(text: advancedSearchParams.lastname);
+      TextEditingController(text: advancedSearchParams?.lastname);
   final middlenameController =
-      TextEditingController(text: advancedSearchParams.middlename);
+      TextEditingController(text: advancedSearchParams?.middlename);
   final genresTextFieldController = TextEditingController();
 
   GenresListBloc _genresListBloc = GenresListBloc();

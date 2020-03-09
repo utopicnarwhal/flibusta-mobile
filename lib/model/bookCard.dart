@@ -13,6 +13,7 @@ class BookCard extends GridData {
   String sequenceTitle;
   String title;
   String size;
+  int score;
   DownloadFormats downloadFormats;
   Authors authors;
   Translators translators;
@@ -38,6 +39,7 @@ class BookCard extends GridData {
     this.authors,
     this.translators,
     this.localPath,
+    this.score,
   }) : assert(id != null);
 
   factory BookCard.fromJson(Map<String, dynamic> json) =>

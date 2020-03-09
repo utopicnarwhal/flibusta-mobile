@@ -18,6 +18,32 @@ List<BookCard> parseHtmlFromMakeBookList(String htmlString) {
 
   var bookCardDivs = form.first.getElementsByTagName("div");
   for (var i = 0; i < bookCardDivs.length; ++i) {
+    int score;
+    var allImgTags = bookCardDivs[i].getElementsByTagName("img");
+    if (allImgTags.isNotEmpty) {
+      switch (allImgTags.first.attributes["src"]) {
+        case "/img/znak.gif":
+          score = 0;
+          break;
+        case "/img/znak1.gif":
+          score = 1;
+          break;
+        case "/img/znak2.gif":
+          score = 2;
+          break;
+        case "/img/znak3.gif":
+          score = 3;
+          break;
+        case "/img/znak4.gif":
+          score = 4;
+          break;
+        case "/img/znak5.gif":
+          score = 5;
+          break;
+        default:
+      }
+    }
+
     var allATags = bookCardDivs[i].getElementsByTagName("a");
     if (allATags.isEmpty) {
       continue;
@@ -25,23 +51,39 @@ List<BookCard> parseHtmlFromMakeBookList(String htmlString) {
 
     var genres = List<Map<int, String>>();
     if (bookCardDivs[i].getElementsByTagName("p").isNotEmpty) {
-      bookCardDivs[i].getElementsByTagName("p")?.first?.getElementsByTagName("a")?.forEach((f) {
-        genres.add({ int.tryParse(f.attributes["href"].replaceAll("/g/", "")?.split("?")[0]): f.text });
+      bookCardDivs[i]
+          .getElementsByTagName("p")
+          ?.first
+          ?.getElementsByTagName("a")
+          ?.forEach((f) {
+        genres.add({
+          int.tryParse(
+              f.attributes["href"].replaceAll("/g/", "")?.split("?")[0]): f.text
+        });
       });
     } else {
-      genres = result[i-1].genres.list;
+      genres = result[i - 1].genres.list;
     }
-    
-    var title = bookCardDivs[i].getElementsByTagName("input")?.first?.nextElementSibling;
+
+    var title = bookCardDivs[i]
+        .getElementsByTagName("input")
+        ?.first
+        ?.nextElementSibling;
 
     var translators = List<Map<int, String>>();
     htmldom.Element sequence;
 
     var temp = title.nextElementSibling;
     while (temp.localName != "span") {
-      if (temp.attributes["href"] != null && temp.attributes["href"].contains("/a/")) {
-        translators.add({ int.tryParse(temp?.attributes["href"]?.replaceAll("/a/", "")?.split("?")[0]): temp.text });
-      } else if (temp.attributes["href"] != null && temp.attributes["href"].contains("/s/")) {
+      if (temp.attributes["href"] != null &&
+          temp.attributes["href"].contains("/a/")) {
+        translators.add({
+          int.tryParse(temp?.attributes["href"]
+              ?.replaceAll("/a/", "")
+              ?.split("?")[0]): temp.text
+        });
+      } else if (temp.attributes["href"] != null &&
+          temp.attributes["href"].contains("/s/")) {
         sequence = temp;
       }
       temp = temp.nextElementSibling;
@@ -49,30 +91,49 @@ List<BookCard> parseHtmlFromMakeBookList(String htmlString) {
     var size = temp;
 
     var downloadFormats = List<Map<String, String>>();
-    for (temp = size.nextElementSibling; temp.attributes["href"] != null && temp.attributes["href"].contains("/b/"); temp = temp.nextElementSibling) {
+    for (temp = size.nextElementSibling;
+        temp.attributes["href"] != null &&
+            temp.attributes["href"].contains("/b/");
+        temp = temp.nextElementSibling) {
       var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), "");
       if (downloadFormatName == 'читать') {
         continue;
       }
       downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
-      var downloadFormatType = temp.attributes["href"].split("/").last.split("?")[0];
-      downloadFormats.add({ downloadFormatName: downloadFormatType });
+      var downloadFormatType =
+          temp.attributes["href"].split("/").last.split("?")[0];
+      downloadFormats.add({downloadFormatName: downloadFormatType});
     }
 
     var authors = List<Map<int, String>>();
-    for (; temp.attributes["href"] != null && temp.attributes["href"].contains("/a/"); temp = temp.nextElementSibling) {
-      authors.add({ int.tryParse(temp?.attributes["href"]?.replaceAll("/a/", "")?.split("?")[0]): temp.text });
+    for (;
+        temp.attributes["href"] != null &&
+            temp.attributes["href"].contains("/a/");
+        temp = temp.nextElementSibling) {
+      authors.add({
+        int.tryParse(
+                temp?.attributes["href"]?.replaceAll("/a/", "")?.split("?")[0]):
+            temp.text
+      });
     }
 
     result.add(BookCard(
-      id: int.tryParse(bookCardDivs[i].getElementsByTagName("input")?.first?.attributes["name"]?.replaceAll("bchk", "")),
+      id: int.tryParse(bookCardDivs[i]
+          .getElementsByTagName("input")
+          ?.first
+          ?.attributes["name"]
+          ?.replaceAll("bchk", "")),
       genres: Genres(genres),
       title: title?.text,
       authors: Authors(authors),
-      sequenceId: sequence != null ? int.tryParse(sequence?.attributes["href"].replaceAll("/s/", "").split("?")[0]) : null,
+      sequenceId: sequence != null
+          ? int.tryParse(
+              sequence?.attributes["href"].replaceAll("/s/", "").split("?")[0])
+          : null,
       sequenceTitle: sequence?.text,
       translators: Translators(translators),
       size: size.text,
+      score: score,
       downloadFormats: DownloadFormats(downloadFormats),
     ));
   }
@@ -81,7 +142,10 @@ List<BookCard> parseHtmlFromMakeBookList(String htmlString) {
 }
 
 SearchResults parseHtmlFromBookSearch(String htmlString) {
-  SearchResults searchResults = SearchResults(books: List<BookCard>(), authors: List<AuthorCard>(), sequences: List<SequenceCard>());
+  SearchResults searchResults = SearchResults(
+      books: List<BookCard>(),
+      authors: List<AuthorCard>(),
+      sequences: List<SequenceCard>());
   htmldom.Document document = parse(htmlString);
 
   var mainIdTag = document.getElementById("main");
@@ -101,31 +165,51 @@ SearchResults parseHtmlFromBookSearch(String htmlString) {
         var bookLis = division.nextElementSibling.getElementsByTagName("li");
         bookLis.forEach((bookLi) {
           var bookAndAuthorTags = bookLi.getElementsByTagName("a");
-          var bookId = int.tryParse(bookAndAuthorTags[0].attributes["href"].replaceAll("/b/", "").split("?")[0]);
+          var bookId = int.tryParse(bookAndAuthorTags[0]
+              .attributes["href"]
+              .replaceAll("/b/", "")
+              .split("?")[0]);
           var bookTitle = bookAndAuthorTags[0].text;
-          var authorId = int.tryParse(bookAndAuthorTags[1].attributes["href"].replaceAll("/a/", "").split("?")[0]);
+          var authorId = int.tryParse(bookAndAuthorTags[1]
+              .attributes["href"]
+              .replaceAll("/a/", "")
+              .split("?")[0]);
           var authorName = bookAndAuthorTags[1].text;
-          searchResults.books.add(BookCard(id: bookId, title: bookTitle, authors: Authors([{authorId: authorName}])));
+          searchResults.books.add(BookCard(
+              id: bookId,
+              title: bookTitle,
+              authors: Authors([
+                {authorId: authorName}
+              ])));
         });
         break;
       case "писатели":
         var authorLis = division.nextElementSibling.getElementsByTagName("li");
         authorLis.forEach((authorLi) {
           var authorTag = authorLi.getElementsByTagName("a");
-          var authorId = int.tryParse(authorTag[0].attributes["href"].replaceAll("/a/", "").split("?")[0]);
+          var authorId = int.tryParse(authorTag[0]
+              .attributes["href"]
+              .replaceAll("/a/", "")
+              .split("?")[0]);
           var authorName = authorTag[0].text;
           var booksCount = authorLi.nodes[1].text.trim();
-          searchResults.authors.add(AuthorCard(id: authorId, name: authorName, booksCount: booksCount));
+          searchResults.authors.add(AuthorCard(
+              id: authorId, name: authorName, booksCount: booksCount));
         });
         break;
       case "серии":
-        var sequenceLis = division.nextElementSibling.getElementsByTagName("li");
+        var sequenceLis =
+            division.nextElementSibling.getElementsByTagName("li");
         sequenceLis.forEach((sequenceLi) {
           var sequenceTag = sequenceLi.getElementsByTagName("a");
-          var sequenceId = int.tryParse(sequenceTag[0].attributes["href"].replaceAll("/sequence/", "").split("?")[0]);
+          var sequenceId = int.tryParse(sequenceTag[0]
+              .attributes["href"]
+              .replaceAll("/sequence/", "")
+              .split("?")[0]);
           var sequenceTitle = sequenceTag[0].text;
           var booksCount = sequenceLi.nodes[1].text.trim();
-          searchResults.sequences.add(SequenceCard(id: sequenceId, title: sequenceTitle, booksCount: booksCount));
+          searchResults.sequences.add(SequenceCard(
+              id: sequenceId, title: sequenceTitle, booksCount: booksCount));
         });
         break;
     }
@@ -144,7 +228,7 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
 
   var titleElement = mainElement.getElementsByClassName("title")?.first;
   bookInfo.title = titleElement?.text ?? "";
-  
+
   var mainNode = titleElement.parentNode;
   var titleNodeIndex = mainNode.nodes.indexOf(titleElement);
 
@@ -152,11 +236,18 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   var translatorsList = List<Map<int, String>>();
   var hasTranslators = false;
 
-  for (int i = titleNodeIndex + 1; i < mainNode.nodes.length && (mainNode.nodes[i].attributes["href"] == null || !mainNode.nodes[i].attributes["href"].contains(RegExp(r"^(/g/)[0-9]*$"))); ++i) {
+  for (int i = titleNodeIndex + 1;
+      i < mainNode.nodes.length &&
+          (mainNode.nodes[i].attributes["href"] == null ||
+              !mainNode.nodes[i].attributes["href"]
+                  .contains(RegExp(r"^(/g/)[0-9]*$")));
+      ++i) {
     var currentNode = mainNode.nodes[i];
 
-    if (currentNode.attributes["href"] != null && currentNode.attributes["href"].contains(RegExp(r"^(/a/)[0-9]*"))) {
-      var id = int.tryParse(currentNode.attributes["href"].replaceAll("/a/", "").split("?")[0]);
+    if (currentNode.attributes["href"] != null &&
+        currentNode.attributes["href"].contains(RegExp(r"^(/a/)[0-9]*"))) {
+      var id = int.tryParse(
+          currentNode.attributes["href"].replaceAll("/a/", "").split("?")[0]);
       var name = currentNode.text;
 
       if (!hasTranslators) {
@@ -174,15 +265,18 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   bookInfo.translators = Translators(translatorsList);
 
   var genresA = allA.where((a) {
-    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp(r"^(/g/)[0-9]*"));
+    return a.attributes["href"] != null &&
+        a.attributes["href"].contains(RegExp(r"^(/g/)[0-9]*"));
   });
   var downloadFormatsA = allA.where((a) {
-    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp("^(/b/$bookId/)(?!read).*"));
+    return a.attributes["href"] != null &&
+        a.attributes["href"].contains(RegExp("^(/b/$bookId/)(?!read).*"));
   });
 
   var genresList = List<Map<int, String>>();
   genresA.forEach((genreA) {
-    var genreId = int.tryParse(genreA.attributes["href"].replaceAll("/g/", "").split("?")[0]);
+    var genreId = int.tryParse(
+        genreA.attributes["href"].replaceAll("/g/", "").split("?")[0]);
     var genreName = genreA.text;
     genresList.add({genreId: genreName});
   });
@@ -190,36 +284,49 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
 
   var downloadFormatsList = List<Map<String, String>>();
   downloadFormatsA.forEach((downloadFormatA) {
-    var downloadFormatName = downloadFormatA.text.replaceAll(RegExp(r'(\(|\))'), "").replaceAll("скачать ", "");
-    var downloadFormatType = downloadFormatA.attributes["href"].split("/").last.split("?")[0];
-    downloadFormatsList.add({ downloadFormatName: downloadFormatType });
+    var downloadFormatName = downloadFormatA.text
+        .replaceAll(RegExp(r'(\(|\))'), "")
+        .replaceAll("скачать ", "");
+    var downloadFormatType =
+        downloadFormatA.attributes["href"].split("/").last.split("?")[0];
+    downloadFormatsList.add({downloadFormatName: downloadFormatType});
   });
   bookInfo.downloadFormats = DownloadFormats(downloadFormatsList);
 
   var sequenceA = allA.where((a) {
-    return a.attributes["href"] != null && a.attributes["href"].contains(RegExp(r"^(/s/)[0-9]*"));
+    return a.attributes["href"] != null &&
+        a.attributes["href"].contains(RegExp(r"^(/s/)[0-9]*"));
   });
 
   if (sequenceA.isNotEmpty) {
-    bookInfo.sequenceId = int.tryParse(sequenceA.first.attributes["href"].replaceAll("/s/", "").split("?")[0]);
+    bookInfo.sequenceId = int.tryParse(
+        sequenceA.first.attributes["href"].replaceAll("/s/", "").split("?")[0]);
     bookInfo.sequenceTitle = sequenceA.first.text;
   }
-  
-  bookInfo.size = mainElement.getElementsByTagName("span").where((span) {
-    return span.attributes["style"] != null && span.attributes["style"] == "size";
-  })?.first?.text;
+
+  bookInfo.size = mainElement
+      .getElementsByTagName("span")
+      .where((span) {
+        return span.attributes["style"] != null &&
+            span.attributes["style"] == "size";
+      })
+      ?.first
+      ?.text;
   var addedToLibraryDateStringStarts = mainNode.text.indexOf("Добавлена:");
-  bookInfo.addedToLibraryDate = mainNode.text.substring(addedToLibraryDateStringStarts, addedToLibraryDateStringStarts + 21);
+  bookInfo.addedToLibraryDate = mainNode.text.substring(
+      addedToLibraryDateStringStarts, addedToLibraryDateStringStarts + 21);
   var lemmaStringStarts = mainNode.text.indexOf("Аннотация") + 10;
   var lemmaStringEnds = mainNode.text.indexOf("Рекомендации:");
-  bookInfo.lemma = mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trimRight();
+  bookInfo.lemma =
+      mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trimRight();
 
   var fb2infoContent = mainElement.getElementsByClassName("fb2info-content");
   if (fb2infoContent.isEmpty) {
     return bookInfo;
   }
 
-  bookInfo.coverImgSrc = fb2infoContent?.first?.nextElementSibling?.nextElementSibling?.attributes["src"];
+  bookInfo.coverImgSrc = fb2infoContent
+      ?.first?.nextElementSibling?.nextElementSibling?.attributes["src"];
   return bookInfo;
 }
 
@@ -263,27 +370,35 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.localName == "br" || child.localName == "img" || child.localName == "svg" || child.localName == "input") {
+    if (child.localName == "br" ||
+        child.localName == "img" ||
+        child.localName == "svg" ||
+        child.localName == "input") {
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains("/a/")) {
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains("/a/")) {
       if (actualTranslators == null) {
         actualTranslators = Translators(List());
       }
-      var translatorId = int.tryParse(child.attributes["href"].replaceAll("/a/", ""));
+      var translatorId =
+          int.tryParse(child.attributes["href"].replaceAll("/a/", ""));
       var translatorName = child.text;
-      actualTranslators.list.add({ translatorId: translatorName });
+      actualTranslators.list.add({translatorId: translatorName});
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains("/s/")) {
-      actualSequenceId = int.tryParse(child.attributes["href"].replaceAll("/s/", ""));
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains("/s/")) {
+      actualSequenceId =
+          int.tryParse(child.attributes["href"].replaceAll("/s/", ""));
       actualSequenceTitle = child.text;
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains("/g/")) {
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains("/g/")) {
       if (nextGenres) {
         actualSequenceId = null;
         actualSequenceTitle = null;
@@ -291,13 +406,15 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
         nextGenres = false;
       }
 
-      var genreId = int.tryParse(child.attributes["href"].replaceAll("/g/", ""));
+      var genreId =
+          int.tryParse(child.attributes["href"].replaceAll("/g/", ""));
       var genreName = child.text;
-      actualGenres.list.add({ genreId: genreName });
+      actualGenres.list.add({genreId: genreName});
       return;
     }
-    
-    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
+
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
       actualBookCard = BookCard(
         id: int.tryParse(child.attributes["href"].replaceAll("/b/", "")),
         title: child.text,
@@ -308,21 +425,25 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*/.*$'))) {
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains(RegExp(r'^\/b\/\d*/.*$'))) {
       var downloadFormatName = child.text.replaceAll(RegExp(r'(\(|\))'), "");
       if (downloadFormatName == 'читать') {
         return;
       }
       downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
-      var downloadFormatType = child.attributes["href"].split("/").last.split("?")[0];
+      var downloadFormatType =
+          child.attributes["href"].split("/").last.split("?")[0];
       if (actualDownloadFormats == null) {
         actualDownloadFormats = List<Map<String, String>>();
       }
-      actualDownloadFormats.add({ downloadFormatName: downloadFormatType });
+      actualDownloadFormats.add({downloadFormatName: downloadFormatType});
       return;
     }
 
-    if (child.localName == "span" && child.attributes["style"] == "size" && actualBookCard != null) {
+    if (child.localName == "span" &&
+        child.attributes["style"] == "size" &&
+        actualBookCard != null) {
       actualBookCard.size = child.text;
       return;
     }
@@ -359,27 +480,35 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.localName == "br" || child.localName == "img" || child.localName == "svg" || child.localName == "input") {
+    if (child.localName == "br" ||
+        child.localName == "img" ||
+        child.localName == "svg" ||
+        child.localName == "input") {
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains("/a/")) {
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains("/a/")) {
       if (actualTranslators == null) {
         actualTranslators = Translators(List());
       }
-      var translatorId = int.tryParse(child.attributes["href"].replaceAll("/a/", ""));
+      var translatorId =
+          int.tryParse(child.attributes["href"].replaceAll("/a/", ""));
       var translatorName = child.text;
-      actualTranslators.list.add({ translatorId: translatorName });
+      actualTranslators.list.add({translatorId: translatorName});
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains("/s/")) {
-      actualSequenceId = int.tryParse(child.attributes["href"].replaceAll("/s/", ""));
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains("/s/")) {
+      actualSequenceId =
+          int.tryParse(child.attributes["href"].replaceAll("/s/", ""));
       actualSequenceTitle = child.text;
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains("/g/")) {
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains("/g/")) {
       if (nextGenres) {
         actualSequenceId = null;
         actualSequenceTitle = null;
@@ -387,13 +516,15 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
         nextGenres = false;
       }
 
-      var genreId = int.tryParse(child.attributes["href"].replaceAll("/g/", ""));
+      var genreId =
+          int.tryParse(child.attributes["href"].replaceAll("/g/", ""));
       var genreName = child.text;
-      actualGenres.list.add({ genreId: genreName });
+      actualGenres.list.add({genreId: genreName});
       return;
     }
-    
-    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
+
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
       actualBookCard = BookCard(
         id: int.tryParse(child.attributes["href"].replaceAll("/b/", "")),
         title: child.text,
@@ -404,21 +535,25 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.attributes["href"] != null && child.attributes["href"].contains(RegExp(r'^\/b\/\d*/.*$'))) {
+    if (child.attributes["href"] != null &&
+        child.attributes["href"].contains(RegExp(r'^\/b\/\d*/.*$'))) {
       var downloadFormatName = child.text.replaceAll(RegExp(r'(\(|\))'), "");
       if (downloadFormatName == 'читать') {
         return;
       }
       downloadFormatName = downloadFormatName.replaceAll("скачать ", "");
-      var downloadFormatType = child.attributes["href"].split("/").last.split("?")[0];
+      var downloadFormatType =
+          child.attributes["href"].split("/").last.split("?")[0];
       if (actualDownloadFormats == null) {
         actualDownloadFormats = List<Map<String, String>>();
       }
-      actualDownloadFormats.add({ downloadFormatName: downloadFormatType });
+      actualDownloadFormats.add({downloadFormatName: downloadFormatType});
       return;
     }
 
-    if (child.localName == "span" && child.attributes["style"] == "size" && actualBookCard != null) {
+    if (child.localName == "span" &&
+        child.attributes["style"] == "size" &&
+        actualBookCard != null) {
       actualBookCard.size = child.text;
       return;
     }

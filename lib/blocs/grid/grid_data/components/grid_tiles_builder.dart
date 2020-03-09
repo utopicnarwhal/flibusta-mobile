@@ -94,7 +94,7 @@ class GridTilesBuilder extends StatelessWidget {
           child: DsOutlineButton(
             child: Text('Повторить'),
             onPressed: () =>
-                BlocProvider.of<GridDataBloc>(context)?.refreshGridData(),
+                BlocProvider.of<GridDataBloc>(context)?.fetchGridData(),
           ),
         ),
       );
@@ -205,7 +205,7 @@ class GridTilesBuilder extends StatelessWidget {
       child: RefreshIndicator(
         onRefresh: () async {
           try {
-            BlocProvider.of<GridDataBloc>(context).refreshGridData();
+            BlocProvider.of<GridDataBloc>(context).fetchGridData();
           } on FlutterError catch (_) {}
         },
         child: ListFadeInSlideStagger(

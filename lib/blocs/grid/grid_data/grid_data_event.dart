@@ -25,16 +25,16 @@ class LoadGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
+      // TODO: add existing search string
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
           _gridData = await _gridDataRepository.getDownloadedBooks(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
           _gridData = await _gridDataRepository.makeBookList(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.authors:
+          _gridData = await _gridDataRepository.getAuthors(1);
           break;
         case GridViewType.genres:
           _gridData = await _gridDataRepository.getAllGenres(1);
@@ -43,9 +43,7 @@ class LoadGridDataEvent extends GridDataEvent {
           break;
         default:
       }
-      // var _gridData = await this._gridDataRepository.getGridData(
-      //     bloc.userViewTypeNum, 1,
-      //     searchString: currentState?.searchString);
+      hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
 
       return currentState.copyWith(
         stateCode: GridDataStateCode.Normal,
@@ -76,12 +74,30 @@ class SearchGridDataEvent extends GridDataEvent {
   Future<GridDataState> applyAsync(
       {GridDataState currentState, GridDataBloc bloc}) async {
     try {
+      List<GridData> _gridData = [];
+      var hasReachedMax = true;
+      // TODO: add existing search string
+      switch (bloc.gridViewType) {
+        case GridViewType.downloaded:
+          _gridData = await _gridDataRepository.getDownloadedBooks(1);
+          break;
+        case GridViewType.newBooks:
+          _gridData = await _gridDataRepository.makeBookList(1);
+          break;
+        case GridViewType.authors:
+          _gridData = await _gridDataRepository.getAuthors(1);
+          break;
+        case GridViewType.genres:
+          _gridData = await _gridDataRepository.getAllGenres(1);
+          break;
+        case GridViewType.sequences:
+          break;
+        default:
+      }
+      hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
       // var _gridData = await this
       //     ._gridDataRepository
       //     .getGridData(bloc.userViewTypeNum, 1, searchString: searchString);
-
-      List<GridData> _gridData = [];
-      var hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
 
       return currentState.copyWith(
         stateCode: GridDataStateCode.Normal,
@@ -119,50 +135,34 @@ class UploadMoreGridDataEvent extends GridDataEvent {
       //     bloc.userViewTypeNum, pageNumber,
       //     searchString: currentState?.searchString);
 
-      List<GridData> gridData = [];
-      var hasReachedMax = (gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+      List<GridData> _gridData = [];
+      var hasReachedMax = true;
+      // TODO: add existing search string
+      switch (bloc.gridViewType) {
+        case GridViewType.downloaded:
+          _gridData = await _gridDataRepository.getDownloadedBooks(pageNumber);
+          break;
+        case GridViewType.newBooks:
+          _gridData = await _gridDataRepository.makeBookList(pageNumber);
+          break;
+        case GridViewType.authors:
+          _gridData = await _gridDataRepository.getAuthors(pageNumber);
+          break;
+        case GridViewType.genres:
+          _gridData = await _gridDataRepository.getAllGenres(pageNumber);
+          break;
+        case GridViewType.sequences:
+          break;
+        default:
+      }
+      hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
       if (currentState.uploadingMore == true) {
-        gridData = [...currentState.gridData, ...gridData];
+        _gridData = [...currentState.gridData, ..._gridData];
       }
 
       return currentState.copyWith(
         stateCode: GridDataStateCode.Normal,
         page: pageNumber,
-        hasReachedMax: hasReachedMax,
-        gridData: gridData,
-        uploadingMore: false,
-        message: '',
-      );
-    } catch (e) {
-      return currentState.copyWith(
-        stateCode: GridDataStateCode.Error,
-        uploadingMore: false,
-        message: e.toString(),
-      );
-    }
-  }
-}
-
-class RefreshGridDataEvent extends GridDataEvent {
-  RefreshGridDataEvent();
-
-  @override
-  String toString() => 'RefreshGridDataEvent';
-
-  @override
-  Future<GridDataState> applyAsync(
-      {GridDataState currentState, GridDataBloc bloc}) async {
-    try {
-      // var _gridData = await this._gridDataRepository.getGridData(
-      //     bloc.userViewTypeNum, 1,
-      //     searchString: currentState?.searchString);
-
-      List<GridData> _gridData = [];
-      var hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
-
-      return currentState.copyWith(
-        stateCode: GridDataStateCode.Normal,
-        page: 1,
         hasReachedMax: hasReachedMax,
         gridData: _gridData,
         uploadingMore: false,
