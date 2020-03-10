@@ -148,7 +148,6 @@ class ShimmerListTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.fade,
                     textWidthBasis: TextWidthBasis.longestLine,
-                    style: TextStyle(backgroundColor: Colors.white),
                   ),
                 ),
               ),

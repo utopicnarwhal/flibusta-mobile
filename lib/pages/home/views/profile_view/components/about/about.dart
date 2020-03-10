@@ -165,7 +165,7 @@ class _FourPDAIcon extends StatelessWidget {
         iconTheme.opacity ?? IconTheme.of(context).color.opacity;
     Color iconColor = iconTheme.color;
     if (iconOpacity != null && iconOpacity != 1.0)
-      iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity * 0.7);
+      iconColor = iconColor.withOpacity(iconOpacity);
 
     return SvgPicture.asset(
       'assets/img/4pda_logo.svg',

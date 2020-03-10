@@ -1,10 +1,12 @@
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/pages/home/views/books_view/components/advanced_search_bs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const _kAdvancedSearchString = '@!&*%AdvencedSearch%*&!@';
 
@@ -53,6 +55,11 @@ class BooksViewSearch extends StatelessWidget {
         hideOnError: true,
         hideOnLoading: false,
         hideSuggestionsOnKeyboardHide: true,
+        suggestionsBoxDecoration: SuggestionsBoxDecoration(
+          borderRadius: BorderRadius.circular(
+            kCardBorderRadius,
+          ),
+        ),
         textFieldConfiguration: TextFieldConfiguration(
           controller: searchTextController,
           textInputAction: TextInputAction.search,
@@ -63,6 +70,7 @@ class BooksViewSearch extends StatelessWidget {
               () => currentGridDataBloc?.searchByString(searchQuery),
             );
           },
+          autofocus: false,
           decoration: InputDecoration(
             hintText: 'Поиск',
             isDense: true,
@@ -90,6 +98,10 @@ class BooksViewSearch extends StatelessWidget {
                   },
                 );
               },
+            ),
+            suffix: Icon(
+              FontAwesomeIcons.filter,
+              color: Colors.black,
             ),
             prefixIcon: Icon(
               EvaIcons.search,

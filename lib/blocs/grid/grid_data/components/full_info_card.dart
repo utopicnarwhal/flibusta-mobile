@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/text_to_icons.dart';
 import 'package:flutter/material.dart';
 
@@ -68,13 +71,19 @@ class _FullInfoCardState extends State<FullInfoCard> {
                             rowName: 'Форматы файлов',
                             value: widget.data.downloadFormats,
                             showCustomLeading:
-                                widget.data.downloadProgress != null,
+                                widget.data.downloadProgress != null &&
+                                    widget.data.localPath == null,
                             customLeading: CircularProgressIndicator(
                               value: widget.data.downloadProgress == 0.0
                                   ? null
                                   : widget.data.downloadProgress,
                             ),
                           ),
+                          if (widget.data.localPath != null)
+                            GridCardRow(
+                              rowName: 'Путь к файлу',
+                              value: widget.data.localPath,
+                            ),
                           ButtonBarTheme(
                             data: ButtonBarThemeData(
                               layoutBehavior:
@@ -84,7 +93,8 @@ class _FullInfoCardState extends State<FullInfoCard> {
                               alignment: MainAxisAlignment.spaceAround,
                               children: [
                                 if (widget.data is BookCard &&
-                                    widget.data.downloadFormats != null)
+                                    widget.data.downloadFormats != null &&
+                                    widget.data.localPath == null)
                                   DownloadBookButton(
                                     book: widget.data,
                                     downloadBookCallback: (downloadProgress) {
@@ -92,6 +102,23 @@ class _FullInfoCardState extends State<FullInfoCard> {
                                         widget.data.downloadProgress =
                                             downloadProgress;
                                       });
+                                    },
+                                  ),
+                                if (widget.data is BookCard &&
+                                    widget.data.localPath != null)
+                                  FutureBuilder(
+                                    future:
+                                        File(widget.data.localPath).exists(),
+                                    builder: (context, bookFileExistsSnapshot) {
+                                      if (bookFileExistsSnapshot.data != true) {
+                                        return Container();
+                                      }
+                                      return FlatButton(
+                                        child: Text('Открыть'),
+                                        onPressed: () => FileUtils.openFile(
+                                          widget.data.localPath,
+                                        ),
+                                      );
                                     },
                                   ),
                               ],
@@ -117,27 +144,6 @@ class _FullInfoCardState extends State<FullInfoCard> {
                       rowName: 'Количество книг',
                       value: widget.data.booksCount,
                     ),
-                    ButtonBarTheme(
-                      data: ButtonBarThemeData(
-                        layoutBehavior: ButtonBarLayoutBehavior.constrained,
-                      ),
-                      child: ButtonBar(
-                        alignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          if (widget.data is BookCard &&
-                              widget.data.downloadFormats != null)
-                            DownloadBookButton(
-                              book: widget.data,
-                              downloadBookCallback: (downloadProgress) {
-                                setState(() {
-                                  widget.data.downloadProgress =
-                                      downloadProgress;
-                                });
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
                   ],
                   if (widget.data is SequenceCard) ...[
                     GridCardRow(
@@ -147,27 +153,6 @@ class _FullInfoCardState extends State<FullInfoCard> {
                     GridCardRow(
                       rowName: 'Количество книг в серии',
                       value: widget.data.booksCount,
-                    ),
-                    ButtonBarTheme(
-                      data: ButtonBarThemeData(
-                        layoutBehavior: ButtonBarLayoutBehavior.constrained,
-                      ),
-                      child: ButtonBar(
-                        alignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          if (widget.data is BookCard &&
-                              widget.data.downloadFormats != null)
-                            DownloadBookButton(
-                              book: widget.data,
-                              downloadBookCallback: (downloadProgress) {
-                                setState(() {
-                                  widget.data.downloadProgress =
-                                      downloadProgress;
-                                });
-                              },
-                            ),
-                        ],
-                      ),
                     ),
                   ],
                 ],

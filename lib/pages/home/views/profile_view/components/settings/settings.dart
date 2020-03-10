@@ -143,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             title: Text('Предпочитаемый формат книги'),
             subtitle: Text(
-              preferredBookExtSnapshot.data ?? '',
+              preferredBookExtSnapshot.data ?? 'Спрашивать меня при скачивании',
             ),
             trailing: kIconArrowForward,
             onTap: () async {
@@ -154,12 +154,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: Text('Выберите предпочитаемый формат книги для скачивания'),
                     children: [
                       ...['fb2', 'epub', 'mobi', 'Спрашивать меня при скачивании'].map((fileExtension) {
-                        return RadioListTile(
-                          onChanged: (newThemeMode) {
+                        String value;
+                        if (fileExtension != 'Спрашивать меня при скачивании') {
+                          value = fileExtension;
+                        }
+                        return RadioListTile<String>(
+                          onChanged: (_) {
                             Navigator.of(context).pop(fileExtension);
                           },
                           groupValue: preferredBookExtSnapshot.data,
-                          value: fileExtension,
+                          value: value,
                           title: Text(fileExtension),
                         );
                       }).toList(),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
+import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/file_utils.dart';
@@ -25,8 +26,8 @@ class BookBloc {
   Future<Null> getBookInfo() async {
     var bookInfo = BookInfo(id: _bookId);
     try {
-      Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
-          "/b/" + _bookId.toString());
+      Uri url = Uri.https(
+          ProxyHttpClient().getHostAddress(), "/b/" + _bookId.toString());
       var response = await ProxyHttpClient().getDio().getUri(url);
 
       bookInfo = parseHtmlFromBookInfo(response.data, _bookId);
@@ -52,9 +53,11 @@ class BookBloc {
       await NativeMethods.rescanFolder(saveDocDir.path);
     }
 
-    Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
-        "/b/$_bookId/${downloadFormat.values.first}");
-    String fileUri = "";
+    Uri url = Uri.https(
+      ProxyHttpClient().getHostAddress(),
+      '/b/$_bookId/${downloadFormat.values.first}',
+    );
+    String fileUri = '';
     CancelToken cancelToken = CancelToken();
     cancelToken.whenCancel.whenComplete(() {
       alertsCallback(cancelToken.cancelError.message, Duration(seconds: 5));
@@ -78,11 +81,12 @@ class BookBloc {
             (Headers responseHeaders) {
               alertsCallback('', Duration(seconds: 0));
 
-              var contentDisposition = responseHeaders["content-disposition"];
+              var contentDisposition = responseHeaders['content-disposition'];
               if (contentDisposition == null) {
                 downloadProgressCallback(null);
                 cancelToken.cancel(
-                    "Доступ к книге ограничен по требованию правоторговца");
+                  'Доступ к книге ограничен по требованию правоторговца',
+                );
                 return fileUri;
               }
 
@@ -140,29 +144,11 @@ class BookBloc {
           onPressed: () => FileUtils.openFile(fileUri),
         ),
       );
-    } on DioError catch (e) {
-      switch (e.type) {
-        case DioErrorType.CONNECT_TIMEOUT:
-          print(e.request.path);
-          alertsCallback(
-            'Время ожидания соединения истекло',
-            Duration(seconds: 5),
-          );
-          break;
-        case DioErrorType.RECEIVE_TIMEOUT:
-          print(e);
-          alertsCallback(
-            "Время ожидания загрузки истекло",
-            Duration(seconds: 5),
-          );
-          break;
-        default:
-          alertsCallback(
-            e.toString(),
-            Duration(seconds: 5),
-          );
-          print(e);
-      }
+    } on DsError catch (dsError) {
+      alertsCallback(
+        dsError.toString(),
+        Duration(seconds: 5),
+      );
       cancelToken.cancel("");
     } catch (e) {
       print(e);
@@ -170,14 +156,13 @@ class BookBloc {
         e.toString(),
         Duration(seconds: 5),
       );
-      cancelToken.cancel("");
+      cancelToken.cancel('');
     }
 
     downloadProgressCallback(null);
   }
 
-  alertsCallback(String alertText,
-      Duration alertDuration,
+  alertsCallback(String alertText, Duration alertDuration,
       {SnackBarAction action}) {
     if (alertText.isEmpty) {
       return;

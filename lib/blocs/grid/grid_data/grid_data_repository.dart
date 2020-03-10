@@ -135,8 +135,8 @@ class GridDataRepository {
 
   static List<T> _getPageFromList<T>(List<T> list, int page) {
     return list.sublist(
-      max(HomeGridConsts.kPageSize * (page - 1), list.length),
-      max(HomeGridConsts.kPageSize * page, list.length),
+      min(HomeGridConsts.kPageSize * (page - 1), list.length),
+      min(HomeGridConsts.kPageSize * page, list.length),
     );
   }
 }

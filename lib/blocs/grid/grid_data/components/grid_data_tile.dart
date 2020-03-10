@@ -47,6 +47,7 @@ class GridDataTile extends StatelessWidget {
                   Text(
                     subtitle ?? '',
                     maxLines: 1,
+                    softWrap: false,
                     overflow: TextOverflow.fade,
                   ),
                   if (genres?.isNotEmpty == true) ...[

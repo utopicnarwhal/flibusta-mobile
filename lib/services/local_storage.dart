@@ -112,20 +112,21 @@ class LocalStorage {
     var prefs = await _prefs;
     try {
       var preferredBookExt = prefs.getString('PreferredBookExt');
-      if (preferredBookExt == null) {
-        await prefs.setString('PreferredBookExt', '');
-        preferredBookExt = '';
-      }
       return preferredBookExt;
     } catch (e) {
-      await prefs.setString('PreferredBookExt', '');
-      return '';
+      return null;
     }
   }
 
   Future<bool> setPreferredBookExt(String preferredBookExt) async {
     var prefs = await _prefs;
-    return await prefs.setString('PreferredBookExt', preferredBookExt);
+    try {
+      await prefs.setString('PreferredBookExt', preferredBookExt);
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future<String> getActualProxy() async {
