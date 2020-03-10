@@ -108,25 +108,24 @@ class LocalStorage {
     );
   }
 
-  Future<bool> getShowAdditionalBookInfo() async {
+  Future<String> getPreferredBookExt() async {
     var prefs = await _prefs;
     try {
-      var showAdditionalBookInfo = prefs.getBool('ShowAdditionalBookInfo');
-      if (showAdditionalBookInfo == null) {
-        await prefs.setBool('ShowAdditionalBookInfo', true);
-        showAdditionalBookInfo = true;
+      var preferredBookExt = prefs.getString('PreferredBookExt');
+      if (preferredBookExt == null) {
+        await prefs.setString('PreferredBookExt', '');
+        preferredBookExt = '';
       }
-      return showAdditionalBookInfo;
+      return preferredBookExt;
     } catch (e) {
-      await prefs.setBool('ShowAdditionalBookInfo', true);
-      return true;
+      await prefs.setString('PreferredBookExt', '');
+      return '';
     }
   }
 
-  Future<bool> setShowAdditionalBookInfo(bool showAdditionalBookInfo) async {
+  Future<bool> setPreferredBookExt(String preferredBookExt) async {
     var prefs = await _prefs;
-    return await prefs.setBool(
-        'ShowAdditionalBookInfo', showAdditionalBookInfo ?? true);
+    return await prefs.setString('PreferredBookExt', preferredBookExt);
   }
 
   Future<String> getActualProxy() async {

@@ -3,6 +3,7 @@ import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/text_to_icons.dart';
 import 'package:flutter/material.dart';
 
@@ -196,9 +197,19 @@ class DownloadBookButton extends StatelessWidget {
     }
 
     var onPressed = () async {
-      var downloadFormat = await showDownloadFormatMBS(context, book);
+      Map<String, String> downloadFormat;
+      var preferredBookExt = await LocalStorage().getPreferredBookExt();
+      if (preferredBookExt != null) {
+        downloadFormat = book.downloadFormats.list.firstWhere(
+          (bookFormat) => preferredBookExt == bookFormat.keys.first,
+          orElse: () => null,
+        );
+      }
       if (downloadFormat == null) {
-        return;
+        downloadFormat = await showDownloadFormatMBS(context, book);
+        if (downloadFormat == null) {
+          return;
+        }
       }
 
       var _bookBloc = BookBloc(book.id);

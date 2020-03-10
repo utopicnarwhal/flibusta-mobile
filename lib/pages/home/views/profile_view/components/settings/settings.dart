@@ -131,17 +131,60 @@ class _SettingsPageState extends State<SettingsPage> {
         },
       ),
       Divider(indent: 72),
-      FutureBuilder<bool>(
-        future: LocalStorage().getShowAdditionalBookInfo(),
-        builder: (context, showAdditionalBookInfo) {
-          return SwitchListTile(
-            title: Text(
-              "Показывать информацию о книге полностью",
+      FutureBuilder<String>(
+        future: LocalStorage().getPreferredBookExt(),
+        builder: (context, preferredBookExtSnapshot) {
+          return ListTile(
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(FontAwesomeIcons.fileDownload, size: 26.0),
+              ],
             ),
-            secondary: Icon(FontAwesomeIcons.bookOpen),
-            value: showAdditionalBookInfo?.data ?? false,
-            onChanged: (value) async {
-              await LocalStorage().setShowAdditionalBookInfo(value);
+            title: Text('Предпочитаемый формат книги'),
+            subtitle: Text(
+              preferredBookExtSnapshot.data ?? '',
+            ),
+            trailing: kIconArrowForward,
+            onTap: () async {
+              var result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    title: Text('Выберите предпочитаемый формат книги для скачивания'),
+                    children: [
+                      ...['fb2', 'epub', 'mobi', 'Спрашивать меня при скачивании'].map((fileExtension) {
+                        return RadioListTile(
+                          onChanged: (newThemeMode) {
+                            Navigator.of(context).pop(fileExtension);
+                          },
+                          groupValue: preferredBookExtSnapshot.data,
+                          value: fileExtension,
+                          title: Text(fileExtension),
+                        );
+                      }).toList(),
+                      ButtonBar(
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Отмена'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+              if (result == null) {
+                return;
+              }
+              if (result == 'Спрашивать меня при скачивании') {
+                result = null;
+              }
+              await LocalStorage().setPreferredBookExt(result);
               setState(() {});
             },
           );
