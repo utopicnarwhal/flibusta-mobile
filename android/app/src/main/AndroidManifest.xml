@@ -12,26 +12,25 @@
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:theme="@style/LaunchTheme"
         android:allowBackup="false"
         android:fullBackupContent="false"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
             android:name=".MainActivity"
+            android:theme="@style/AppTheme.Splash"
             android:launchMode="singleTop"
-            android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
             <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
-                android:resource="@drawable/launch_background" />
+                android:resource="@drawable/splash_drawable" />
 
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/LaunchTheme"
+                android:resource="@style/AppTheme.Splash"
                 />
 
             <intent-filter>

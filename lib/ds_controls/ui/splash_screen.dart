@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
         backgroundColor: Colors.transparent,
         body: Center(
           child: FlibustaLogo(
-            sideHeight: ScreenUtil().setWidth(400),
+            sideHeight: 200,
           ),
         ),
       ),
