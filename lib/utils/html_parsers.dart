@@ -570,13 +570,42 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
 }
 
 List<AuthorCard> parseHtmlFromGetAuthors(String htmlString) {
+  var result = List<AuthorCard>();
+  htmlString =
+      '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
+<body id="body">
+$htmlString
+</body></html>''';
+
   htmldom.Document document = parse(htmlString);
 
-  var result = List<BookCard>();
-
-  document.nodes.forEach((node) {
-    print(node.text);
+  final authorsAndBookCountNodes =
+      document.getElementById('body').nodes.where((node) {
+    return (node is htmldom.Text && node.text.trim().isNotEmpty) ||
+        (node is htmldom.Element &&
+            node.localName != 'div' &&
+            node.localName != 'br');
   });
 
-  return null;
+  int authorId;
+  String authorBookCount;
+  String authorName;
+  for (var node in authorsAndBookCountNodes) {
+    if (node is htmldom.Element) {
+      authorName = node.text.trim();
+      authorId = int.tryParse(node.attributes['href'].replaceAll('/a/', ''));
+    } else if (node is htmldom.Text) {
+      authorBookCount = node.text.trim().replaceAll(RegExp(r'(\(|\))'), '');
+      result.add(
+        AuthorCard(
+          booksCount: authorBookCount,
+          id: authorId,
+          name: authorName,
+        ),
+      );
+    }
+  }
+
+  return result;
 }

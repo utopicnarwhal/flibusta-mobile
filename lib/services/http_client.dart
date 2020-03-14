@@ -45,7 +45,6 @@ class ProxyHttpClient {
         onRequest: (RequestOptions options) async {
           if (kReleaseMode == false) {
             print('Send request：path = ${options.path}');
-            print('data: ${options.data}');
           }
         },
         onError: (dioError) {
@@ -80,6 +79,7 @@ class ProxyHttpClient {
     _dio.clear();
     _dio.close();
     _dio = newDio;
+    _init();
   }
 
   String getActualProxy() {

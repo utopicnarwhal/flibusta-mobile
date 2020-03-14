@@ -1,15 +1,13 @@
-import 'dart:typed_data';
-
-import 'package:dio/dio.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/ui/app_bar.dart';
+import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/model/bookInfo.dart';
+import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/pages/book/components/book_app_bar.dart';
-import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
-import 'package:flibusta/services/http_client.dart';
-import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/services/transport/book_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/components/loading_indicator.dart';
+import 'package:rxdart/rxdart.dart';
 
 class BookPage extends StatefulWidget {
   static const routeName = "/BookPage";
@@ -23,45 +21,91 @@ class BookPage extends StatefulWidget {
 
 class BookPageState extends State<BookPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  BehaviorSubject<double> _downloadProgressController;
 
   BookInfo _bookInfo;
   Image _coverImage;
+
+  DsError _getBookInfoError;
+  DsError _getBookCoverImageError;
 
   @override
   void initState() {
     super.initState();
 
+    _downloadProgressController = BehaviorSubject<double>();
+
     BookService.getBookInfo(widget.bookId).then((bookInfo) {
+      if (!mounted) return;
       setState(() {
         _bookInfo = bookInfo;
       });
-      LocalStorage().addToLastOpenBooks(_bookInfo);
       BookService.getBookCoverImage(bookInfo.coverImgSrc).then((coverImgBytes) {
+        if (!mounted) return;
         setState(() {
           _coverImage = Image.memory(
             coverImgBytes,
             fit: BoxFit.cover,
           );
         });
+      }, onError: (dsError) {
+        if (!mounted) return;
+        setState(() {
+          _getBookCoverImageError = dsError;
+        });
+      });
+    }, onError: (dsError) {
+      if (!mounted) return;
+      setState(() {
+        _getBookInfoError = dsError;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_getBookInfoError != null) {
+      return Scaffold(
+        key: _scaffoldKey,
+        appBar: DsAppBar(),
+        body: Center(
+          child: Text(
+            _getBookInfoError.toString(),
+            style: Theme.of(context).textTheme.headline,
+          ),
+        ),
+      );
+    }
+    if (_bookInfo == null) {
+      return Scaffold(
+        key: _scaffoldKey,
+        appBar: DsAppBar(),
+        body: LoadingIndicator(),
+      );
+    }
     return Scaffold(
       key: _scaffoldKey,
       body: Builder(
         builder: (context) {
-          if (_bookInfo == null) {
-            return LoadingIndicator();
+          Widget appBarBackground;
+          if (_getBookCoverImageError != null) {
+            appBarBackground = Center(
+              child: Text(
+                _getBookCoverImageError.toString(),
+                style: Theme.of(context).textTheme.headline,
+              ),
+            );
+          } else if (_coverImage == null) {
+            appBarBackground = LoadingIndicator();
+          } else {
+            appBarBackground = _coverImage;
           }
 
           return CustomScrollView(
             physics: kBouncingAlwaysScrollableScrollPhysics,
             slivers: [
               BookAppBar(
-                coverImg: _coverImage,
+                coverImg: appBarBackground,
               ),
               SliverList(
                 delegate: SliverChildListDelegate([
@@ -140,22 +184,24 @@ class BookPageState extends State<BookPage> {
                       ),
                     ),
                   ],
-                  Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: RaisedButton(
-                      child: Text('Скачать'),
-                      onPressed: _bookInfo.downloadProgress == null
-                          ? () => _onDownloadBookClick(_bookInfo)
-                          : null,
-                    ),
+                  StreamBuilder<double>(
+                    builder: (context, downloadProgressSnapshot) {
+                      if (!downloadProgressSnapshot.hasData) {
+                        return Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: RaisedButton(
+                            child: Text('Скачать'),
+                            onPressed: () => _onDownloadBookClick(_bookInfo),
+                          ),
+                        );
+                      }
+                      return LinearProgressIndicator(
+                        value: downloadProgressSnapshot.data == 0.0
+                            ? null
+                            : downloadProgressSnapshot.data,
+                      );
+                    },
                   ),
-                  _bookInfo.downloadProgress != null
-                      ? LinearProgressIndicator(
-                          value: _bookInfo.downloadProgress == 0.0
-                              ? null
-                              : _bookInfo.downloadProgress,
-                        )
-                      : Container(),
                   SizedBox(height: 56),
                 ]),
               ),
@@ -171,15 +217,15 @@ class BookPageState extends State<BookPage> {
       context,
       bookInfo,
       (downloadProgress) {
-        setState(() {
-          bookInfo.downloadProgress = downloadProgress;
-        });
+        if (!mounted) return;
+        _downloadProgressController.add(downloadProgress);
       },
     );
   }
 
   @override
   void dispose() {
+    _downloadProgressController?.close();
     super.dispose();
   }
 }

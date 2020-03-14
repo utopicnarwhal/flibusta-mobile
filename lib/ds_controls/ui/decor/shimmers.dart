@@ -12,10 +12,12 @@ const kShimmerTextHighlightColor = Color(0x3FBBBBBB);
 class ShimmerContainer extends StatelessWidget {
   final double blockWidth;
   final double blockHeight;
+  final double borderRadius;
 
   ShimmerContainer({
     this.blockWidth,
     this.blockHeight,
+    this.borderRadius = 5,
   });
 
   @override
@@ -26,7 +28,7 @@ class ShimmerContainer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(borderRadius),
         ),
         width: blockWidth,
         height: blockHeight,

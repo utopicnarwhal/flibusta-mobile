@@ -19,6 +19,7 @@ class GridDataRepository {
   Future<List<GridData>> makeBookList(
     int page, {
     AdvancedSearchParams advancedSearchParams,
+    
     List<Map<int, String>> lastGenres,
   }) async {
     Map<String, String> queryParams = {'ab': 'ab1', 'sort': 'sd2'};
@@ -81,16 +82,21 @@ class GridDataRepository {
   }
 
   Future<List<AuthorCard>> getAuthors(int page) async {
-    var _dio = ProxyHttpClient().getDio();
-
     var result = List<AuthorCard>();
+    
+    Map<String, String> queryParams = {'ab': 'ab2', 'sort': 'sln1'};
 
+    if (page != null && page > 1) {
+      queryParams.addAll({'page': (page - 1).toString()});
+    }
+    
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
-      '/a',
+      '/makebooklist',
+      queryParams,
     );
 
-    var response = await _dio.getUri(url);
+    var response = await ProxyHttpClient().getDio().getUri(url);
 
     if (response.data == null || !(response.data is String)) {
       return null;

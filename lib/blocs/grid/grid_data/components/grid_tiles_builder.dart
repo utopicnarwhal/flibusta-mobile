@@ -15,6 +15,7 @@ import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -141,6 +142,7 @@ class GridTilesBuilder extends StatelessWidget {
             score: score,
             onTap: () {
               if (gridData[index] is BookCard) {
+                LocalStorage().addToLastOpenBooks(gridData[index]);
                 Navigator.of(context).pushNamed(
                   BookPage.routeName,
                   arguments: gridData[index].id,
@@ -265,9 +267,7 @@ class GridTilesBuilder extends StatelessWidget {
             gridDataState?.stateCode == GridDataStateCode.Error) &&
         isScrollingDown &&
         maxScroll - currentScroll <= delta) {
-      BlocProvider.of<GridDataBloc>(context).uploadMore(
-        ((gridDataState.gridData?.length ?? 0) ~/ HomeGridConsts.kPageSize) + 1,
-      );
+      BlocProvider.of<GridDataBloc>(context).uploadMore();
     }
     return false;
   }

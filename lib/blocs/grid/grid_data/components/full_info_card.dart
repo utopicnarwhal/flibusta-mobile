@@ -4,8 +4,6 @@ import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
-import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
-import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/services/transport/book_service.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/icon_utils.dart';

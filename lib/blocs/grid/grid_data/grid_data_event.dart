@@ -30,21 +30,24 @@ class LoadGridDataEvent extends GridDataEvent {
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
           _gridData = await _gridDataRepository.getDownloadedBooks(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
           _gridData = await _gridDataRepository.makeBookList(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.authors:
           _gridData = await _gridDataRepository.getAuthors(1);
+          hasReachedMax = (_gridData?.length ?? 0) < 49;
           break;
         case GridViewType.genres:
           _gridData = await _gridDataRepository.getAllGenres(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
           break;
         default:
       }
-      hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
 
       return currentState.copyWith(
         stateCode: GridDataStateCode.Normal,
@@ -81,24 +84,24 @@ class SearchGridDataEvent extends GridDataEvent {
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
           _gridData = await _gridDataRepository.getDownloadedBooks(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
           _gridData = await _gridDataRepository.makeBookList(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.authors:
           _gridData = await _gridDataRepository.getAuthors(1);
+          hasReachedMax = (_gridData?.length ?? 0) < 49;
           break;
         case GridViewType.genres:
           _gridData = await _gridDataRepository.getAllGenres(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
           break;
         default:
       }
-      hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
-      // var _gridData = await this
-      //     ._gridDataRepository
-      //     .getGridData(bloc.userViewTypeNum, 1, searchString: searchString);
 
       return currentState.copyWith(
         stateCode: GridDataStateCode.Normal,

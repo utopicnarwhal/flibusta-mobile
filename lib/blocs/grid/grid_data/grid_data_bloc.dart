@@ -27,8 +27,8 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
     this.add(SearchGridDataEvent(searchString));
   }
 
-  void uploadMore(int nextPageNumber) {
-    this.add(UploadMoreGridDataEvent(nextPageNumber));
+  void uploadMore() {
+    this.add(UploadMoreGridDataEvent(state.page + 1));
   }
 
   @override
@@ -48,6 +48,7 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
             uploadingMore: true,
             message: '',
           );
+          return;
         }
       } else {
         yield state.copyWith(

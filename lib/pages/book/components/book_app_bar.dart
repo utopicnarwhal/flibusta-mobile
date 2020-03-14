@@ -1,4 +1,3 @@
-import 'package:flibusta/components/loading_indicator.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -12,14 +11,14 @@ class BookAppBar extends StatefulWidget {
 
 class _BookAppBarState extends State<BookAppBar> {
   ImageStream coverImageStream;
-  double coverImgHeight = 0;
+  double coverImgHeight;
 
   @override
   void didUpdateWidget(BookAppBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.coverImg != widget.coverImg) {
+    if (oldWidget.coverImg != widget.coverImg && widget.coverImg is Image) {
       coverImageStream =
-          widget.coverImg.image.resolve(new ImageConfiguration());
+          (widget.coverImg as Image).image.resolve(new ImageConfiguration());
       coverImageStream.addListener(ImageStreamListener(imageStreamListener));
     }
   }
@@ -44,16 +43,12 @@ class _BookAppBarState extends State<BookAppBar> {
       pinned: true,
       snap: false,
       floating: false,
-      expandedHeight: coverImageLoading ? 150 : coverImgHeight,
-      title: !coverImageLoading && coverImg == null
+      expandedHeight: coverImgHeight ?? 150,
+      title: widget.coverImg == null
           ? Text('Нет обложки')
           : Text(''),
       flexibleSpace: FlexibleSpaceBar(
-        background: coverImageLoading ? LoadingIndicator() : coverImg,
-        stretchModes: [
-          StretchMode.fadeTitle,
-          StretchMode.blurBackground,
-        ],
+        background: widget.coverImg,
       ),
       elevation: 0,
       textTheme: Theme.of(context).textTheme,
