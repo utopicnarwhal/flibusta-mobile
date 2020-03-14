@@ -1,3 +1,4 @@
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flutter/material.dart';
 
 class LoadingIndicator extends StatelessWidget {
@@ -11,7 +12,7 @@ class LoadingIndicator extends StatelessWidget {
           width: 70.0,
           height: 70.0,
           child: Center(
-            child: CircularProgressIndicator(),
+            child: DsCircularProgressIndicator(),
           ),
         ),
       ],

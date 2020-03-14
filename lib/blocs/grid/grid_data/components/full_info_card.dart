@@ -1,11 +1,12 @@
 import 'dart:io';
 
-import 'package:flibusta/blocs/book/book_bloc.dart';
 import 'package:flibusta/ds_controls/theme.dart';
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/services/transport/book_service.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/icon_utils.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +74,7 @@ class _FullInfoCardState extends State<FullInfoCard> {
                             showCustomLeading:
                                 widget.data.downloadProgress != null &&
                                     widget.data.localPath == null,
-                            customLeading: CircularProgressIndicator(
+                            customLeading: DsCircularProgressIndicator(
                               value: widget.data.downloadProgress == 0.0
                                   ? null
                                   : widget.data.downloadProgress,
@@ -182,31 +183,11 @@ class DownloadBookButton extends StatelessWidget {
     }
 
     var onPressed = () async {
-      Map<String, String> downloadFormat;
-      var preferredBookExt = await LocalStorage().getPreferredBookExt();
-      if (preferredBookExt != null) {
-        downloadFormat = book.downloadFormats.list.firstWhere(
-          (bookFormat) => preferredBookExt == bookFormat.keys.first,
-          orElse: () => null,
-        );
-      }
-      if (downloadFormat == null) {
-        downloadFormat = await showDownloadFormatMBS(context, book);
-        if (downloadFormat == null) {
-          return;
-        }
-      }
-
-      var _bookBloc = BookBloc(book.id);
-
-      await _bookBloc.downloadBook(
+      BookService.downloadBook(
         context,
         book,
-        downloadFormat,
         downloadBookCallback,
       );
-
-      _bookBloc.dispose();
     };
 
     return FlatButton(

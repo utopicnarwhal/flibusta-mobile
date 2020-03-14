@@ -71,6 +71,7 @@ flutter:
     - assets/img/Logo.png
     - assets/img/bg-header.png
     - assets/img/flibusta_logo.png
+    - assets/img/utopic_narwhal.png
     - assets/img/4pda_logo.svg
     - assets/animations/empty_state.flr
     - assets/animations/floating_document.flr

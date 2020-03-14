@@ -93,6 +93,9 @@ class LocalStorage {
   Future<bool> addToLastOpenBooks(BookCard book) async {
     var prefs = await _prefs;
     var lastOpenBooks = await getLastOpenBooks();
+    if (lastOpenBooks.contains(book)) {
+      return true;
+    }
     lastOpenBooks.add(book);
     if (lastOpenBooks.length > 3) {
       lastOpenBooks = lastOpenBooks.sublist(

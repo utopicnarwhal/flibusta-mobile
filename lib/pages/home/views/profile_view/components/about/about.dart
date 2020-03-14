@@ -28,7 +28,27 @@ class AboutPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 30, horizontal: 40),
                 child: Column(
                   children: [
-                    FlibustaLogo(isIconLike: true),
+                    Wrap(
+                      runSpacing: 20,
+                      spacing: 20,
+                      children: <Widget>[
+                        FlibustaLogo(isIconLike: true),
+                        SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Material(
+                            elevation: 8,
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child:
+                                  Image.asset('assets/img/utopic_narwhal.png'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 16),
                     Text(
                       'Версия ' + (packageInfo?.data?.version ?? ''),
@@ -61,24 +81,10 @@ class AboutPage extends StatelessWidget {
                       ),
                       isThreeLine: true,
                       subtitle: Text(
-                        'Данилов Сергей (@utopicnarwhal)\ngigok@bk.ru',
+                        'Данилов Сергей\ngigok@bk.ru',
                       ),
                       onTap: () async {
                         launch('mailto:gigok@bk.ru');
-                      },
-                    ),
-                    Divider(indent: 70),
-                    ListTile(
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [_FourPDAIcon()],
-                      ),
-                      title: Text('Тема на 4PDA'),
-                      trailing: kIconArrowForward,
-                      subtitle: Text('github.com/utopicnarwhal/FlibustaApp'),
-                      onTap: () async {
-                        await launch(
-                            'https://github.com/utopicnarwhal/FlibustaApp');
                       },
                     ),
                     Divider(indent: 70),
@@ -98,6 +104,19 @@ class AboutPage extends StatelessWidget {
                       onTap: () async {
                         await launch(
                             'https://github.com/utopicnarwhal/FlibustaApp');
+                      },
+                    ),
+                    Divider(indent: 70),
+                    ListTile(
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [_FourPDAIcon()],
+                      ),
+                      title: Text('Тема на 4PDA'),
+                      trailing: kIconArrowForward,
+                      onTap: () async {
+                        await launch(
+                            'https://4pda.ru/forum/index.php?showtopic=964348');
                       },
                     ),
                     Divider(indent: 70),

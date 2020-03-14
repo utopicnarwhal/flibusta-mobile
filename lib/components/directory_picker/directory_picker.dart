@@ -2,6 +2,7 @@ library directory_picker;
 
 import 'dart:io';
 
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -149,7 +150,7 @@ class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog>
           padding: EdgeInsets.all(spacing * 2),
           child: Column(
             children: <Widget>[
-              CircularProgressIndicator(),
+              DsCircularProgressIndicator(),
               SizedBox(height: spacing),
               Text('Проверка разрешений', textAlign: TextAlign.center)
             ],

@@ -1,3 +1,4 @@
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +31,7 @@ class _GetNewProxyTileState extends State<GetNewProxyTile> {
             ? SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(),
+                child: DsCircularProgressIndicator(),
               )
             : Icon(
                 Icons.add,

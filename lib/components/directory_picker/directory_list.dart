@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 
@@ -43,7 +44,7 @@ class _DirectoryListState extends State<DirectoryList> {
       return [
         Expanded(
           child: Center(
-            child: CircularProgressIndicator(),
+            child: DsCircularProgressIndicator(),
           ),
         )
       ];

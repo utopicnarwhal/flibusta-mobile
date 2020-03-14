@@ -1,5 +1,6 @@
 import 'package:flibusta/blocs/genres_list/genres_list_bloc.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flutter/material.dart';
@@ -111,7 +112,7 @@ Future<AdvancedSearchParams> showAdvancedSearchBS(
                                     ? null
                                     : Padding(
                                         padding: EdgeInsets.all(8.0),
-                                        child: CircularProgressIndicator()),
+                                        child: DsCircularProgressIndicator()),
                               ),
                             ),
                             itemBuilder: (context, suggestion) {
@@ -316,7 +317,7 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
                                   ? null
                                   : Padding(
                                       padding: EdgeInsets.all(8.0),
-                                      child: CircularProgressIndicator()),
+                                      child: DsCircularProgressIndicator()),
                             ),
                           ),
                           itemBuilder: (context, suggestion) {

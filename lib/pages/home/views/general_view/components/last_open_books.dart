@@ -79,9 +79,16 @@ class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
                   return ListTile(
                     title: Text(
                       lastOpenBooks[index].tileTitle,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
                     ),
-                    subtitle: Text(lastOpenBooks[index].tileSubtitle),
+                    subtitle: Text(
+                      lastOpenBooks[index].tileSubtitle,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                    ),
                     trailing: kIconArrowForward,
                     onTap: () {},
                   );

@@ -19,30 +19,31 @@ class GridDataRepository {
   Future<List<GridData>> makeBookList(
     int page, {
     AdvancedSearchParams advancedSearchParams,
+    List<Map<int, String>> lastGenres,
   }) async {
-    Map<String, String> queryParams = {"ab": "ab1", "sort": "sd2"};
+    Map<String, String> queryParams = {'ab': 'ab1', 'sort': 'sd2'};
 
     if (page != null && page > 1) {
-      queryParams.addAll({"page": (page - 1).toString()});
+      queryParams.addAll({'page': (page - 1).toString()});
     }
     if (advancedSearchParams?.title?.isNotEmpty == true) {
-      queryParams.addAll({"t": advancedSearchParams.title});
+      queryParams.addAll({'t': advancedSearchParams.title});
     }
     if (advancedSearchParams?.firstname?.isNotEmpty == true) {
-      queryParams.addAll({"fn": advancedSearchParams.firstname});
+      queryParams.addAll({'fn': advancedSearchParams.firstname});
     }
     if (advancedSearchParams?.lastname?.isNotEmpty == true) {
-      queryParams.addAll({"ln": advancedSearchParams.lastname});
+      queryParams.addAll({'ln': advancedSearchParams.lastname});
     }
     if (advancedSearchParams?.middlename?.isNotEmpty == true) {
-      queryParams.addAll({"mn": advancedSearchParams.middlename});
+      queryParams.addAll({'mn': advancedSearchParams.middlename});
     }
     if (advancedSearchParams?.genres?.isNotEmpty == true) {
-      queryParams.addAll({"g": advancedSearchParams.genres});
+      queryParams.addAll({'g': advancedSearchParams.genres});
     }
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
-      "/makebooklist",
+      '/makebooklist',
       queryParams,
     );
 
@@ -51,21 +52,21 @@ class GridDataRepository {
       return null;
     }
 
-    var result = parseHtmlFromMakeBookList(response.data);
+    var result = parseHtmlFromMakeBookList(response.data, lastGenres);
     return result;
   }
 
-  Future<SearchResults> bookSearch(String searchQuery) async {
+  Future<SearchResults> bookSearch(int page, String searchQuery) async {
     Map<String, String> queryParams = {
-      "page": "0",
-      "ask": searchQuery,
-      "chs": "on",
-      "cha": "on",
-      "chb": "on"
+      'page': (page + 1).toString(),
+      'ask': searchQuery,
+      'chs': 'on',
+      'cha': 'on',
+      'chb': 'on',
     };
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
-      "/booksearch",
+      '/booksearch',
       queryParams,
     );
 
@@ -86,7 +87,7 @@ class GridDataRepository {
 
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
-      "/a",
+      '/a',
     );
 
     var response = await _dio.getUri(url);
@@ -94,22 +95,32 @@ class GridDataRepository {
     if (response.data == null || !(response.data is String)) {
       return null;
     }
+
+    result = parseHtmlFromGetAuthors(response.data);
+    return result;
   }
 
-  Future<List<GridData>> getAllGenres(int page) async {
+  Future<List<GridData>> getAllGenres(int page, {String searchString}) async {
     if (cachedGenreList != null) {
-      return _getPageFromList<GridData>(cachedGenreList, page);
+      var result = cachedGenreList;
+      if (searchString?.isNotEmpty == true) {
+        result = result.where(
+          (genre) =>
+              genre.name.toLowerCase().contains(searchString.toLowerCase()),
+        );
+      }
+      return _getPageFromList<GridData>(result, page);
     }
 
     var _dio = ProxyHttpClient().getDio();
 
     var result = List<Genre>();
     Map<String, String> queryParams = {
-      "op": "getList",
+      'op': 'getList',
     };
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
-      "/ajaxro/genre",
+      '/ajaxro/genre',
       queryParams,
     );
 
@@ -122,13 +133,19 @@ class GridDataRepository {
     response.data.forEach((headIndex, headGenre) {
       headGenre.forEach((genre) {
         result.add(Genre(
-          id: int.tryParse(genre["id"]),
-          name: genre["name"],
-          code: genre["code"],
+          id: int.tryParse(genre['id']),
+          name: genre['name'],
+          code: genre['code'],
         ));
       });
     });
     cachedGenreList = result;
+    if (searchString?.isNotEmpty == true) {
+      result = result.where(
+        (genre) =>
+            genre.name.toLowerCase().contains(searchString.toLowerCase()),
+      );
+    }
 
     return _getPageFromList<GridData>(cachedGenreList, page);
   }

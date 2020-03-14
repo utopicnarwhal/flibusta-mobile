@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
@@ -131,10 +132,6 @@ class UploadMoreGridDataEvent extends GridDataEvent {
   Future<GridDataState> applyAsync(
       {GridDataState currentState, GridDataBloc bloc}) async {
     try {
-      // var gridData = await this._gridDataRepository.getGridData(
-      //     bloc.userViewTypeNum, pageNumber,
-      //     searchString: currentState?.searchString);
-
       List<GridData> _gridData = [];
       var hasReachedMax = true;
       // TODO: add existing search string
@@ -143,7 +140,10 @@ class UploadMoreGridDataEvent extends GridDataEvent {
           _gridData = await _gridDataRepository.getDownloadedBooks(pageNumber);
           break;
         case GridViewType.newBooks:
-          _gridData = await _gridDataRepository.makeBookList(pageNumber);
+          _gridData = await _gridDataRepository.makeBookList(
+            pageNumber,
+            lastGenres: (currentState.gridData.last as BookCard).genres?.list,
+          );
           break;
         case GridViewType.authors:
           _gridData = await _gridDataRepository.getAuthors(pageNumber);
