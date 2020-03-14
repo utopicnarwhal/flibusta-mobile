@@ -32,7 +32,7 @@ class DsAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: title,
       centerTitle: false,
       actions: actions,
-      bottom: showBottomDivider ? _AppBarBottomDivider() : null,
+      bottom: showBottomDivider ? DsAppBarBottomDivider() : null,
       elevation: 0,
       textTheme: Theme.of(context).textTheme,
       iconTheme: Theme.of(context).iconTheme,
@@ -43,7 +43,7 @@ class DsAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class _AppBarBottomDivider extends StatelessWidget
+class DsAppBarBottomDivider extends StatelessWidget
     implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
@@ -54,5 +54,5 @@ class _AppBarBottomDivider extends StatelessWidget
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(50);
+  Size get preferredSize => Size.fromHeight(0.5);
 }

@@ -1,11 +1,13 @@
 import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/utils/icon_utils.dart';
 import 'package:flutter/material.dart';
 
 class GridDataTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final List<String> genres;
+  final int score;
   final GestureTapCallback onTap;
   final GestureLongPressCallback onLongPress;
   final bool isFirst;
@@ -21,6 +23,7 @@ class GridDataTile extends StatelessWidget {
     this.isFirst = false,
     this.isLast = false,
     this.index = 0,
+    this.score,
   });
 
   @override
@@ -50,8 +53,8 @@ class GridDataTile extends StatelessWidget {
                     softWrap: false,
                     overflow: TextOverflow.fade,
                   ),
-                  if (genres?.isNotEmpty == true) ...[
-                    _genresBuilder(context, genres)
+                  if (genres?.isNotEmpty == true || score != null) ...[
+                    _genresAndScoreBuilder(context, genres, score)
                   ],
                 ],
               ),
@@ -70,7 +73,11 @@ class GridDataTile extends StatelessWidget {
     );
   }
 
-  Widget _genresBuilder(BuildContext context, List<String> genres) {
+  Widget _genresAndScoreBuilder(
+    BuildContext context,
+    List<String> genres,
+    int score,
+  ) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 30,
@@ -92,11 +99,17 @@ class GridDataTile extends StatelessWidget {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           scrollDirection: Axis.horizontal,
-          itemCount: genres?.length ?? 0,
+          itemCount: (genres?.length ?? 0) + 1,
           separatorBuilder: (context, index) {
             return SizedBox(width: 10);
           },
           itemBuilder: (context, index) {
+            if (index == 0) {
+              return AspectRatio(
+                aspectRatio: 1,
+                child: scoreToIcon(score, 18),
+              );
+            }
             return Container(
               padding: EdgeInsets.symmetric(
                 vertical: 4,
@@ -107,7 +120,7 @@ class GridDataTile extends StatelessWidget {
                 color: Theme.of(context).scaffoldBackgroundColor,
               ),
               child: Text(
-                genres.elementAt(index),
+                genres.elementAt(index - 1),
               ),
             );
           },

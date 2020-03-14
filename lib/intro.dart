@@ -110,9 +110,10 @@ class IntroPage extends StatelessWidget {
       styleNameSkipBtn: Theme.of(context).textTheme.button,
       nameNextBtn: 'Далее',
       namePrevBtn: 'Назад',
+      nameDoneBtn: '',
       isShowSkipBtn: false,
       isShowPrevBtn: true,
-      isShowDoneBtn: false,
+      isShowDoneBtn: true,
       typeDotAnimation: dotSliderAnimation.SIZE_TRANSITION,
     );
   }

@@ -23,6 +23,7 @@ class FlibustaLogo extends StatelessWidget {
         child: isIconLike
             ? Material(
                 elevation: 8,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),

@@ -2,7 +2,11 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flibusta/blocs/book/book_bloc.dart';
+import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/fields/selector.dart';
+import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/model/bookInfo.dart';
+import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/components/loading_indicator.dart';
@@ -12,13 +16,12 @@ class BookPage extends StatefulWidget {
 
   final int bookId;
 
-  const BookPage({Key key, this.bookId}): super(key: key);
+  const BookPage({Key key, this.bookId}) : super(key: key);
   @override
   BookPageState createState() => BookPageState();
 }
 
 class BookPageState extends State<BookPage> {
-  Dio _dio = ProxyHttpClient().getDio();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   BookBloc _bookBloc;
@@ -26,8 +29,6 @@ class BookPageState extends State<BookPage> {
   Image coverImg;
   ImageStream coverImageStream;
   double coverImgHeight = 0;
-
-  Map<String, String> formatForDownload;
 
   bool coverImageLoading = true;
 
@@ -42,7 +43,10 @@ class BookPageState extends State<BookPage> {
   void imageStreamListener(ImageInfo info, bool _) {
     if (mounted) {
       setState(() {
-        coverImgHeight = (info.image.height.toDouble() * (MediaQuery.of(context).size.width / info.image.width.toDouble()) - 24);
+        coverImgHeight = (info.image.height.toDouble() *
+                (MediaQuery.of(context).size.width /
+                    info.image.width.toDouble()) -
+            24);
         coverImageLoading = false;
       });
     }
@@ -54,170 +58,195 @@ class BookPageState extends State<BookPage> {
       key: _scaffoldKey,
       body: StreamBuilder<BookInfo>(
         stream: _bookBloc.outBookInfo,
-        builder: (context, snapshot) {
-          if (snapshot.data != null && snapshot.data.coverImgSrc == null) {
+        builder: (context, outBookInfoSnapshot) {
+          if (outBookInfoSnapshot.data != null &&
+              outBookInfoSnapshot.data.coverImgSrc == null) {
             coverImg = null;
             coverImageLoading = false;
           }
-          
-          if (snapshot.data != null && coverImageLoading && snapshot.data.coverImgSrc != null) {
-            var url = Uri.https(ProxyHttpClient().getHostAddress(), snapshot.data.coverImgSrc);
-            
-            _dio.getUri(
-              url, 
-              options: Options(
-                sendTimeout: 15000,
-                receiveTimeout: 8000,
-                responseType: ResponseType.bytes,
-              ),
-            ).then((response) {
+
+          if (outBookInfoSnapshot.data != null &&
+              coverImageLoading &&
+              outBookInfoSnapshot.data.coverImgSrc != null) {
+            var url = Uri.https(
+              ProxyHttpClient().getHostAddress(),
+              outBookInfoSnapshot.data.coverImgSrc,
+            );
+
+            ProxyHttpClient()
+                .getDio()
+                .getUri(
+                  url,
+                  options: Options(
+                    sendTimeout: 15000,
+                    receiveTimeout: 8000,
+                    responseType: ResponseType.bytes,
+                  ),
+                )
+                .then((response) {
               if (mounted && coverImageLoading) {
                 setState(() {
-                  coverImg = Image.memory(Uint8List.fromList(response.data), fit: BoxFit.fitWidth);
-                  coverImageStream = coverImg.image.resolve(new ImageConfiguration());
-                  coverImageStream.addListener(ImageStreamListener(imageStreamListener));
+                  coverImg = Image.memory(Uint8List.fromList(response.data),
+                      fit: BoxFit.fitWidth);
+                  coverImageStream =
+                      coverImg.image.resolve(new ImageConfiguration());
+                  coverImageStream
+                      .addListener(ImageStreamListener(imageStreamListener));
                 });
               }
             });
           }
 
-          if (!snapshot.hasData) {
+          if (!outBookInfoSnapshot.hasData) {
             return LoadingIndicator();
           }
 
           return CustomScrollView(
+            physics: kBouncingAlwaysScrollableScrollPhysics,
             slivers: <Widget>[
               SliverAppBar(
-                backgroundColor: coverImageLoading ? Theme.of(context).disabledColor : null,
+                backgroundColor:
+                    Theme.of(context).brightness == Brightness.light
+                        ? Theme.of(context).cardColor
+                        : null,
                 pinned: true,
                 snap: false,
                 floating: false,
-                expandedHeight: coverImageLoading ? MediaQuery.of(context).size.width - 100 : coverImgHeight,
-                title: !coverImageLoading && coverImg == null ? Text("Нет обложки") : Container(),
+                expandedHeight: coverImageLoading
+                    ? MediaQuery.of(context).size.width - 100
+                    : coverImgHeight,
+                title: !coverImageLoading && coverImg == null
+                    ? Text('Нет обложки')
+                    : Text(outBookInfoSnapshot.data.title ?? ''),
                 flexibleSpace: FlexibleSpaceBar(
                   background: coverImageLoading ? LoadingIndicator() : coverImg,
                 ),
+                bottom: DsAppBarBottomDivider(),
               ),
               SliverList(
                 delegate: SliverChildListDelegate(
                   <Widget>[
+                    ListTile(
+                      title: Text(outBookInfoSnapshot.data.title ?? ''),
+                      subtitle: Text('Название произведения'),
+                    ),
+                    Divider(indent: 16),
+                    ListTile(
+                      title: Text(
+                          outBookInfoSnapshot.data.authors?.toString() ?? ''),
+                      subtitle: Text('Автор(-ы)'),
+                    ),
+                    if (outBookInfoSnapshot.data.translators?.isNotEmpty ==
+                        true) ...[
+                      Divider(indent: 16),
+                      ListTile(
+                        title: Text(
+                          outBookInfoSnapshot.data.translators.toString(),
+                        ),
+                        subtitle: Text('Переведено'),
+                      ),
+                    ],
+                    if (outBookInfoSnapshot.data.genres?.isNotEmpty ==
+                        true) ...[
+                      Divider(indent: 16),
+                      ListTile(
+                        title: Text(
+                          outBookInfoSnapshot.data.genres.toString(),
+                        ),
+                        subtitle: Text('Жанр(-ы)'),
+                      ),
+                    ],
+                    if (outBookInfoSnapshot.data.sequenceTitle?.isNotEmpty ==
+                        true) ...[
+                      Divider(indent: 16),
+                      ListTile(
+                        title: Text(
+                          outBookInfoSnapshot.data.sequenceTitle,
+                        ),
+                        subtitle: Text('Серия произведений'),
+                      ),
+                    ],
+                    if (outBookInfoSnapshot
+                            .data.addedToLibraryDate?.isNotEmpty ==
+                        true) ...[
+                      Divider(indent: 16),
+                      ListTile(
+                        title: Text(
+                          outBookInfoSnapshot.data.addedToLibraryDate,
+                        ),
+                      ),
+                    ],
+                    if (outBookInfoSnapshot.data.size?.isNotEmpty == true) ...[
+                      Divider(indent: 16),
+                      ListTile(
+                        title: Text(
+                          outBookInfoSnapshot.data.size,
+                        ),
+                        subtitle: Text('Размер файла'),
+                      ),
+                    ],
+                    if (outBookInfoSnapshot.data.lemma?.isNotEmpty == true) ...[
+                      Divider(),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
+                        child: Text(
+                          'Аннотация:',
+                          style: Theme.of(context).textTheme.headline,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                        ),
+                        child: Text(
+                          outBookInfoSnapshot.data.lemma,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ],
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Center(
-                            child: Text(
-                              snapshot.data.title ?? "", 
-                              style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              snapshot.data.authors == null ? "" : snapshot.data.authors.toString(), 
-                              style: TextStyle(fontSize: 20, color: Theme.of(context).textTheme.caption.color),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          snapshot.data.translators != null && snapshot.data.translators.isNotEmpty ? Center(
-                            child: Text(
-                              "Переведено: " + snapshot.data.translators.toString(),
-                              style: TextStyle(fontSize: 18, color: Theme.of(context).textTheme.caption.color), 
-                              textAlign: TextAlign.center,
-                            ),
-                          ) : Container(),
-                          snapshot.data.genres != null && snapshot.data.genres.isNotEmpty ? Center(
-                            child: Text(
-                              "Жанр: " + snapshot.data.genres.toString(),
-                              style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.caption.color),
-                              textAlign: TextAlign.center,
-                            ),
-                          ) : Container(),
-                          snapshot.data.sequenceTitle != null ? Center(
-                            child: Text(
-                              "Серия произведений: " + snapshot.data.sequenceTitle,
-                              style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.caption.color),
-                              textAlign: TextAlign.center,
-                            ),
-                          ) : Container(),
-                          Center(
-                            child: Text(
-                              snapshot.data.addedToLibraryDate ?? "",
-                              style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.caption.color),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              snapshot.data.size == null ? "" : "Размер: ${snapshot.data.size}",
-                              style: TextStyle(fontSize: 15, color: Theme.of(context).textTheme.caption.color),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          snapshot.data.lemma != null ? Text("Аннотация:", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),) : Container(),
-                          Text(snapshot.data.lemma ?? "", style: TextStyle(fontSize: 18),),
-                          snapshot.data.downloadFormats != null ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.only(top: 12.0, bottom: 12.0, right: 12.0),
-                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                                // decoration: BoxDecoration(
-                                //   borderRadius: BorderRadius.circular(10.0),
-                                //   border: Border.all(
-                                //     color: Colors.grey.shade600,
-                                //   )
-                                // ),
-                                child: DropdownButton(
-                                  isDense: false,
-                                  value: formatForDownload,
-                                  hint: Text("Формат файла"),
-                                  items: snapshot.data.downloadFormats.list.map((format) {
-                                    return DropdownMenuItem(
-                                      value: format,
-                                      child: Text(format.keys.first),
-                                    );
-                                  }).toList(),
-                                  onChanged: (choosedFormat) {
+                      padding: const EdgeInsets.all(14.0),
+                      child: RaisedButton(
+                        child: Text('Скачать'),
+                        onPressed: outBookInfoSnapshot.data.downloadProgress ==
+                                null
+                            ? () async {
+                                var formatForDownload =
+                                    await showDownloadFormatMBS(
+                                        context, outBookInfoSnapshot.data);
+                                _bookBloc.downloadBook(
+                                  context,
+                                  outBookInfoSnapshot.data,
+                                  formatForDownload,
+                                  (downloadProgress) {
                                     setState(() {
-                                      formatForDownload = choosedFormat;
+                                      outBookInfoSnapshot.data.downloadProgress =
+                                          downloadProgress;
                                     });
                                   },
-                                ),
-                              ),
-                              RaisedButton(
-                                child: Text('Скачать'),
-                                onPressed: formatForDownload != null && snapshot.data.downloadProgress == null ? () {
-                                  _bookBloc.downloadBook(
-                                    context,
-                                    snapshot.data,
-                                    formatForDownload,
-                                    (downloadProgress) {
-                                      setState(() {
-                                        snapshot.data.downloadProgress = downloadProgress;
-                                      });
-                                    },
-                                  );
-                                } : null,
-                              )
-                            ],
-                          ) : Container(),
-                          snapshot.data.downloadProgress != null ? LinearProgressIndicator(
-                            value: snapshot.data.downloadProgress == 0.0 ? null : snapshot.data.downloadProgress,
-                          ) : Container(),
-                        ],
+                                );
+                              }
+                            : null,
                       ),
                     ),
+                    outBookInfoSnapshot.data.downloadProgress != null
+                        ? LinearProgressIndicator(
+                            value:
+                                outBookInfoSnapshot.data.downloadProgress == 0.0
+                                    ? null
+                                    : outBookInfoSnapshot.data.downloadProgress,
+                          )
+                        : Container(),
+                    SizedBox(height: 56),
                   ],
                 ),
-              )
+              ),
             ],
           );
-        }
+        },
       ),
     );
   }

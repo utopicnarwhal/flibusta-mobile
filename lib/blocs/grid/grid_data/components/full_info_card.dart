@@ -7,7 +7,7 @@ import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/file_utils.dart';
-import 'package:flibusta/utils/text_to_icons.dart';
+import 'package:flibusta/utils/icon_utils.dart';
 import 'package:flutter/material.dart';
 
 class FullInfoCard<T> extends StatefulWidget {

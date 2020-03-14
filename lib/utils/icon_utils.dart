@@ -28,3 +28,42 @@ IconData gridRowNameToIcon(String rowName) {
       return FontAwesomeIcons.question;
   }
 }
+
+Icon scoreToIcon(int score, double size) {
+  IconData iconData;
+  Color color;
+  switch (score) {
+    case 0:
+      iconData = FontAwesomeIcons.star;
+      color = Colors.grey;
+      break;
+    case 1:
+      iconData = FontAwesomeIcons.poop;
+      color = Colors.brown;
+      break;
+    case 2:
+      iconData = FontAwesomeIcons.solidFrown;
+      color = Colors.grey;
+      break;
+    case 3:
+      iconData = FontAwesomeIcons.solidMeh;
+      color = Colors.blue;
+      break;
+    case 4:
+      iconData = FontAwesomeIcons.solidSmile;
+      color = Colors.green;
+      break;
+    case 5:
+      iconData = FontAwesomeIcons.solidStar;
+      color = Colors.yellow;
+      break;
+    default:
+      iconData = FontAwesomeIcons.question;
+      color = Colors.black;
+  }
+  return Icon(
+    iconData,
+    size: size,
+    color: color,
+  );
+}

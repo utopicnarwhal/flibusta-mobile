@@ -122,11 +122,13 @@ class GridTilesBuilder extends StatelessWidget {
             );
           }
           List<String> genresStrings;
+          int score;
           if (gridData[index] is BookCard) {
             genresStrings =
                 (gridData[index] as BookCard)?.genres?.list?.map((genre) {
               return genre.values?.first;
             })?.toList();
+            score = (gridData[index] as BookCard)?.score;
           }
 
           return GridDataTile(
@@ -136,6 +138,7 @@ class GridTilesBuilder extends StatelessWidget {
             title: gridData[index].tileTitle,
             subtitle: gridData[index].tileSubtitle,
             genres: genresStrings,
+            score: score,
             onTap: () {
               if (gridData[index] is BookCard) {
                 Navigator.of(context).pushNamed(
