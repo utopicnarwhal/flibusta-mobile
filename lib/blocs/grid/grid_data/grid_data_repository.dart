@@ -78,14 +78,26 @@ class GridDataRepository {
     return result;
   }
 
-  Future<SearchResults> bookSearch(int page, String searchQuery) async {
+  Future<SearchResults> bookSearch(
+    int page,
+    String searchQuery, {
+    bool isAuthorSearch = false,
+    bool isBookSearch = false,
+    bool isSequenceSearch = false,
+  }) async {
     Map<String, String> queryParams = {
       'page': (page + 1).toString(),
       'ask': searchQuery,
-      'chs': 'on',
-      'cha': 'on',
-      'chb': 'on',
     };
+    if (isAuthorSearch) {
+      queryParams.addAll({'cha': 'on'});
+    }
+    if (isBookSearch) {
+      queryParams.addAll({'chb': 'on'});
+    }
+    if (isSequenceSearch) {
+      queryParams.addAll({'chs': 'on'});
+    }
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
       '/booksearch',
