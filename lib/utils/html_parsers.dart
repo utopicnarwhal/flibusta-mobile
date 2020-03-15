@@ -593,17 +593,62 @@ $htmlString
   String authorName;
   for (var node in authorsAndBookCountNodes) {
     if (node is htmldom.Element) {
+      if (authorName != null && authorId != null) {
+        result.add(
+          AuthorCard(
+            booksCount: authorBookCount,
+            id: authorId,
+            name: authorName,
+          ),
+        );
+        authorName = null;
+        authorId = null;
+        authorBookCount = null;
+      }
       authorName = node.text.trim();
       authorId = int.tryParse(node.attributes['href'].replaceAll('/a/', ''));
     } else if (node is htmldom.Text) {
       authorBookCount = node.text.trim().replaceAll(RegExp(r'(\(|\))'), '');
+    }
+  }
+
+  return result;
+}
+
+List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
+  var result = List<SequenceCard>();
+
+  htmldom.Document document = parse(htmlString);
+
+  final sequenceUl = document.getElementById('main')?.nodes?.firstWhere(
+        (node) => node is htmldom.Element && node.localName == 'ul',
+        orElse: () => null,
+      );
+
+  int sequenceId;
+  String sequenceBookCount;
+  String sequenceName;
+  for (var li in sequenceUl.children) {
+    for (var node in li.nodes) {
+      if (node is htmldom.Element) {
+        sequenceName = node.text.trim();
+        sequenceId =
+            int.tryParse(node.attributes['href'].replaceAll('/sequence/', ''));
+      } else if (node is htmldom.Text) {
+        sequenceBookCount = node.text.trim().replaceAll(RegExp(r'(\(|\))'), '');
+      }
+    }
+    if (sequenceName != null && sequenceId != null) {
       result.add(
-        AuthorCard(
-          booksCount: authorBookCount,
-          id: authorId,
-          name: authorName,
+        SequenceCard(
+          booksCount: sequenceBookCount,
+          id: sequenceId,
+          title: sequenceName,
         ),
       );
+      sequenceName = null;
+      sequenceId = null;
+      sequenceBookCount = null;
     }
   }
 

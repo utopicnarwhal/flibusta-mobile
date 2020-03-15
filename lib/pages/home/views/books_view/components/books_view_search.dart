@@ -99,10 +99,6 @@ class BooksViewSearch extends StatelessWidget {
                 );
               },
             ),
-            suffix: Icon(
-              FontAwesomeIcons.filter,
-              color: Colors.black,
-            ),
             prefixIcon: Icon(
               EvaIcons.search,
               size: 28,

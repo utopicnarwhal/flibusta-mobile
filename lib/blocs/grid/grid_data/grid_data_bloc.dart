@@ -48,6 +48,7 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
             uploadingMore: true,
             message: '',
           );
+        } else {
           return;
         }
       } else {

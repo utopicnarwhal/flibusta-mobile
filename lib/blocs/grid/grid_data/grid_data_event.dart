@@ -38,13 +38,15 @@ class LoadGridDataEvent extends GridDataEvent {
           break;
         case GridViewType.authors:
           _gridData = await _gridDataRepository.getAuthors(1);
-          hasReachedMax = (_gridData?.length ?? 0) < 49;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.genres:
           _gridData = await _gridDataRepository.getAllGenres(1);
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
+          _gridData = await _gridDataRepository.getSequences(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         default:
       }
@@ -92,13 +94,15 @@ class SearchGridDataEvent extends GridDataEvent {
           break;
         case GridViewType.authors:
           _gridData = await _gridDataRepository.getAuthors(1);
-          hasReachedMax = (_gridData?.length ?? 0) < 49;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.genres:
           _gridData = await _gridDataRepository.getAllGenres(1);
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
+          _gridData = await _gridDataRepository.getSequences(1);
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         default:
       }
@@ -155,6 +159,7 @@ class UploadMoreGridDataEvent extends GridDataEvent {
           _gridData = await _gridDataRepository.getAllGenres(pageNumber);
           break;
         case GridViewType.sequences:
+          _gridData = await _gridDataRepository.getSequences(pageNumber);
           break;
         default:
       }

@@ -101,10 +101,18 @@ class GridDataTile extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: (genres?.length ?? 0) + 1,
           separatorBuilder: (context, index) {
+            if (index == 0) {
+              if (score == null) {
+                return Container();
+              }
+            }
             return SizedBox(width: 10);
           },
           itemBuilder: (context, index) {
             if (index == 0) {
+              if (score == null) {
+                return Container();
+              }
               return AspectRatio(
                 aspectRatio: 1,
                 child: scoreToIcon(score, 18),

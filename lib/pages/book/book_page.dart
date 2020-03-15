@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
-import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
+import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/pages/book/components/book_app_bar.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/services/transport/book_service.dart';
+import 'package:flibusta/utils/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/components/loading_indicator.dart';
 import 'package:rxdart/rxdart.dart';
@@ -39,6 +43,18 @@ class BookPageState extends State<BookPage> {
       if (!mounted) return;
       setState(() {
         _bookInfo = bookInfo;
+      });
+      LocalStorage().getDownloadedBooks().then((downloadedBooks) {
+        var downloadedBook = downloadedBooks?.firstWhere(
+          (book) => book.id == _bookInfo.id,
+          orElse: () => null,
+        );
+        if (downloadedBook != null) {
+          if (!mounted) return;
+          setState(() {
+            _bookInfo.localPath = downloadedBook.localPath;
+          });
+        }
       });
       BookService.getBookCoverImage(bookInfo.coverImgSrc).then((coverImgBytes) {
         if (!mounted) return;
@@ -184,24 +200,62 @@ class BookPageState extends State<BookPage> {
                       ),
                     ),
                   ],
-                  StreamBuilder<double>(
-                    builder: (context, downloadProgressSnapshot) {
-                      if (!downloadProgressSnapshot.hasData) {
+                  if (_bookInfo.downloadFormats != null &&
+                      _bookInfo.localPath == null)
+                    StreamBuilder<double>(
+                      builder: (context, downloadProgressSnapshot) {
+                        if (!downloadProgressSnapshot.hasData) {
+                          return Padding(
+                            padding: const EdgeInsets.all(14.0),
+                            child: DsOutlineButton(
+                              child: Text('Скачать'),
+                              onPressed: () => _onDownloadBookClick(_bookInfo),
+                            ),
+                          );
+                        }
+                        return LinearProgressIndicator(
+                          value: downloadProgressSnapshot.data == 0.0
+                              ? null
+                              : downloadProgressSnapshot.data,
+                        );
+                      },
+                    ),
+                  if (_bookInfo.localPath != null)
+                    FutureBuilder(
+                      future: File(_bookInfo.localPath).exists(),
+                      builder: (context, bookFileExistsSnapshot) {
+                        if (bookFileExistsSnapshot.data != true) {
+                          return StreamBuilder<double>(
+                            builder: (context, downloadProgressSnapshot) {
+                              if (!downloadProgressSnapshot.hasData) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(14.0),
+                                  child: DsOutlineButton(
+                                    child: Text('Скачать'),
+                                    onPressed: () =>
+                                        _onDownloadBookClick(_bookInfo),
+                                  ),
+                                );
+                              }
+                              return LinearProgressIndicator(
+                                value: downloadProgressSnapshot.data == 0.0
+                                    ? null
+                                    : downloadProgressSnapshot.data,
+                              );
+                            },
+                          );
+                        }
                         return Padding(
                           padding: const EdgeInsets.all(14.0),
-                          child: RaisedButton(
-                            child: Text('Скачать'),
-                            onPressed: () => _onDownloadBookClick(_bookInfo),
+                          child: DsOutlineButton(
+                            child: Text('Открыть'),
+                            onPressed: () => FileUtils.openFile(
+                              _bookInfo.localPath,
+                            ),
                           ),
                         );
-                      }
-                      return LinearProgressIndicator(
-                        value: downloadProgressSnapshot.data == 0.0
-                            ? null
-                            : downloadProgressSnapshot.data,
-                      );
-                    },
-                  ),
+                      },
+                    ),
                   SizedBox(height: 56),
                 ]),
               ),

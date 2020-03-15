@@ -4,10 +4,12 @@ import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/searchResults.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/services/transport/book_service.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/icon_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FullInfoCard<T> extends StatefulWidget {
   final T data;
@@ -21,6 +23,28 @@ class FullInfoCard<T> extends StatefulWidget {
 }
 
 class _FullInfoCardState extends State<FullInfoCard> {
+  BehaviorSubject<double> _downloadProgressController;
+
+  @override
+  void initState() {
+    super.initState();
+    _downloadProgressController = BehaviorSubject<double>();
+    if (widget.data is BookCard) {
+      LocalStorage().getDownloadedBooks().then((downloadedBooks) {
+        var downloadedBook = downloadedBooks?.firstWhere(
+          (book) => book.id == (widget.data as BookCard).id,
+          orElse: () => null,
+        );
+        if (downloadedBook != null) {
+          if (!mounted) return;
+          setState(() {
+            (widget.data as BookCard).localPath = downloadedBook.localPath;
+          });
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -66,17 +90,22 @@ class _FullInfoCardState extends State<FullInfoCard> {
                             rowName: 'Размер книги',
                             value: widget.data.size,
                           ),
-                          GridCardRow(
-                            rowName: 'Форматы файлов',
-                            value: widget.data.downloadFormats,
-                            showCustomLeading:
-                                widget.data.downloadProgress != null &&
-                                    widget.data.localPath == null,
-                            customLeading: DsCircularProgressIndicator(
-                              value: widget.data.downloadProgress == 0.0
-                                  ? null
-                                  : widget.data.downloadProgress,
-                            ),
+                          StreamBuilder<double>(
+                            stream: _downloadProgressController,
+                            builder: (context, downloadProgressSnapshot) {
+                              return GridCardRow(
+                                rowName: 'Форматы файлов',
+                                value: widget.data.downloadFormats,
+                                showCustomLeading:
+                                    downloadProgressSnapshot.hasData &&
+                                        widget.data.localPath == null,
+                                customLeading: DsCircularProgressIndicator(
+                                  value: downloadProgressSnapshot.data == 0.0
+                                      ? null
+                                      : downloadProgressSnapshot.data,
+                                ),
+                              );
+                            },
                           ),
                           if (widget.data.localPath != null)
                             GridCardRow(
@@ -104,13 +133,22 @@ class _FullInfoCardState extends State<FullInfoCard> {
                                     },
                                   ),
                                 if (widget.data is BookCard &&
-                                    widget.data.localPath != null)
+                                    (widget.data.localPath != null))
                                   FutureBuilder(
                                     future:
                                         File(widget.data.localPath).exists(),
                                     builder: (context, bookFileExistsSnapshot) {
                                       if (bookFileExistsSnapshot.data != true) {
-                                        return Container();
+                                        return DownloadBookButton(
+                                          book: widget.data,
+                                          downloadBookCallback:
+                                              (downloadProgress) {
+                                            setState(() {
+                                              widget.data.downloadProgress =
+                                                  downloadProgress;
+                                            });
+                                          },
+                                        );
                                       }
                                       return FlatButton(
                                         child: Text('Открыть'),
@@ -161,6 +199,12 @@ class _FullInfoCardState extends State<FullInfoCard> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _downloadProgressController?.close();
+    super.dispose();
   }
 }
 

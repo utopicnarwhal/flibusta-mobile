@@ -105,7 +105,7 @@ class ProxyHttpClient {
         responseType: ResponseType.plain,
       ),
     );
-    if (hostPort != "") {
+    if (hostPort != '') {
       (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {
         client.findProxy = (url) {
