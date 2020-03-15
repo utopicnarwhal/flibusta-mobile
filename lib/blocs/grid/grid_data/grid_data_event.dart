@@ -13,7 +13,7 @@ abstract class GridDataEvent {
   Future<GridDataState> applyAsync(
       {GridDataState currentState, GridDataBloc bloc});
 
-  final GridDataRepository _gridDataRepository = new GridDataRepository();
+  final GridDataRepository _gridDataRepository = GridDataRepository();
 }
 
 class LoadGridDataEvent extends GridDataEvent {
@@ -26,27 +26,65 @@ class LoadGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
-      // TODO: add existing search string
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
-          _gridData = await _gridDataRepository.getDownloadedBooks(1);
+          _gridData = await _gridDataRepository.getDownloadedBooks(
+            1,
+            currentState.searchString,
+          );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
-          _gridData = await _gridDataRepository.makeBookList(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          if (currentState.searchString?.isNotEmpty == true) {
+            var bookSearch = await _gridDataRepository.bookSearch(
+              1,
+              currentState.searchString,
+              isBookSearch: true,
+            );
+            _gridData = bookSearch.books;
+            hasReachedMax = (_gridData?.length ?? 0) < 30;
+          } else {
+            _gridData = await _gridDataRepository.makeBookList(
+              1,
+              lastGenres: (currentState.gridData.last as BookCard).genres?.list,
+            );
+            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          }
           break;
         case GridViewType.authors:
-          _gridData = await _gridDataRepository.getAuthors(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          if (currentState.searchString?.isNotEmpty == true) {
+            var bookSearch = await _gridDataRepository.bookSearch(
+              1,
+              currentState.searchString,
+              isAuthorSearch: true,
+            );
+            _gridData = bookSearch.authors;
+            hasReachedMax = (_gridData?.length ?? 0) < 30;
+          } else {
+            _gridData = await _gridDataRepository.getAuthors(1);
+            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          }
           break;
         case GridViewType.genres:
-          _gridData = await _gridDataRepository.getAllGenres(1);
+          _gridData = await _gridDataRepository.getGenres(
+            1,
+            searchString: currentState.searchString,
+          );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
-          _gridData = await _gridDataRepository.getSequences(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          if (currentState.searchString?.isNotEmpty == true) {
+            var bookSearch = await _gridDataRepository.bookSearch(
+              1,
+              currentState.searchString,
+              isSequenceSearch: true,
+            );
+            _gridData = bookSearch.sequences;
+            hasReachedMax = (_gridData?.length ?? 0) < 30;
+          } else {
+            _gridData = await _gridDataRepository.getSequences(1);
+            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          }
           break;
         default:
       }
@@ -82,14 +120,20 @@ class SearchGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
-      // TODO: add existing search string
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
-          _gridData = await _gridDataRepository.getDownloadedBooks(1);
+          _gridData = await _gridDataRepository.getDownloadedBooks(
+            1,
+            searchString,
+          );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
-          _gridData = await _gridDataRepository.makeBookList(1);
+          var bookSearch = await _gridDataRepository.bookSearch(
+            1,
+            currentState.searchString,
+          );
+          _gridData = bookSearch.books;
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.authors:
@@ -97,7 +141,7 @@ class SearchGridDataEvent extends GridDataEvent {
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.genres:
-          _gridData = await _gridDataRepository.getAllGenres(1);
+          _gridData = await _gridDataRepository.getGenres(1);
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
@@ -141,22 +185,32 @@ class UploadMoreGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
-      // TODO: add existing search string
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
-          _gridData = await _gridDataRepository.getDownloadedBooks(pageNumber);
+          _gridData = await _gridDataRepository.getDownloadedBooks(
+            pageNumber,
+            currentState.searchString,
+          );
           break;
         case GridViewType.newBooks:
-          _gridData = await _gridDataRepository.makeBookList(
-            pageNumber,
-            lastGenres: (currentState.gridData.last as BookCard).genres?.list,
-          );
+          if (currentState.searchString?.isNotEmpty == true) {
+            var bookSearch = await _gridDataRepository.bookSearch(
+              pageNumber,
+              currentState.searchString,
+            );
+            _gridData = bookSearch.books;
+          } else {
+            _gridData = await _gridDataRepository.makeBookList(
+              pageNumber,
+              lastGenres: (currentState.gridData.last as BookCard).genres?.list,
+            );
+          }
           break;
         case GridViewType.authors:
           _gridData = await _gridDataRepository.getAuthors(pageNumber);
           break;
         case GridViewType.genres:
-          _gridData = await _gridDataRepository.getAllGenres(pageNumber);
+          _gridData = await _gridDataRepository.getGenres(pageNumber);
           break;
         case GridViewType.sequences:
           _gridData = await _gridDataRepository.getSequences(pageNumber);

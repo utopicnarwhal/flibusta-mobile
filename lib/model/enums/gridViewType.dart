@@ -4,6 +4,9 @@ enum GridViewType {
   authors,
   sequences,
   downloaded,
+  suquence,
+  author,
+  advancedSearch,
 }
 
 String gridViewTypeToString(GridViewType gridViewType) {

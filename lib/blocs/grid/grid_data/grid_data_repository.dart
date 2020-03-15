@@ -10,8 +10,30 @@ import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 
 class GridDataRepository {
-  Future<List<GridData>> getDownloadedBooks(int page) async {
-    return _getPageFromList(await LocalStorage().getDownloadedBooks(), page);
+  Future<List<GridData>> getDownloadedBooks(
+    int page, [
+    String searchString,
+  ]) async {
+    var downloadedBooks = await LocalStorage().getDownloadedBooks();
+    if (searchString?.isNotEmpty == true) {
+      downloadedBooks = downloadedBooks.where((book) {
+        var lowerCaseSearchString = searchString.toLowerCase();
+        return book.sequenceTitle
+                .toLowerCase()
+                .contains(lowerCaseSearchString) ||
+            book.title.toLowerCase().contains(lowerCaseSearchString) ||
+            book.authors.list.any((author) => author.values.first
+                .toLowerCase()
+                .contains(lowerCaseSearchString)) ||
+            book.translators.list.any((translator) => translator.values.first
+                .toLowerCase()
+                .contains(lowerCaseSearchString)) ||
+            book.genres.list.any((genre) => genre.values.first
+                .toLowerCase()
+                .contains(lowerCaseSearchString));
+      });
+    }
+    return _getPageFromList(downloadedBooks, page);
   }
 
   List<Genre> cachedGenreList;
@@ -130,7 +152,7 @@ class GridDataRepository {
     return result;
   }
 
-  Future<List<GridData>> getAllGenres(int page, {String searchString}) async {
+  Future<List<GridData>> getGenres(int page, {String searchString}) async {
     if (cachedGenreList != null) {
       var result = cachedGenreList;
       if (searchString?.isNotEmpty == true) {

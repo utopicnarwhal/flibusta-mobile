@@ -6,7 +6,6 @@ import 'package:flibusta/pages/home/views/books_view/components/advanced_search_
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const _kAdvancedSearchString = '@!&*%AdvencedSearch%*&!@';
 
