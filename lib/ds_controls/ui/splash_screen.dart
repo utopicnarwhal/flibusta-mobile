@@ -9,7 +9,6 @@ import 'package:flare_flutter/provider/asset_flare.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const _filesToWarmup = [
   'assets/animations/empty_state.flr',
@@ -59,18 +58,6 @@ class _SplashScreenState extends State<SplashScreen>
         pageBuilder: (context, __, ___) => HomePage(),
       ),
     );
-    // } else {
-    // Navigator.of(context).pushReplacement(
-    //   PageRouteBuilder(
-    //     transitionDuration: kSplashsceenToLoginTransitionDuration,
-    //     pageBuilder: (context, __, ___) => LoginPage(leadId: _leadId),
-    //   ),
-    // );
-    //       }
-    //     },
-    //   ),
-    // );
-    // await Future.wait(futures);
   }
 
   Future<void> warmupFlare() async {
@@ -91,16 +78,6 @@ class _SplashScreenState extends State<SplashScreen>
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     appInit();
-  }
-
-  @override
-  void didChangeDependencies() {
-    ScreenUtil.init(
-      context,
-      height: window?.physicalSize?.height ?? 1920,
-      width: window?.physicalSize?.width ?? 1080,
-    );
-    super.didChangeDependencies();
   }
 
   @override
