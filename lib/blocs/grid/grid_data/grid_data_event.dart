@@ -17,6 +17,10 @@ abstract class GridDataEvent {
 }
 
 class LoadGridDataEvent extends GridDataEvent {
+  final String searchString;
+
+  LoadGridDataEvent([this.searchString]);
+
   @override
   String toString() => 'LoadGridDataEvent';
 
@@ -26,19 +30,21 @@ class LoadGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
+      var currentSearchString = searchString ?? currentState.searchString;
+
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
           _gridData = await _gridDataRepository.getDownloadedBooks(
             1,
-            currentState.searchString,
+            currentSearchString,
           );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
-          if (currentState.searchString?.isNotEmpty == true) {
+          if (currentSearchString?.isNotEmpty == true) {
             var bookSearch = await _gridDataRepository.bookSearch(
               1,
-              currentState.searchString,
+              currentSearchString,
               isBookSearch: true,
             );
             _gridData = bookSearch.books;
@@ -51,10 +57,10 @@ class LoadGridDataEvent extends GridDataEvent {
           }
           break;
         case GridViewType.authors:
-          if (currentState.searchString?.isNotEmpty == true) {
+          if (currentSearchString?.isNotEmpty == true) {
             var bookSearch = await _gridDataRepository.bookSearch(
               1,
-              currentState.searchString,
+              currentSearchString,
               isAuthorSearch: true,
             );
             _gridData = bookSearch.authors;
@@ -67,15 +73,15 @@ class LoadGridDataEvent extends GridDataEvent {
         case GridViewType.genres:
           _gridData = await _gridDataRepository.getGenres(
             1,
-            searchString: currentState.searchString,
+            searchString: currentSearchString,
           );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
-          if (currentState.searchString?.isNotEmpty == true) {
+          if (currentSearchString?.isNotEmpty == true) {
             var bookSearch = await _gridDataRepository.bookSearch(
               1,
-              currentState.searchString,
+              currentSearchString,
               isSequenceSearch: true,
             );
             _gridData = bookSearch.sequences;
@@ -130,22 +136,36 @@ class SearchGridDataEvent extends GridDataEvent {
         case GridViewType.newBooks:
           var bookSearch = await _gridDataRepository.bookSearch(
             1,
-            currentState.searchString,
+            searchString,
+            isBookSearch: true,
           );
           _gridData = bookSearch.books;
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          hasReachedMax = (_gridData?.length ?? 0) < 30;
           break;
         case GridViewType.authors:
-          _gridData = await _gridDataRepository.getAuthors(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          var authorSearch = await _gridDataRepository.bookSearch(
+            1,
+            searchString,
+            isAuthorSearch: true,
+          );
+          _gridData = authorSearch.authors;
+          hasReachedMax = (_gridData?.length ?? 0) < 30;
           break;
         case GridViewType.genres:
-          _gridData = await _gridDataRepository.getGenres(1);
+          _gridData = await _gridDataRepository.getGenres(
+            1,
+            searchString: searchString,
+          );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
-          _gridData = await _gridDataRepository.getSequences(1);
-          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          var sequenceSearch = await _gridDataRepository.bookSearch(
+            1,
+            searchString,
+            isSequenceSearch: true,
+          );
+          _gridData = sequenceSearch.sequences;
+          hasReachedMax = (_gridData?.length ?? 0) < 30;
           break;
         default:
       }
@@ -184,39 +204,68 @@ class UploadMoreGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
+
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
           _gridData = await _gridDataRepository.getDownloadedBooks(
             pageNumber,
             currentState.searchString,
           );
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.newBooks:
           if (currentState.searchString?.isNotEmpty == true) {
             var bookSearch = await _gridDataRepository.bookSearch(
               pageNumber,
               currentState.searchString,
+              isBookSearch: true,
             );
             _gridData = bookSearch.books;
+            hasReachedMax = (_gridData?.length ?? 0) < 30;
           } else {
             _gridData = await _gridDataRepository.makeBookList(
               pageNumber,
-              lastGenres: (currentState.gridData.last as BookCard).genres?.list,
             );
+            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           }
           break;
         case GridViewType.authors:
-          _gridData = await _gridDataRepository.getAuthors(pageNumber);
+          if (currentState.searchString?.isNotEmpty == true) {
+            var bookSearch = await _gridDataRepository.bookSearch(
+              pageNumber,
+              currentState.searchString,
+              isAuthorSearch: true,
+            );
+            _gridData = bookSearch.authors;
+            hasReachedMax = (_gridData?.length ?? 0) < 30;
+          } else {
+            _gridData = await _gridDataRepository.getAuthors(pageNumber);
+            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          }
           break;
         case GridViewType.genres:
-          _gridData = await _gridDataRepository.getGenres(pageNumber);
+          _gridData = await _gridDataRepository.getGenres(
+            pageNumber,
+            searchString: currentState.searchString,
+          );
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.sequences:
-          _gridData = await _gridDataRepository.getSequences(pageNumber);
+          if (currentState.searchString?.isNotEmpty == true) {
+            var bookSearch = await _gridDataRepository.bookSearch(
+              pageNumber,
+              currentState.searchString,
+              isSequenceSearch: true,
+            );
+            _gridData = bookSearch.sequences;
+            hasReachedMax = (_gridData?.length ?? 0) < 30;
+          } else {
+            _gridData = await _gridDataRepository.getSequences(pageNumber);
+            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          }
           break;
         default:
       }
-      hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
       if (currentState.uploadingMore == true) {
         _gridData = [...currentState.gridData, ..._gridData];
       }

@@ -1,6 +1,7 @@
 import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,11 +9,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class GridDataScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final GridDataBloc gridDataBloc;
+  final TextEditingController searchTextController;
+  final BehaviorSubject<List<String>> favoriteGenreCodesController;
 
   const GridDataScreen({
     Key key,
     @required this.scaffoldKey,
     @required this.gridDataBloc,
+    @required this.searchTextController,
+    @required this.favoriteGenreCodesController,
   }) : super(key: key);
 
   @override
@@ -42,6 +47,8 @@ class GridDataScreen extends StatelessWidget {
             return GridTilesBuilder(
               gridViewType: gridDataBloc.gridViewType,
               gridDataState: gridDataState,
+              searchTextController: searchTextController,
+              favoriteGenreCodesController: favoriteGenreCodesController,
             );
           },
         ),

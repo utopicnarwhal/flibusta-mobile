@@ -24,11 +24,8 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
   }
 
   void searchByString(String searchString) {
-    if (searchString == (state.searchString ?? '')) {
-      return;
-    }
     if (searchString == null || searchString == '') {
-      this.add(LoadGridDataEvent());
+      this.add(LoadGridDataEvent(searchString));
       return;
     }
     this.add(SearchGridDataEvent(searchString));

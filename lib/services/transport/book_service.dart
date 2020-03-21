@@ -80,7 +80,7 @@ class BookService {
     CancelToken cancelToken = CancelToken();
 
     downloadProgressCallback(0.0);
-    _alertsCallback(
+    var prepareToDownloadToastFuture = _alertsCallback(
       'Подготовка к загрузке',
       Duration(seconds: 8),
       action: ToastAction(
@@ -100,7 +100,7 @@ class BookService {
         .downloadUri(
           url,
           (Headers responseHeaders) {
-            _alertsCallback('', Duration(seconds: 0));
+            ToastManager().hideToast(prepareToDownloadToastFuture);
 
             var contentDisposition = responseHeaders['content-disposition'];
             if (contentDisposition == null) {
@@ -148,6 +148,7 @@ class BookService {
           },
         )
         .catchError((error) {
+      ToastManager().hideToast(prepareToDownloadToastFuture);
       if (error is DsError) {
         _alertsCallback(
           error.toString(),
@@ -157,6 +158,7 @@ class BookService {
     });
 
     if (response == null || response.statusCode != 200) {
+      ToastManager().hideToast(prepareToDownloadToastFuture);
       downloadProgressCallback(null);
       return;
     }
@@ -179,13 +181,13 @@ class BookService {
     downloadProgressCallback(null);
   }
 
-  static _alertsCallback(String alertText, Duration alertDuration,
+  static ToastFuture _alertsCallback(String alertText, Duration alertDuration,
       {ToastAction action}) {
     if (alertText.isEmpty) {
-      return;
+      return null;
     }
 
-    ToastManager().showToast(
+    return ToastManager().showToast(
       alertText,
       duration: alertDuration,
       action: action,

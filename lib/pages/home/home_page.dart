@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription _selectedViewTypeSubscription;
   BehaviorSubject<int> _selectedNavItemController = BehaviorSubject<int>();
   StreamSubscription _selectedNavItemSubscription;
+  BehaviorSubject<List<String>> _favoriteGenreCodesController;
 
   List<GridDataBloc> _gridDataBlocsList = [];
   TextEditingController _searchTextController = TextEditingController();
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _initNavItemController();
     _initGridData();
+    _favoriteGenreCodesController = BehaviorSubject<List<String>>();
   }
 
   void _initNavItemController() async {
@@ -45,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _initGridData() {
+  void _initGridData() async {
     _gridDataBlocsList = [];
     for (var gridViewType in [
       GridViewType.newBooks,
@@ -61,6 +63,10 @@ class _HomePageState extends State<HomePage> {
         _selectedViewTypeBloc.stream.listen(_onSelectedViewTypeChange);
 
     _selectedViewTypeBloc.changeViewType(GridViewType.newBooks);
+
+    var favoriteGenreCodes = await LocalStorage().getFavoriteGenreCodes();
+    if (!mounted) return;
+    _favoriteGenreCodesController.add(favoriteGenreCodes);
   }
 
   void _onSelectedViewTypeChange(GridViewType selectedViewType) async {
@@ -100,6 +106,7 @@ class _HomePageState extends State<HomePage> {
               searchTextController: _searchTextController,
               selectedViewTypeBloc: _selectedViewTypeBloc,
               gridDataBlocsList: _gridDataBlocsList,
+              favoriteGenreCodesController: _favoriteGenreCodesController,
             );
           case 2:
             return ProxySettingsPage(
@@ -128,6 +135,7 @@ class _HomePageState extends State<HomePage> {
     _selectedNavItemController?.close();
     _selectedViewTypeSubscription?.cancel();
     _selectedViewTypeBloc?.close();
+    _favoriteGenreCodesController?.close();
     super.dispose();
   }
 }

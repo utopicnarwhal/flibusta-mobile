@@ -31,12 +31,12 @@ class GridDataRepository {
             book.genres.list.any((genre) => genre.values.first
                 .toLowerCase()
                 .contains(lowerCaseSearchString));
-      });
+      }).toList();
     }
     return _getPageFromList(downloadedBooks, page);
   }
 
-  List<Genre> cachedGenreList;
+  static List<Genre> cachedGenreList;
 
   Future<List<GridData>> makeBookList(
     int page, {
@@ -168,9 +168,16 @@ class GridDataRepository {
     if (cachedGenreList != null) {
       var result = cachedGenreList;
       if (searchString?.isNotEmpty == true) {
-        result = result.where(
-          (genre) =>
-              genre.name.toLowerCase().contains(searchString.toLowerCase()),
+        result = result
+            .where(
+              (genre) =>
+                  genre.name.toLowerCase().contains(searchString.toLowerCase()),
+            )
+            .toList();
+      } else {
+        var favoriteGenreCodes = await LocalStorage().getFavoriteGenreCodes();
+        result.sort(
+          (genre1, genre2) => _genreSorting(favoriteGenreCodes, genre1, genre2),
         );
       }
       return _getPageFromList<GridData>(result, page);
@@ -205,13 +212,20 @@ class GridDataRepository {
     });
     cachedGenreList = result;
     if (searchString?.isNotEmpty == true) {
-      result = result.where(
-        (genre) =>
-            genre.name.toLowerCase().contains(searchString.toLowerCase()),
+      result = result
+          .where(
+            (genre) =>
+                genre.name.toLowerCase().contains(searchString.toLowerCase()),
+          )
+          .toList();
+    } else {
+      var favoriteGenreCodes = await LocalStorage().getFavoriteGenreCodes();
+      result.sort(
+        (genre1, genre2) => _genreSorting(favoriteGenreCodes, genre1, genre2),
       );
     }
 
-    return _getPageFromList<GridData>(cachedGenreList, page);
+    return _getPageFromList<GridData>(result, page);
   }
 
   static List<T> _getPageFromList<T>(List<T> list, int page) {
@@ -219,5 +233,27 @@ class GridDataRepository {
       min(HomeGridConsts.kPageSize * (page - 1), list.length),
       min(HomeGridConsts.kPageSize * page, list.length),
     );
+  }
+
+  static int _genreSorting(
+      List<String> favoriteGenreCodes, Genre genre1, Genre genre2) {
+    var isFavorite1 = favoriteGenreCodes?.any((favoriteGenreCode) {
+          return favoriteGenreCode == genre1.code;
+        }) ??
+        false;
+
+    var isFavorite2 = favoriteGenreCodes?.any((favoriteGenreCode) {
+          return favoriteGenreCode == genre2.code;
+        }) ??
+        false;
+
+    if (isFavorite1 && isFavorite2)
+      return genre1.name.compareTo(genre2.name);
+    else if (isFavorite1)
+      return -1;
+    else if (isFavorite2)
+      return 1;
+    else
+      return genre1.name.compareTo(genre2.name);
   }
 }

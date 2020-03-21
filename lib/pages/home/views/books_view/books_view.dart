@@ -19,6 +19,7 @@ class BooksView extends StatelessWidget {
   final BehaviorSubject<int> selectedNavItemController;
   final List<GridDataBloc> gridDataBlocsList;
   final TextEditingController searchTextController;
+  final BehaviorSubject<List<String>> favoriteGenreCodesController;
 
   BooksView({
     @required this.scaffoldKey,
@@ -26,6 +27,7 @@ class BooksView extends StatelessWidget {
     @required this.selectedNavItemController,
     @required this.searchTextController,
     @required this.gridDataBlocsList,
+    @required this.favoriteGenreCodesController,
   });
 
   @override
@@ -69,6 +71,8 @@ class BooksView extends StatelessWidget {
                         key: ValueKey(gridViewType),
                         scaffoldKey: scaffoldKey,
                         gridDataBloc: gridDataBlocsList[gridViewType.index],
+                        searchTextController: searchTextController,
+                        favoriteGenreCodesController: favoriteGenreCodesController,
                       ),
                     );
                   }

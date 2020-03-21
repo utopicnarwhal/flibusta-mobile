@@ -13,6 +13,7 @@ class GridDataTile extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
   final int index;
+  final Widget trailingIcon;
 
   GridDataTile({
     @required this.title,
@@ -24,6 +25,7 @@ class GridDataTile extends StatelessWidget {
     this.isLast = false,
     this.index = 0,
     this.score,
+    this.trailingIcon,
   });
 
   @override
@@ -46,7 +48,7 @@ class GridDataTile extends StatelessWidget {
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+                children: [
                   Text(
                     subtitle ?? '',
                     maxLines: 1,
@@ -59,12 +61,22 @@ class GridDataTile extends StatelessWidget {
                 ],
               ),
               isThreeLine: genres?.isNotEmpty == true,
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  kIconArrowForward,
-                ],
-              ),
+              trailing: trailingIcon != null || onTap != null
+                  ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (trailingIcon != null) trailingIcon,
+                          if (onTap != null) kIconArrowForward,
+                        ],
+                      ),
+                    ],
+                  )
+                  : SizedBox(),
             ),
           ),
           if (!isLast || isFirst) Divider(indent: 16),

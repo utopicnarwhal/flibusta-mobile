@@ -12,6 +12,7 @@ import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
+import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/book/book_page.dart';
@@ -19,16 +20,22 @@ import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rxdart/rxdart.dart';
 
 class GridTilesBuilder extends StatelessWidget {
   final GridDataState gridDataState;
   final String errorMessage;
   final GridViewType gridViewType;
+  final TextEditingController searchTextController;
+  final BehaviorSubject<List<String>> favoriteGenreCodesController;
 
   const GridTilesBuilder({
     Key key,
     @required this.gridDataState,
     @required this.gridViewType,
+    @required this.searchTextController,
+    @required this.favoriteGenreCodesController,
   })  : errorMessage = null,
         super(key: key);
 
@@ -37,6 +44,8 @@ class GridTilesBuilder extends StatelessWidget {
     @required this.gridViewType,
   })  : gridDataState = null,
         errorMessage = null,
+        searchTextController = null,
+        favoriteGenreCodesController = null,
         super(key: key);
 
   @override
@@ -140,6 +149,47 @@ class GridTilesBuilder extends StatelessWidget {
             subtitle: gridData[index].tileSubtitle,
             genres: genresStrings,
             score: score,
+            trailingIcon: gridData[index] is Genre
+                ? StreamBuilder<List<String>>(
+                    stream: favoriteGenreCodesController,
+                    builder: (context, favoriteGenreCodesSnapshot) {
+                      var isFavorite = favoriteGenreCodesSnapshot.data
+                          ?.contains((gridData[index] as Genre).code);
+                      return IconButton(
+                        icon: Icon(
+                          isFavorite == true
+                              ? FontAwesomeIcons.solidStar
+                              : FontAwesomeIcons.star,
+                          color: isFavorite == true ? Colors.yellow : null,
+                        ),
+                        onPressed: () {
+                          if (isFavorite == null) {
+                            return;
+                          }
+                          if (isFavorite) {
+                            favoriteGenreCodesController.add([
+                              ...favoriteGenreCodesSnapshot.data
+                                ..remove(
+                                  (gridData[index] as Genre).code,
+                                ),
+                            ]);
+                            LocalStorage().deleteFavoriteGenre(
+                              (gridData[index] as Genre).code,
+                            );
+                          } else {
+                            favoriteGenreCodesController.add([
+                              (gridData[index] as Genre).code,
+                              ...favoriteGenreCodesSnapshot.data,
+                            ]);
+                            LocalStorage().addFavoriteGenre(
+                              (gridData[index] as Genre).code,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  )
+                : null,
             onTap: () {
               if (gridData[index] is BookCard) {
                 LocalStorage().addToLastOpenBooks(gridData[index]);
@@ -161,6 +211,10 @@ class GridTilesBuilder extends StatelessWidget {
                 //   SequencePage.routeName,
                 //   arguments: gridData[index].id,
                 // );
+                return;
+              }
+              if (gridData[index] is Genre) {
+                print(gridData[index]);
                 return;
               }
             },
@@ -210,7 +264,8 @@ class GridTilesBuilder extends StatelessWidget {
       child: RefreshIndicator(
         onRefresh: () async {
           try {
-            BlocProvider.of<GridDataBloc>(context).fetchGridData();
+            BlocProvider.of<GridDataBloc>(context)
+                .searchByString(searchTextController?.text);
           } on FlutterError catch (_) {}
         },
         child: ListFadeInSlideStagger(

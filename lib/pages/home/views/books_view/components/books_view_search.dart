@@ -7,21 +7,17 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class BooksViewSearch extends StatelessWidget {
-  final GlobalKey<ScaffoldState> scafffoldKey;
   final GridDataBloc currentGridDataBloc;
   final TextEditingController searchTextController;
 
   const BooksViewSearch({
     Key key,
-    @required this.scafffoldKey,
     @required this.currentGridDataBloc,
     @required this.searchTextController,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var suggestionBoxController = SuggestionsBoxController();
-
     return Theme(
       data: Theme.of(context).copyWith(
           inputDecorationTheme: Theme.of(context)
@@ -32,6 +28,16 @@ class BooksViewSearch extends StatelessWidget {
           return ListTile(
             leading: Icon(Icons.history),
             title: Text(suggestion),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () async {
+                var previousBookSearches =
+                    await LocalStorage().getPreviousBookSearches();
+                LocalStorage().setPreviousBookSearches(
+                    previousBookSearches..remove(suggestion));
+                FocusScope.of(context).unfocus();
+              },
+            ),
           );
         },
         onSuggestionSelected: (suggestion) async {
@@ -56,7 +62,6 @@ class BooksViewSearch extends StatelessWidget {
 
           return filteredSuggestions;
         },
-        suggestionsBoxController: suggestionBoxController,
         getImmediateSuggestions: true,
         hideOnEmpty: true,
         hideOnError: true,
@@ -73,14 +78,16 @@ class BooksViewSearch extends StatelessWidget {
           onEditingComplete: () async {
             currentGridDataBloc?.searchByString(searchTextController.text);
             if (searchTextController.text?.isEmpty != false) {
+              FocusScope.of(context).unfocus();
               return;
             }
             var previousBookSearches =
                 await LocalStorage().getPreviousBookSearches();
             LocalStorage().setPreviousBookSearches([
               searchTextController.text,
-              ...previousBookSearches,
+              ...(previousBookSearches..remove(searchTextController.text)),
             ]);
+            FocusScope.of(context).unfocus();
           },
           autofocus: false,
           decoration: InputDecoration(

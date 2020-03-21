@@ -220,7 +220,7 @@ class LocalStorage {
     return await prefs.setString('BooksDirectoryPath', booksDirectory?.path);
   }
 
-  Future<List<String>> getfavoriteGenreCodes() async {
+  Future<List<String>> getFavoriteGenreCodes() async {
     var prefs = await _prefs;
     try {
       var favoriteGenreCodes = prefs.getStringList('FavoriteGenreCodes');
@@ -237,7 +237,7 @@ class LocalStorage {
 
   Future<bool> addFavoriteGenre(String favoriteGenreCode) async {
     var prefs = await _prefs;
-    var favoriteGenreCodes = await getfavoriteGenreCodes();
+    var favoriteGenreCodes = await getFavoriteGenreCodes();
     if (favoriteGenreCodes.contains(favoriteGenreCode)) return true;
 
     favoriteGenreCodes.add(favoriteGenreCode);
@@ -246,7 +246,7 @@ class LocalStorage {
 
   Future<bool> deleteFavoriteGenre(String favoriteGenreCode) async {
     var prefs = await _prefs;
-    var favoriteGenreCodes = await getfavoriteGenreCodes();
+    var favoriteGenreCodes = await getFavoriteGenreCodes();
     if (!favoriteGenreCodes.contains(favoriteGenreCode)) return true;
 
     favoriteGenreCodes.remove(favoriteGenreCode);
@@ -279,6 +279,15 @@ class LocalStorage {
     return await prefs.setStringList(
       'DownloadedBooks',
       downloadedBooks.map((book) => json.encode(book.toJson())).toList(),
+    );
+  }
+
+  Future<bool> clearDownloadedBook() async {
+    var prefs = await _prefs;
+
+    return await prefs.setStringList(
+      'DownloadedBooks',
+      [],
     );
   }
 

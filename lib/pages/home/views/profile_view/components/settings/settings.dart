@@ -151,9 +151,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 context: context,
                 builder: (context) {
                   return SimpleDialog(
-                    title: Text('Выберите предпочитаемый формат книги для скачивания'),
+                    title: Text(
+                        'Выберите предпочитаемый формат книги для скачивания'),
                     children: [
-                      ...['fb2', 'epub', 'mobi', 'Спрашивать меня при скачивании'].map((fileExtension) {
+                      ...[
+                        'fb2',
+                        'epub',
+                        'mobi',
+                        'Спрашивать меня при скачивании'
+                      ].map((fileExtension) {
                         String value;
                         if (fileExtension != 'Спрашивать меня при скачивании') {
                           value = fileExtension;
@@ -192,6 +198,20 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() {});
             },
           );
+        },
+      ),
+      Divider(indent: 72),
+      ListTile(
+        title: Text('Очистить историю поиска'),
+        onTap: () {
+          LocalStorage().setPreviousBookSearches([]);
+        },
+      ),
+      Divider(indent: 72),
+      ListTile(
+        title: Text('Очистить список скачанных книг'),
+        onTap: () {
+          LocalStorage().clearDownloadedBook();
         },
       ),
       Divider(),
