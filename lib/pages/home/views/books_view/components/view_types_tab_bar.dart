@@ -15,7 +15,7 @@ class ViewTypesTabBar extends StatelessWidget {
       indicatorSize: TabBarIndicatorSize.label,
       isScrollable: true,
       tabs: [
-        for (var gridViewType in GridViewType.values)
+        for (var gridViewType in booksViewGridTypes)
           Tab(text: gridViewTypeToString(gridViewType)),
       ],
     );

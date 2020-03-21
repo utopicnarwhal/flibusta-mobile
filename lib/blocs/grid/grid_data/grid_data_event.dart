@@ -46,7 +46,6 @@ class LoadGridDataEvent extends GridDataEvent {
           } else {
             _gridData = await _gridDataRepository.makeBookList(
               1,
-              lastGenres: (currentState.gridData.last as BookCard).genres?.list,
             );
             hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           }

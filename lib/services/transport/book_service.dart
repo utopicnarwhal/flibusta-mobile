@@ -10,10 +10,9 @@ import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
-import 'package:flibusta/utils/toast_utils.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
-import 'package:oktoast/oktoast.dart';
 
 class BookService {
   static Future<BookInfo> getBookInfo(int bookId) async {
@@ -84,10 +83,10 @@ class BookService {
     _alertsCallback(
       'Подготовка к загрузке',
       Duration(seconds: 8),
-      action: SnackBarAction(
+      action: ToastAction(
         label: 'Отменить',
-        onPressed: () {
-          dismissAllToast();
+        onPressed: (hideToast) {
+          hideToast();
           if (cancelToken.isCancelled) {
             return;
           }
@@ -168,9 +167,12 @@ class BookService {
     _alertsCallback(
       'Файл скачан',
       Duration(seconds: 5),
-      action: SnackBarAction(
+      action: ToastAction(
         label: 'Открыть',
-        onPressed: () => FileUtils.openFile(fileUri),
+        onPressed: (hideToast) {
+          FileUtils.openFile(fileUri);
+          hideToast();
+        },
       ),
     );
 
@@ -178,12 +180,12 @@ class BookService {
   }
 
   static _alertsCallback(String alertText, Duration alertDuration,
-      {SnackBarAction action}) {
+      {ToastAction action}) {
     if (alertText.isEmpty) {
       return;
     }
 
-    ToastUtils.showToast(
+    ToastManager().showToast(
       alertText,
       duration: alertDuration,
       action: action,

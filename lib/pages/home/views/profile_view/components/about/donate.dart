@@ -1,6 +1,6 @@
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
-import 'package:flibusta/utils/toast_utils.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -34,7 +34,7 @@ class DonatePage extends StatelessWidget {
                         Clipboard.setData(
                           ClipboardData(text: '4276380128899718'),
                         );
-                        ToastUtils.showToast(
+                        ToastManager().showToast(
                           'Номер карты скопирован в буфер обмена',
                         );
                       },
@@ -51,7 +51,7 @@ class DonatePage extends StatelessWidget {
                         Clipboard.setData(
                           ClipboardData(text: '5321304554099306'),
                         );
-                        ToastUtils.showToast(
+                        ToastManager().showToast(
                           'Номер карты скопирован в буфер обмена',
                         );
                       },

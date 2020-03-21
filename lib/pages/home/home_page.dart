@@ -64,7 +64,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onSelectedViewTypeChange(GridViewType selectedViewType) async {
-    if (_gridDataBlocsList[selectedViewType.index]?.state?.searchString !=
+    if ((_gridDataBlocsList[selectedViewType.index]?.state?.searchString ??
+            '') !=
         _searchTextController.text) {
       _gridDataBlocsList[selectedViewType.index]
           ?.searchByString(_searchTextController.text);

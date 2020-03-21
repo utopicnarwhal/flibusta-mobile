@@ -1,13 +1,10 @@
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/ds_controls/theme.dart';
-import 'package:flibusta/pages/home/views/books_view/components/advanced_search_bs.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-
-const _kAdvancedSearchString = '@!&*%AdvencedSearch%*&!@';
 
 class BooksViewSearch extends StatelessWidget {
   final GlobalKey<ScaffoldState> scafffoldKey;
@@ -23,6 +20,8 @@ class BooksViewSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var suggestionBoxController = SuggestionsBoxController();
+
     return Theme(
       data: Theme.of(context).copyWith(
           inputDecorationTheme: Theme.of(context)
@@ -30,29 +29,38 @@ class BooksViewSearch extends StatelessWidget {
               .copyWith(isCollapsed: true)),
       child: TypeAheadField<String>(
         itemBuilder: (context, suggestion) {
-          var text = suggestion;
-          if (suggestion == _kAdvancedSearchString) {
-            text = 'Расширенный поиск';
-          }
           return ListTile(
-            title: Text(text),
+            leading: Icon(Icons.history),
+            title: Text(suggestion),
           );
         },
         onSuggestionSelected: (suggestion) async {
-          if (suggestion == _kAdvancedSearchString) {
-            await showAdvancedSearchBS(scafffoldKey, null);
-          }
           currentGridDataBloc?.searchByString(suggestion);
+          searchTextController.text = suggestion;
+          var previousBookSearches =
+              await LocalStorage().getPreviousBookSearches();
+          LocalStorage().setPreviousBookSearches([
+            suggestion,
+            ...previousBookSearches..remove(suggestion),
+          ]);
         },
-        suggestionsCallback: (searchText) {
-          return [
-            _kAdvancedSearchString,
-          ];
+        suggestionsCallback: (searchText) async {
+          var previousBookSearches =
+              await LocalStorage().getPreviousBookSearches();
+
+          var filteredSuggestions = previousBookSearches
+              ?.where((suggestion) => suggestion
+                  ?.toLowerCase()
+                  ?.startsWith(searchText.trim().toLowerCase()))
+              ?.toList();
+
+          return filteredSuggestions;
         },
+        suggestionsBoxController: suggestionBoxController,
         getImmediateSuggestions: true,
         hideOnEmpty: true,
         hideOnError: true,
-        hideOnLoading: false,
+        hideOnLoading: true,
         hideSuggestionsOnKeyboardHide: true,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
           borderRadius: BorderRadius.circular(
@@ -62,12 +70,17 @@ class BooksViewSearch extends StatelessWidget {
         textFieldConfiguration: TextFieldConfiguration(
           controller: searchTextController,
           textInputAction: TextInputAction.search,
-          onChanged: (searchQuery) {
-            EasyDebounce.debounce(
-              'search-debouncer',
-              Duration(milliseconds: 1000),
-              () => currentGridDataBloc?.searchByString(searchQuery),
-            );
+          onEditingComplete: () async {
+            currentGridDataBloc?.searchByString(searchTextController.text);
+            if (searchTextController.text?.isEmpty != false) {
+              return;
+            }
+            var previousBookSearches =
+                await LocalStorage().getPreviousBookSearches();
+            LocalStorage().setPreviousBookSearches([
+              searchTextController.text,
+              ...previousBookSearches,
+            ]);
           },
           autofocus: false,
           decoration: InputDecoration(

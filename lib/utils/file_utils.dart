@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
-import 'package:flibusta/utils/toast_utils.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,7 +25,7 @@ class FileUtils {
   }) async {
     try {
       if (fileData == null || fileName == null && showSavingInfo) {
-        ToastUtils.showToast(
+        ToastManager().showToast(
           'Не удалось сохранить файл, так как не хватает данных о файле',
           type: ToastType.error,
         );
@@ -53,7 +53,7 @@ class FileUtils {
       }
 
       if ((fileName == null || fileName.trim().isEmpty) && showSavingInfo) {
-        ToastUtils.showToast(
+        ToastManager().showToast(
           'Нет данных о названии файла',
           type: ToastType.error,
         );
@@ -64,12 +64,15 @@ class FileUtils {
       var myFile = File(fileUri);
       if (myFile.existsSync()) {
         if (Platform.isAndroid && showSavingInfo) {
-          ToastUtils.showToast(
+          ToastManager().showToast(
             'Файл с именем "$fileName" уже существует в папке "${dirToSave.path}"',
-            action: SnackBarAction(
+            action: ToastAction(
               label: 'Открыть',
               textColor: Theme.of(scaffoldKey.currentContext).cardColor,
-              onPressed: () => openFile(myFile.path),
+              onPressed: (hideToast) {
+                openFile(myFile.path);
+                hideToast();
+              },
             ),
           );
         } else if (Platform.isIOS) {
@@ -81,14 +84,16 @@ class FileUtils {
       myFile.writeAsBytesSync(fileData);
       if (Platform.isAndroid && showSavingInfo) {
         await NativeMethods.rescanFolder(fileUri);
-        ToastUtils.showToast(
+        ToastManager().showToast(
           'Файл "$fileName" успешно сохранен в папку "${dirToSave.path}" во внутренней памяти устройства',
           type: ToastType.success,
-          action: SnackBarAction(
-            label: 'Открыть',
-            textColor: Colors.black87,
-            onPressed: () => openFile(myFile.path),
-          ),
+          action: ToastAction(
+              label: 'Открыть',
+              textColor: Colors.black87,
+              onPressed: (hideToast) {
+                openFile(myFile.path);
+                hideToast();
+              }),
         );
       } else if (Platform.isIOS) {
         openFile(myFile.path);
@@ -96,7 +101,7 @@ class FileUtils {
       return true;
     } catch (e) {
       if (showSavingInfo) {
-        ToastUtils.showToast(
+        ToastManager().showToast(
           'При сохранении файла произошла ошибка: ${e.toString()}',
           type: ToastType.error,
         );
@@ -170,17 +175,17 @@ class FileUtils {
     }
     switch (openResult.type) {
       case ResultType.error:
-        ToastUtils.showToast(openResult.message);
+        ToastManager().showToast(openResult.message);
         break;
       case ResultType.fileNotFound:
-        ToastUtils.showToast('Файл не найден.');
+        ToastManager().showToast('Файл не найден.');
         break;
       case ResultType.noAppToOpen:
-        ToastUtils.showToast(
-            'Не найдено приложение для открытия этого типа файлов.');
+        ToastManager()
+            .showToast('Не найдено приложение для открытия этого типа файлов.');
         break;
       case ResultType.permissionDenied:
-        ToastUtils.showToast('Нет доступа к файлу.');
+        ToastManager().showToast('Нет доступа к файлу.');
         break;
       default:
     }

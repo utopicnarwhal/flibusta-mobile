@@ -6,7 +6,7 @@ import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
-import 'package:flibusta/utils/toast_utils.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:intro_slider/dot_animation_enum.dart';
 import 'package:intro_slider/intro_slider.dart';
@@ -192,7 +192,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
     final value = _urlController.text;
 
     if (value != null && !await canLaunch('https://$value')) {
-      ToastUtils.showToast('Извините, но этот путь нельзя открыть');
+      ToastManager().showToast('Извините, но этот путь нельзя открыть');
       return;
     }
 
@@ -205,7 +205,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
     try {
       response = await ProxyHttpClient().getDio().getUri(Uri.https(value, '/'));
     } on DsError catch (dsError) {
-      ToastUtils.showToast(
+      ToastManager().showToast(
         'Произошла ошибка, при открытии сайта, возможно надо включить прокси. ${dsError.userMessage}',
       );
       setState(() {

@@ -1,7 +1,7 @@
 import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
-import 'package:flibusta/utils/toast_utils.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,7 +31,7 @@ class GridDataScreen extends StatelessWidget {
           } else {
             toastType = ToastType.success;
           }
-          ToastUtils.showToast(
+          ToastManager().showToast(
             gridDataState.message,
             type: toastType,
           );

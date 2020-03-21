@@ -5,11 +5,12 @@ import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/route.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:oktoast/oktoast.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 
 import 'utils/file_utils.dart';
 
@@ -54,60 +55,55 @@ class FlibustaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-      position: ToastPosition.top,
-      handleTouth: true,
-      dismissOtherOnShow: true,
-      movingOnWindowChange: true,
-      child: DynamicThemeMode(
-        builder: (context, themeMode) {
-          return MaterialApp(
-            title: 'Флибуста - книжное братство',
-            supportedLocales: [
-              Locale('ru', 'RU'),
-              Locale('en', 'US'),
-            ],
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-            ],
-            builder: (context, child) {
-              statusBarHeight = MediaQuery.of(context).padding.top;
-              currentTheme = Theme.of(context);
+    return DynamicThemeMode(
+      builder: (context, themeMode) {
+        return MaterialApp(
+          title: 'Флибуста - книжное братство',
+          supportedLocales: [
+            Locale('ru', 'RU'),
+          ],
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            DefaultCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            statusBarHeight = MediaQuery.of(context).padding.top;
+            currentTheme = Theme.of(context);
 
-              if (Theme.of(context).brightness == Brightness.dark) {
-                SystemChrome.setSystemUIOverlayStyle(
-                  SystemUiOverlayStyle(
-                    statusBarColor: Colors.transparent,
-                    statusBarBrightness: Brightness.dark,
-                    statusBarIconBrightness: Brightness.light,
-                    systemNavigationBarDividerColor: Colors.white,
-                    systemNavigationBarColor:
-                        Theme.of(context).scaffoldBackgroundColor,
-                    systemNavigationBarIconBrightness: Brightness.light,
-                  ),
-                );
-              } else {
-                SystemChrome.setSystemUIOverlayStyle(
-                  SystemUiOverlayStyle(
-                    statusBarColor: Colors.transparent,
-                    statusBarBrightness: Brightness.light,
-                    statusBarIconBrightness: Brightness.dark,
-                    systemNavigationBarDividerColor: Colors.black,
-                    systemNavigationBarColor: Theme.of(context).cardColor,
-                    systemNavigationBarIconBrightness: Brightness.dark,
-                  ),
-                );
-              }
-              return child;
-            },
-            themeMode: themeMode,
-            theme: kFlibustaLightTheme,
-            darkTheme: kFlibustaDarkTheme,
-            onGenerateRoute: onGenerateRoute,
-          );
-        },
-      ),
+            if (Theme.of(context).brightness == Brightness.dark) {
+              SystemChrome.setSystemUIOverlayStyle(
+                SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarBrightness: Brightness.dark,
+                  statusBarIconBrightness: Brightness.light,
+                  systemNavigationBarDividerColor: Colors.white,
+                  systemNavigationBarColor:
+                      Theme.of(context).scaffoldBackgroundColor,
+                  systemNavigationBarIconBrightness: Brightness.light,
+                ),
+              );
+            } else {
+              SystemChrome.setSystemUIOverlayStyle(
+                SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarBrightness: Brightness.light,
+                  statusBarIconBrightness: Brightness.dark,
+                  systemNavigationBarDividerColor: Colors.black,
+                  systemNavigationBarColor: Theme.of(context).cardColor,
+                  systemNavigationBarIconBrightness: Brightness.dark,
+                ),
+              );
+            }
+            return ToastOverlay(child: child);
+          },
+          themeMode: themeMode,
+          theme: kFlibustaLightTheme,
+          darkTheme: kFlibustaDarkTheme,
+          onGenerateRoute: onGenerateRoute,
+        );
+      },
     );
   }
 }

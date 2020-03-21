@@ -253,7 +253,7 @@
 //     }
 
 //     if (state is ErrorAuthenticationState) {
-//       ToastUtils.showToast(
+//       ToastManager().showToast(
 //         state.message,
 //         type: SnackBarType.error,
 //       );
@@ -275,7 +275,7 @@
 //     FocusScope.of(context).unfocus();
 //     var login = _loginTextController.text.trim();
 //     if (login == '' || _passwordTextController.text == '') {
-//       ToastUtils.showToast(
+//       ToastManager().showToast(
 //         'Не заполнено поле логин или пароль',
 //       );
 //       return;

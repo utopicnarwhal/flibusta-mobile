@@ -35,12 +35,12 @@ class BooksView extends StatelessWidget {
       body: SafeArea(
         child: DefaultDsTabController(
           onChangeHandler: (newValue) {
-            if (newValue > GridViewType.values.length - 1) {
+            if (newValue > booksViewGridTypes.length - 1) {
               return;
             }
-            selectedViewTypeBloc.changeViewType(GridViewType.values[newValue]);
+            selectedViewTypeBloc.changeViewType(booksViewGridTypes[newValue]);
           },
-          length: GridViewType.values.length,
+          length: booksViewGridTypes.length,
           child: NestedScrollView(
             physics: kBouncingAlwaysScrollableScrollPhysics,
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -63,7 +63,7 @@ class BooksView extends StatelessWidget {
               child: Builder(
                 builder: (context) {
                   List<Widget> tabViews = [];
-                  for (var gridViewType in GridViewType.values) {
+                  for (var gridViewType in booksViewGridTypes) {
                     tabViews.add(
                       GridDataScreen(
                         key: ValueKey(gridViewType),

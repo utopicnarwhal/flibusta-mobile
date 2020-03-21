@@ -3,7 +3,7 @@
 // import 'package:flibusta/model/authorInfo.dart';
 // import 'package:flibusta/services/http_client.dart';
 // import 'package:flibusta/utils/html_parsers.dart';
-// import 'package:flibusta/utils/toast_utils.dart';
+// import 'package:utopic_toast/utopic_toast.dart';
 // import 'package:flutter/material.dart';
 
 // class AuthorPage extends StatefulWidget {
@@ -56,7 +56,7 @@
 
 //       authorInfo = parseHtmlFromAuthorInfo(response.data, authorId);
 //     } catch (e) {
-//       ToastUtils.showToast(
+//       ToastManager().showToast(
 //         'Не удалось получить данные об авторе',
 //         action: SnackBarAction(
 //           label: "Попробовать ещё раз",

@@ -1,4 +1,4 @@
-import 'package:flibusta/utils/toast_utils.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -11,7 +11,7 @@ class PermissionsUtils {
 
     switch (permissionStatus) {
       case PermissionStatus.restricted:
-        ToastUtils.showToast(
+        ToastManager().showToast(
           'На вашем устройстве отключена возможность работы с памятью',
           type: ToastType.error,
         );
@@ -59,7 +59,7 @@ class PermissionsUtils {
           return false;
         }
 
-        ToastUtils.showToast(
+        ToastManager().showToast(
           'Не удалось сохранить файл, так как доступ к памяти не предоставлен',
           type: ToastType.error,
         );

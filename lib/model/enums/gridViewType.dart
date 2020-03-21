@@ -9,6 +9,14 @@ enum GridViewType {
   advancedSearch,
 }
 
+const booksViewGridTypes = [
+  GridViewType.newBooks,
+  GridViewType.genres,
+  GridViewType.authors,
+  GridViewType.sequences,
+  GridViewType.downloaded,
+];
+
 String gridViewTypeToString(GridViewType gridViewType) {
   switch (gridViewType) {
     case GridViewType.newBooks:
