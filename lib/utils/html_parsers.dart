@@ -99,7 +99,8 @@ List<BookCard> parseHtmlFromMakeBookList(
 
     var downloadFormats = List<Map<String, String>>();
     for (temp = size.nextElementSibling;
-        temp.attributes['href'] != null &&
+        temp != null &&
+            temp.attributes['href'] != null &&
             temp.attributes['href'].contains('/b/');
         temp = temp.nextElementSibling) {
       var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
@@ -114,7 +115,8 @@ List<BookCard> parseHtmlFromMakeBookList(
 
     var authors = List<Map<int, String>>();
     for (;
-        temp.attributes['href'] != null &&
+        temp != null &&
+            temp.attributes['href'] != null &&
             temp.attributes['href'].contains('/a/');
         temp = temp.nextElementSibling) {
       authors.add({
@@ -365,7 +367,12 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
   List<Map<String, String>> actualDownloadFormats;
   bool nextGenres = false;
 
-  formChildren.forEach((child) {
+  if (formChildren.any((htmldom.Element child) => child.localName == 'div')) {
+    authorInfo.books = parseHtmlFromMakeBookList(form.outerHtml);
+    return authorInfo;
+  }
+
+  formChildren.forEach((htmldom.Element child) {
     if (child.localName == 'br' && actualDownloadFormats != null) {
       actualBookCard.translators = actualTranslators;
       actualBookCard.downloadFormats = DownloadFormats(actualDownloadFormats);
@@ -591,6 +598,7 @@ $htmlString
   int authorId;
   String authorBookCount;
   String authorName;
+
   for (var node in authorsAndBookCountNodes) {
     if (node is htmldom.Element) {
       if (authorName != null && authorId != null) {
@@ -610,6 +618,18 @@ $htmlString
     } else if (node is htmldom.Text) {
       authorBookCount = node.text.trim().replaceAll(RegExp(r'(\(|\))'), '');
     }
+  }
+  if (authorName != null && authorId != null) {
+    result.add(
+      AuthorCard(
+        booksCount: authorBookCount,
+        id: authorId,
+        name: authorName,
+      ),
+    );
+    authorName = null;
+    authorId = null;
+    authorBookCount = null;
   }
 
   return result;

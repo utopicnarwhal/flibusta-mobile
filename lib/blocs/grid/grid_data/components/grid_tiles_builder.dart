@@ -17,6 +17,7 @@ import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -208,10 +209,10 @@ class GridTilesBuilder extends StatelessWidget {
                 return;
               }
               if (gridData[index] is SequenceCard) {
-                // Navigator.of(context).pushNamed(
-                //   SequencePage.routeName,
-                //   arguments: gridData[index].id,
-                // );
+                Navigator.of(context).pushNamed(
+                  SequencePage.routeName,
+                  arguments: gridData[index].id,
+                );
                 return;
               }
               if (gridData[index] is Genre) {

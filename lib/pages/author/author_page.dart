@@ -63,61 +63,63 @@ class _AuthorPageState extends State<AuthorPage> {
         );
       }
     } else {
-      body = ListView.separated(
-        physics: kBouncingAlwaysScrollableScrollPhysics,
-        addSemanticIndexes: false,
-        itemCount: _authorInfo.books.length,
-        padding: EdgeInsets.symmetric(vertical: 20),
-        separatorBuilder: (context, index) {
-          return Material(
-            type: MaterialType.card,
-            borderRadius: BorderRadius.zero,
-            child: Divider(indent: 16),
-          );
-        },
-        itemBuilder: (context, index) {
-          List<String> genresStrings =
-              _authorInfo.books[index]?.genres?.list?.map((genre) {
-            return genre.values?.first;
-          })?.toList();
-          var score = _authorInfo.books[index]?.score;
+      body = Scrollbar(
+        child: ListView.separated(
+          physics: kBouncingAlwaysScrollableScrollPhysics,
+          addSemanticIndexes: false,
+          itemCount: _authorInfo.books.length,
+          padding: EdgeInsets.symmetric(vertical: 20),
+          separatorBuilder: (context, index) {
+            return Material(
+              type: MaterialType.card,
+              borderRadius: BorderRadius.zero,
+              child: Divider(indent: 16),
+            );
+          },
+          itemBuilder: (context, index) {
+            List<String> genresStrings =
+                _authorInfo.books[index]?.genres?.list?.map((genre) {
+              return genre.values?.first;
+            })?.toList();
+            var score = _authorInfo.books[index]?.score;
 
-          return Material(
-            type: MaterialType.card,
-            borderRadius: BorderRadius.zero,
-            child: GridDataTile(
-              index: index,
-              isFirst: false,
-              isLast: true,
-              showTopDivider: index == 0,
-              showBottomDivier: index == _authorInfo.books.length - 1,
-              title: _authorInfo.books[index].tileTitle,
-              subtitle: _authorInfo.books[index].sequenceTitle,
-              genres: genresStrings,
-              score: score,
-              onTap: () {
-                LocalStorage().addToLastOpenBooks(_authorInfo.books[index]);
-                Navigator.of(context).pushNamed(
-                  BookPage.routeName,
-                  arguments: _authorInfo.books[index].id,
-                );
-              },
-              onLongPress: () {
-                showCupertinoModalPopup(
-                  filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                  context: context,
-                  builder: (context) {
-                    return Center(
-                      child: FullInfoCard<BookCard>(
-                        data: _authorInfo.books[index],
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          );
-        },
+            return Material(
+              type: MaterialType.card,
+              borderRadius: BorderRadius.zero,
+              child: GridDataTile(
+                index: index,
+                isFirst: false,
+                isLast: true,
+                showTopDivider: index == 0,
+                showBottomDivier: index == _authorInfo.books.length - 1,
+                title: _authorInfo.books[index].tileTitle,
+                subtitle: _authorInfo.books[index].sequenceTitle,
+                genres: genresStrings,
+                score: score,
+                onTap: () {
+                  LocalStorage().addToLastOpenBooks(_authorInfo.books[index]);
+                  Navigator.of(context).pushNamed(
+                    BookPage.routeName,
+                    arguments: _authorInfo.books[index].id,
+                  );
+                },
+                onLongPress: () {
+                  showCupertinoModalPopup(
+                    filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                    context: context,
+                    builder: (context) {
+                      return Center(
+                        child: FullInfoCard<BookCard>(
+                          data: _authorInfo.books[index],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            );
+          },
+        ),
       );
     }
     return Scaffold(
@@ -184,7 +186,11 @@ class _AuthorPageState extends State<AuthorPage> {
 
     try {
       var queryParams = {
+        'lang': '__',
         'order': sortBooksByToQueryParam(_sortBooksBy),
+        'hg1': '1',
+        'sa1': '1',
+        'hr1': '1',
       };
 
       Uri url = Uri.https(
@@ -205,10 +211,5 @@ class _AuthorPageState extends State<AuthorPage> {
         _dsError = dsError;
       });
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

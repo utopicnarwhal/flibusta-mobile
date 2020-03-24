@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
 import 'package:flibusta/model/genre.dart';
-import 'package:flibusta/services/http_client.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GenresListBloc {
@@ -20,14 +19,14 @@ class GenresListBloc {
   Sink<List<Genre>> get _allGenresListSink => _allGenresListController.sink;
 
   GenresListBloc() {
-    _getAllGenres().then((genresList) {
+    GridDataRepository().getGenres(null).then((genresList) {
       if (_allGenresListController.isClosed) return;
       _allGenresListSink.add(genresList);
     });
   }
 
   refreshGenresList() {
-    _getAllGenres().then((genresList) {
+    GridDataRepository().getGenres(null).then((genresList) {
       if (_allGenresListController.isClosed) return;
       _allGenresListSink.add(genresList);
     });
@@ -48,32 +47,5 @@ class GenresListBloc {
   void dispose() {
     _selectedGenresListController.close();
     _allGenresListController.close();
-  }
-
-  Future<List<Genre>> _getAllGenres() async {
-    Dio _dio = ProxyHttpClient().getDio();
-
-    var result = List<Genre>();
-    Map<String, String> queryParams = {
-      "op": "getList",
-    };
-    Uri url = Uri.https(ProxyHttpClient().getHostAddress(),
-        "/ajaxro/genre", queryParams);
-    try {
-      var response = await _dio.getUri(url);
-      response.data.forEach((headIndex, headGenre) {
-        headGenre.forEach((genre) {
-          result.add(Genre(
-            id: int.tryParse(genre["id"]),
-            name: genre["name"],
-            code: genre["code"],
-          ));
-        });
-      });
-      return result;
-    } catch (error) {
-      print(error);
-      return _getAllGenres();
-    }
   }
 }

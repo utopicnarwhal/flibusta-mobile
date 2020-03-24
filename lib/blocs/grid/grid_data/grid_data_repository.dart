@@ -180,7 +180,10 @@ class GridDataRepository {
           (genre1, genre2) => _genreSorting(favoriteGenreCodes, genre1, genre2),
         );
       }
-      return _getPageFromList<GridData>(result, page);
+      if (page != null) {
+        return _getPageFromList<GridData>(result, page);
+      }
+      return result;
     }
 
     var _dio = ProxyHttpClient().getDio();
@@ -225,7 +228,10 @@ class GridDataRepository {
       );
     }
 
-    return _getPageFromList<GridData>(result, page);
+    if (page != null) {
+      return _getPageFromList<GridData>(result, page);
+    }
+    return result;
   }
 
   static List<T> _getPageFromList<T>(List<T> list, int page) {
