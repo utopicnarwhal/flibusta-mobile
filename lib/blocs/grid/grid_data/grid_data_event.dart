@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
 import 'package:flibusta/constants.dart';
-import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';

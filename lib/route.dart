@@ -1,4 +1,5 @@
 import 'package:flibusta/ds_controls/ui/splash_screen.dart';
+import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/home/views/books_view/components/advanced_search_page.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
@@ -34,8 +35,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           return SettingsPage();
         case BookPage.routeName:
           return BookPage(bookId: settings.arguments);
-        // case AuthorPage.routeName:
-        //   return AuthorPage(authorId: settings.arguments);
+        case AuthorPage.routeName:
+          return AuthorPage(authorId: settings.arguments);
         case AdvancedSearchPage.routeName:
           return AdvancedSearchPage();
         case SequencePage.routeName:
