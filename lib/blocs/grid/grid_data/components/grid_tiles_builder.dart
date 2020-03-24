@@ -310,7 +310,7 @@ class GridTilesBuilder extends StatelessWidget {
     var uploadingMore = gridDataState?.uploadingMore;
 
     if (gridDataState?.hasReachedMax != false ||
-        uploadingMore ||
+        uploadingMore != false ||
         gridDataState?.gridData?.isEmpty != false) {
       return false;
     }

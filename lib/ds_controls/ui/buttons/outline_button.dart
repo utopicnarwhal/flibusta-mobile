@@ -8,6 +8,7 @@ class DsOutlineButton extends StatelessWidget {
   final FocusNode focusNode;
   final bool autofocus;
   final Widget child;
+  final EdgeInsetsGeometry margin;
 
   DsOutlineButton({
     @required this.onPressed,
@@ -15,11 +16,12 @@ class DsOutlineButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.child,
+    this.margin,
   });
 
   @override
   Widget build(BuildContext context) {
-    return OutlineButton(
+    final button = OutlineButton(
       onPressed: onPressed,
       padding: padding ?? EdgeInsets.all(8),
       focusNode: focusNode,
@@ -38,5 +40,13 @@ class DsOutlineButton extends StatelessWidget {
       ),
       highlightedBorderColor: kSecondaryColor(context),
     );
+
+    if (margin != null) {
+      return Padding(
+        padding: margin,
+        child: button,
+      );
+    }
+    return button;
   }
 }

@@ -14,10 +14,12 @@ class GridDataTile extends StatelessWidget {
   final bool isLast;
   final int index;
   final Widget trailingIcon;
+  final bool showTopDivider;
+  final bool showBottomDivier;
 
   GridDataTile({
     @required this.title,
-    @required this.subtitle,
+    this.subtitle,
     this.genres,
     this.onTap,
     this.onLongPress,
@@ -26,6 +28,8 @@ class GridDataTile extends StatelessWidget {
     this.index = 0,
     this.score,
     this.trailingIcon,
+    this.showTopDivider = false,
+    this.showBottomDivier = false,
   });
 
   @override
@@ -35,6 +39,7 @@ class GridDataTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          if (showTopDivider) Divider(),
           InkWell(
             onLongPress: onLongPress,
             onTap: onTap,
@@ -49,37 +54,38 @@ class GridDataTile extends StatelessWidget {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    subtitle ?? '',
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                    ),
                   if (genres?.isNotEmpty == true || score != null) ...[
                     _genresAndScoreBuilder(context, genres, score)
                   ],
                 ],
               ),
-              isThreeLine: genres?.isNotEmpty == true,
+              isThreeLine: genres?.isNotEmpty == true && subtitle != null,
               trailing: trailingIcon != null || onTap != null
                   ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (trailingIcon != null) trailingIcon,
-                          if (onTap != null) kIconArrowForward,
-                        ],
-                      ),
-                    ],
-                  )
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (trailingIcon != null) trailingIcon,
+                            if (onTap != null) kIconArrowForward,
+                          ],
+                        ),
+                      ],
+                    )
                   : SizedBox(),
             ),
           ),
           if (!isLast || isFirst) Divider(indent: 16),
+          if (showBottomDivier) Divider(),
         ],
       ),
     );
