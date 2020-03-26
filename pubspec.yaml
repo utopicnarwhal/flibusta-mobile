@@ -76,6 +76,7 @@ flutter:
     - assets/animations/questions.flr
     - assets/animations/like.flr
     - assets/animations/roskomnadzor.flr
+    - assets/animations/books_placeholder.flr
 
   fonts:
     - family: Inter

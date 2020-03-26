@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/constants.dart';
@@ -33,23 +34,40 @@ class AdvancedSearchPage extends StatefulWidget {
 class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  
+  bool _isRequestWaiting = true;
   List<BookCard> _searchResult;
   DsError _dsError;
 
   @override
   void initState() {
     super.initState();
-
-    _getSequenceInfo();
   }
 
-  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (widget.advancedSearchParams == null) {
+      _scaffoldKey.currentState.openEndDrawer();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body;
 
-    if (_searchResult == null) {
+    if (_isRequestWaiting) {
+      body = Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300, maxHeight: 300),
+          child: FlareActor(
+            'assets/animations/books_placeholder.flr',
+            fit: BoxFit.contain,
+            animation: 'Animations',
+          ),
+        ),
+      );
+    } else if (_searchResult == null) {
       if (_dsError != null) {
         body = ErrorScreen(
           errorMessage: _dsError.toString(),
@@ -128,10 +146,13 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: AdvancedSearchDrawer(
-        advancedSearchParams: widget.advancedSearchParams,),
+        advancedSearchParams: widget.advancedSearchParams,
+      ),
       appBar: DsAppBar(
         title: Text(
-          _searchResult == null ? 'Поиск...' : 'Расширенный поиск',
+          _searchResult == null && !_isRequestWaiting
+              ? 'Поиск...'
+              : 'Расширенный поиск',
           overflow: TextOverflow.fade,
         ),
         actions: [
