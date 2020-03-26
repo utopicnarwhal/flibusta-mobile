@@ -1,14 +1,17 @@
 import 'dart:ui';
 
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookCard.dart';
+import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/pages/advanced_search/advanced_search_drawer.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/services/http_client.dart';
@@ -34,22 +37,12 @@ class AdvancedSearchPage extends StatefulWidget {
 class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  bool _isRequestWaiting = true;
-  List<BookCard> _searchResult;
-  DsError _dsError;
+  GridDataBloc _gridDataBloc;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (widget.advancedSearchParams == null) {
-      _scaffoldKey.currentState.openEndDrawer();
-    }
+    _gridDataBloc = GridDataBloc(GridViewType.advancedSearch);
   }
 
   @override
@@ -219,23 +212,23 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
     List<BookCard> result;
 
     try {
-      // var queryParams = {
-      //   'lang': '__',
-      //   'order': sortBooksByToQueryParam(_sortBooksBy),
-      //   'hg1': '1',
-      //   'sa1': '1',
-      //   'hr1': '1',
-      // };
+      var queryParams = {
+        'lang': '__',
+        'order': sortBooksByToQueryParam(_sortBooksBy),
+        'hg1': '1',
+        'sa1': '1',
+        'hr1': '1',
+      };
 
-      // Uri url = Uri.https(
-      //   ProxyHttpClient().getHostAddress(),
-      //   '/s/' + widget.sequenceId.toString(),
-      //   // queryParams,
-      // );
+      Uri url = Uri.https(
+        ProxyHttpClient().getHostAddress(),
+        '/s/' + widget.sequenceId.toString(),
+        // queryParams,
+      );
 
-      // var response = await ProxyHttpClient().getDio().getUri(url);
+      var response = await GridDataRepository().makeBookList(page);
 
-      // result = parseHtmlFromSequenceInfo(response.data, widget.sequenceId);
+      result = parseHtmlFromSequenceInfo(response.data, widget.sequenceId);
 
       setState(() {
         _searchResult = result;

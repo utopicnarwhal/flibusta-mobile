@@ -164,6 +164,63 @@ class GridDataRepository {
     return result;
   }
 
+Future<void> _getSequenceInfo() async {
+    SequenceInfo result;
+
+    try {
+      // var queryParams = {
+      //   'lang': '__',
+      //   'order': sortBooksByToQueryParam(_sortBooksBy),
+      //   'hg1': '1',
+      //   'sa1': '1',
+      //   'hr1': '1',
+      // };
+
+      Uri url = Uri.https(
+        ProxyHttpClient().getHostAddress(),
+        '/s/' + widget.sequenceId.toString(),
+        // queryParams,
+      );
+
+      var response = await ProxyHttpClient().getDio().getUri(url);
+
+      result = parseHtmlFromSequenceInfo(response.data, widget.sequenceId);
+
+      setState(() {
+        _sequenceInfo = result;
+      });
+    } on DsError catch (dsError) {
+      setState(() {
+        _dsError = dsError;
+      });
+    }
+  }
+
+  Future<List<SequenceCard>> getSequences(int page) async {
+    var result = List<SequenceCard>();
+
+    Map<String, String> queryParams;
+
+    if (page != null && page > 1) {
+      queryParams = {'page': (page - 1).toString()};
+    }
+
+    Uri url = Uri.https(
+      ProxyHttpClient().getHostAddress(),
+      '/s',
+      queryParams,
+    );
+
+    var response = await ProxyHttpClient().getDio().getUri(url);
+
+    if (response.data == null || !(response.data is String)) {
+      return null;
+    }
+
+    result = parseHtmlFromGetSequences(response.data);
+    return result;
+  }
+
   Future<List<GridData>> getGenres(int page, {String searchString}) async {
     if (cachedGenreList != null) {
       var result = cachedGenreList;
