@@ -74,6 +74,32 @@ class ShimmerGridTileBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (gridViewType == GridViewType.suquence) {
+      return ListView.builder(
+        physics: kBouncingAlwaysScrollableScrollPhysics,
+        addSemanticIndexes: false,
+        itemCount: itemCount,
+        padding: EdgeInsets.only(top: 20),
+        itemBuilder: (context, index) {
+          return Material(
+            type: MaterialType.card,
+            borderRadius: BorderRadius.zero,
+            child: Column(
+              children: <Widget>[
+                if (index == 0) Divider(),
+                ShimmerListTile(
+                  index: index,
+                  gridViewType: gridViewType,
+                ),
+                if (index != (itemCount - 1) || index == 0) Divider(indent: 16),
+                if (index == (itemCount - 1)) Divider(),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,

@@ -478,6 +478,7 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
   String actualSequenceTitle;
   Genres actualGenres = Genres(List());
   Translators actualTranslators;
+  Authors actualAuthors;
   BookCard actualBookCard;
   List<Map<String, String>> actualDownloadFormats;
   bool nextGenres = false;
@@ -485,10 +486,12 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
   mainElementChildren.forEach((child) {
     if (child.localName == 'br' && actualDownloadFormats != null) {
       actualBookCard.translators = actualTranslators;
+      actualBookCard.authors = actualAuthors;
       actualBookCard.downloadFormats = DownloadFormats(actualDownloadFormats);
       sequenceInfo.books.add(actualBookCard);
       actualDownloadFormats = null;
       actualTranslators = null;
+      actualAuthors = null;
       actualBookCard = null;
       nextGenres = true;
       return;
@@ -503,14 +506,25 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
 
     if (child.attributes['href'] != null &&
         child.attributes['href'].contains('/a/')) {
-      if (actualTranslators == null) {
-        actualTranslators = Translators(List());
+      if (actualBookCard.size != null) {
+        if (actualAuthors == null) {
+          actualAuthors = Authors(List());
+        }
+        var authorId =
+            int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
+        var authorName = child.text;
+        actualAuthors.list.add({authorId: authorName});
+        return;
+      } else {
+        if (actualTranslators == null) {
+          actualTranslators = Translators(List());
+        }
+        var translatorId =
+            int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
+        var translatorName = child.text;
+        actualTranslators.list.add({translatorId: translatorName});
+        return;
       }
-      var translatorId =
-          int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
-      var translatorName = child.text;
-      actualTranslators.list.add({translatorId: translatorName});
-      return;
     }
 
     if (child.attributes['href'] != null &&

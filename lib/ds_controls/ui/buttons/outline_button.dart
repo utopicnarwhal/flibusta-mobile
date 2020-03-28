@@ -1,6 +1,5 @@
+import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flutter/material.dart';
-
-import '../../theme.dart';
 
 class DsOutlineButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -33,7 +32,7 @@ class DsOutlineButton extends StatelessWidget {
       child: DefaultTextStyle(
         style: Theme.of(context).textTheme.button.copyWith(
               color: kSecondaryColor(context),
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
         child: child,

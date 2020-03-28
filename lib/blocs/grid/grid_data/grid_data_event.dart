@@ -28,6 +28,7 @@ class LoadGridDataEvent extends GridDataEvent {
       {GridDataState currentState, GridDataBloc bloc}) async {
     try {
       List<GridData> _gridData = [];
+      String sequenceTitle;
       var hasReachedMax = true;
       var currentSearchString = searchString ?? currentState.searchString;
 
@@ -76,6 +77,13 @@ class LoadGridDataEvent extends GridDataEvent {
           );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
+        case GridViewType.suquence:
+          var sequenceInfo =
+              await _gridDataRepository.getSequence(bloc.sequenceId, 1);
+          _gridData = sequenceInfo.books;
+          sequenceTitle = sequenceInfo.title;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          break;
         case GridViewType.sequences:
           if (currentSearchString?.isNotEmpty == true) {
             var bookSearch = await _gridDataRepository.bookSearch(
@@ -99,6 +107,7 @@ class LoadGridDataEvent extends GridDataEvent {
         hasReachedMax: hasReachedMax,
         gridData: _gridData,
         uploadingMore: false,
+        sequenceTitle: sequenceTitle,
         message: '',
       );
     } on DsError catch (dsError) {
@@ -123,7 +132,9 @@ class SearchGridDataEvent extends GridDataEvent {
       {GridDataState currentState, GridDataBloc bloc}) async {
     try {
       List<GridData> _gridData = [];
+      String sequenceTitle;
       var hasReachedMax = true;
+
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
           _gridData = await _gridDataRepository.getDownloadedBooks(
@@ -157,6 +168,13 @@ class SearchGridDataEvent extends GridDataEvent {
           );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
+        case GridViewType.suquence:
+          var sequenceInfo =
+              await _gridDataRepository.getSequence(bloc.sequenceId, 1);
+          _gridData = sequenceInfo.books;
+          sequenceTitle = sequenceInfo.title;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          break;
         case GridViewType.sequences:
           var sequenceSearch = await _gridDataRepository.bookSearch(
             1,
@@ -176,6 +194,7 @@ class SearchGridDataEvent extends GridDataEvent {
         hasReachedMax: hasReachedMax,
         gridData: _gridData,
         uploadingMore: false,
+        sequenceTitle: sequenceTitle,
         message: '',
       );
     } catch (e) {
@@ -203,6 +222,7 @@ class UploadMoreGridDataEvent extends GridDataEvent {
     try {
       List<GridData> _gridData = [];
       var hasReachedMax = true;
+      String sequenceTitle;
 
       switch (bloc.gridViewType) {
         case GridViewType.downloaded:
@@ -249,6 +269,13 @@ class UploadMoreGridDataEvent extends GridDataEvent {
           );
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
+        case GridViewType.suquence:
+          var sequenceInfo =
+              await _gridDataRepository.getSequence(bloc.sequenceId, pageNumber);
+          _gridData = sequenceInfo.books;
+          sequenceTitle = sequenceInfo.title;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+          break;
         case GridViewType.sequences:
           if (currentState.searchString?.isNotEmpty == true) {
             var bookSearch = await _gridDataRepository.bookSearch(
@@ -275,6 +302,7 @@ class UploadMoreGridDataEvent extends GridDataEvent {
         hasReachedMax: hasReachedMax,
         gridData: _gridData,
         uploadingMore: false,
+        sequenceTitle: sequenceTitle,
         message: '',
       );
     } catch (e) {

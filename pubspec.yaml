@@ -42,7 +42,7 @@ dependencies:
   launch_review: ^2.0.0
   package_info: ^0.4.0+16
   flare_flutter: ^2.0.1
-  utopic_toast: ^0.1.0
+  utopic_toast: ^0.1.2
 
   share: ^0.6.3+6
   connectivity: ^0.4.8+2

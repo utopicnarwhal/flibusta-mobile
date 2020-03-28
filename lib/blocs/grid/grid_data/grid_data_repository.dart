@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
+import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
+import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/html_parsers.dart';
@@ -164,40 +166,8 @@ class GridDataRepository {
     return result;
   }
 
-Future<void> _getSequenceInfo() async {
+  Future<SequenceInfo> getSequence(int sequenceId, int page) async {
     SequenceInfo result;
-
-    try {
-      // var queryParams = {
-      //   'lang': '__',
-      //   'order': sortBooksByToQueryParam(_sortBooksBy),
-      //   'hg1': '1',
-      //   'sa1': '1',
-      //   'hr1': '1',
-      // };
-
-      Uri url = Uri.https(
-        ProxyHttpClient().getHostAddress(),
-        '/s/' + widget.sequenceId.toString(),
-        // queryParams,
-      );
-
-      var response = await ProxyHttpClient().getDio().getUri(url);
-
-      result = parseHtmlFromSequenceInfo(response.data, widget.sequenceId);
-
-      setState(() {
-        _sequenceInfo = result;
-      });
-    } on DsError catch (dsError) {
-      setState(() {
-        _dsError = dsError;
-      });
-    }
-  }
-
-  Future<List<SequenceCard>> getSequences(int page) async {
-    var result = List<SequenceCard>();
 
     Map<String, String> queryParams;
 
@@ -207,17 +177,14 @@ Future<void> _getSequenceInfo() async {
 
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
-      '/s',
+      '/s/' + sequenceId.toString(),
       queryParams,
     );
 
     var response = await ProxyHttpClient().getDio().getUri(url);
 
-    if (response.data == null || !(response.data is String)) {
-      return null;
-    }
+    result = parseHtmlFromSequenceInfo(response.data, sequenceId);
 
-    result = parseHtmlFromGetSequences(response.data);
     return result;
   }
 

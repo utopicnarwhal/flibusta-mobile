@@ -1,6 +1,6 @@
-import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
-import 'package:flibusta/ds_controls/theme.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flibusta/ds_controls/theme.dart';
+import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flutter/material.dart';
 
 class ErrorScreen extends StatelessWidget {

@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 
 class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
   final GridViewType gridViewType;
+  final int sequenceId;
 
-  GridDataBloc(this.gridViewType);
+  GridDataBloc(this.gridViewType, [this.sequenceId]);
 
   @override
   GridDataState get initialState => GridDataState(
@@ -19,7 +21,7 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
         stateCode: GridDataStateCode.Empty,
       );
 
-  void fetchGridData() {
+  void fetchGridData([AdvancedSearchParams advancedSearchParams]) {
     this.add(LoadGridDataEvent());
   }
 

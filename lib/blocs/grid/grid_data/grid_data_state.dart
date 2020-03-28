@@ -18,6 +18,7 @@ class GridDataState extends Equatable {
   final List<GridData> gridData;
   final bool uploadingMore;
   final GridDataStateCode stateCode;
+  final String sequenceTitle;
 
   GridDataState({
     this.searchString,
@@ -27,6 +28,7 @@ class GridDataState extends Equatable {
     this.uploadingMore,
     this.stateCode,
     this.message,
+    this.sequenceTitle,
   });
 
   @override
@@ -37,6 +39,7 @@ class GridDataState extends Equatable {
         this.uploadingMore,
         this.stateCode,
         this.message,
+        this.gridData?.length,
       ];
 
   GridDataState copyWith({
@@ -46,6 +49,7 @@ class GridDataState extends Equatable {
     List<GridData> gridData,
     bool uploadingMore,
     GridDataStateCode stateCode,
+    String sequenceTitle,
     String message,
   }) {
     return GridDataState(
@@ -56,6 +60,7 @@ class GridDataState extends Equatable {
       uploadingMore: uploadingMore ?? this.uploadingMore,
       stateCode: stateCode ?? this.stateCode,
       message: message ?? this.message,
+      sequenceTitle: sequenceTitle ?? this.sequenceTitle,
     );
   }
 }

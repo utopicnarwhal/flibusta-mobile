@@ -1,8 +1,8 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
+import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
-import 'package:flibusta/model/sequenceInfo.dart';
-import 'package:flibusta/services/http_client.dart';
-import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -15,7 +15,6 @@ import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/services/local_storage.dart';
-import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SequencePage extends StatefulWidget {
@@ -31,15 +30,14 @@ class SequencePage extends StatefulWidget {
 class _SequencePageState extends State<SequencePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  SequenceInfo _sequenceInfo;
-  DsError _dsError;
   GridDataBloc _gridDataBloc;
 
   @override
   void initState() {
     super.initState();
 
-    _gridDataBloc = GridDataBloc(GridViewType.suquence);
+    _gridDataBloc = GridDataBloc(GridViewType.suquence, widget.sequenceId);
+    _gridDataBloc.fetchGridData();
   }
 
   @override
@@ -49,146 +47,192 @@ class _SequencePageState extends State<SequencePage> {
       builder: (context, GridDataState gridDataState) {
         Widget body;
 
-        if (_sequenceInfo == null) {
-          if (_dsError != null) {
-            body = ErrorScreen(
-              errorMessage: _dsError.toString(),
-              onTryAgain: () {
-                _getSequenceInfo();
-                setState(() {
-                  _dsError = null;
-                });
-              },
-            );
-          } else {
-            body = Center(
-              child: DsCircularProgressIndicator(),
-            );
-          }
-          body = SingleChildScrollView(
-            physics: kBouncingAlwaysScrollableScrollPhysics,
-            child: body,
-          );
-        } else {
-          body = Scrollbar(
-            child: ListView.separated(
-              physics: kBouncingAlwaysScrollableScrollPhysics,
-              addSemanticIndexes: false,
-              itemCount: _sequenceInfo.books.length,
-              padding: EdgeInsets.symmetric(vertical: 20),
-              separatorBuilder: (context, index) {
-                return Material(
-                  type: MaterialType.card,
-                  borderRadius: BorderRadius.zero,
-                  child: Divider(indent: 16),
-                );
-              },
-              itemBuilder: (context, index) {
-                List<String> genresStrings =
-                    _sequenceInfo.books[index]?.genres?.list?.map((genre) {
-                  return genre.values?.first;
-                })?.toList();
-                var score = _sequenceInfo.books[index]?.score;
+        int shimmerListCount =
+            (MediaQuery.of(context).size.height / 110).round();
 
-                return Material(
-                  type: MaterialType.card,
-                  borderRadius: BorderRadius.zero,
-                  child: GridDataTile(
-                    index: index,
-                    isFirst: false,
-                    isLast: true,
-                    showTopDivider: index == 0,
-                    showBottomDivier: index == _sequenceInfo.books.length - 1,
-                    title: _sequenceInfo.books[index].tileTitle,
-                    subtitle: _sequenceInfo.books[index].tileSubtitle,
-                    genres: genresStrings,
-                    score: score,
-                    onTap: () {
-                      LocalStorage()
-                          .addToLastOpenBooks(_sequenceInfo.books[index]);
-                      Navigator.of(context).pushNamed(
-                        BookPage.routeName,
-                        arguments: _sequenceInfo.books[index].id,
-                      );
-                    },
-                    onLongPress: () {
-                      showCupertinoModalPopup(
-                        filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                        context: context,
-                        builder: (context) {
-                          return Center(
-                            child: FullInfoCard<BookCard>(
-                              data: _sequenceInfo.books[index],
+        if ((gridDataState.stateCode == GridDataStateCode.Normal ||
+                gridDataState.stateCode == GridDataStateCode.Error) &&
+            gridDataState.gridData?.isEmpty == true) {
+          body = Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              SizedBox(
+                height: 230,
+                width: 300,
+                child: FlareActor(
+                  'assets/animations/empty_state.flr',
+                  alignment: Alignment.topCenter,
+                  fit: BoxFit.contain,
+                  animation: 'idle',
+                  color: Theme.of(context).textTheme.body1.color,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(
+                  'В данной серии пока нет книг',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          );
+        } else if (gridDataState?.stateCode == GridDataStateCode.Error &&
+            gridDataState.gridData == null) {
+          body = ErrorScreen(
+            errorMessage: gridDataState.message,
+            onTryAgain: () {
+              _gridDataBloc.fetchGridData();
+            },
+          );
+        } else if (gridDataState?.stateCode == GridDataStateCode.Loading) {
+          body = ShimmerGridTileBuilder(
+            itemCount: shimmerListCount,
+            gridViewType: GridViewType.suquence,
+          );
+        } else if (gridDataState.gridData != null) {
+          body = NotificationListener<ScrollNotification>(
+            onNotification: (scrollNotification) => _handleScrollNotification(
+                context, gridDataState, scrollNotification),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                _gridDataBloc.fetchGridData();
+              },
+              child: Scrollbar(
+                child: ListView.separated(
+                  physics: kBouncingAlwaysScrollableScrollPhysics,
+                  addSemanticIndexes: false,
+                  itemCount: gridDataState.uploadingMore
+                      ? (gridDataState.gridData.length + 1)
+                      : gridDataState.gridData.length,
+                  padding: EdgeInsets.only(top: 20),
+                  separatorBuilder: (context, index) {
+                    return Material(
+                      type: MaterialType.card,
+                      borderRadius: BorderRadius.zero,
+                      child: Divider(indent: 16),
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    if (index == gridDataState.gridData.length) {
+                      return Material(
+                        type: MaterialType.card,
+                        borderRadius: BorderRadius.zero,
+                        child: Column(
+                          children: <Widget>[
+                            ShimmerListTile(
+                              index: index,
+                              gridViewType: GridViewType.suquence,
                             ),
+                            Divider(),
+                          ],
+                        ),
+                      );
+                    }
+
+                    List<String> genresStrings =
+                        (gridDataState.gridData[index] as BookCard)
+                            ?.genres
+                            ?.list
+                            ?.map((genre) {
+                      return genre.values?.first;
+                    })?.toList();
+                    var score =
+                        (gridDataState.gridData[index] as BookCard)?.score;
+
+                    return Material(
+                      type: MaterialType.card,
+                      borderRadius: BorderRadius.zero,
+                      child: GridDataTile(
+                        index: index,
+                        isFirst: false,
+                        isLast: true,
+                        showTopDivider: index == 0,
+                        showBottomDivier: !gridDataState.uploadingMore &&
+                            index == gridDataState.gridData.length - 1,
+                        title: gridDataState.gridData[index].tileTitle,
+                        subtitle: gridDataState.gridData[index].tileSubtitle,
+                        genres: genresStrings,
+                        score: score,
+                        onTap: () {
+                          LocalStorage().addToLastOpenBooks(
+                              gridDataState.gridData[index]);
+                          Navigator.of(context).pushNamed(
+                            BookPage.routeName,
+                            arguments: gridDataState.gridData[index].id,
                           );
                         },
-                      );
-                    },
-                  ),
-                );
-              },
+                        onLongPress: () {
+                          showCupertinoModalPopup(
+                            filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                            context: context,
+                            builder: (context) {
+                              return Center(
+                                child: FullInfoCard<BookCard>(
+                                  data: gridDataState.gridData[index],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           );
+        } else {
+          body = ShimmerGridTileBuilder(
+            itemCount: shimmerListCount,
+            gridViewType: GridViewType.suquence,
+          );
         }
+
         return Scaffold(
           key: _scaffoldKey,
           appBar: DsAppBar(
             title: Text(
-              _sequenceInfo?.title ?? 'Загрузка...',
+              gridDataState.sequenceTitle ?? 'Загрузка...',
               overflow: TextOverflow.fade,
             ),
-            // actions: <Widget>[
-            //   PopupMenuButton<SortBooksBy>(
-            //     tooltip: 'Сортировать по...',
-            //     icon: Icon(Icons.filter_list),
-            //     captureInheritedThemes: true,
-            //     onSelected: (newSortBooksBy) {
-            //       if (newSortBooksBy == null || newSortBooksBy == _sortBooksBy) {
-            //         return;
-            //       }
-            //       setState(() {
-            //         _sortBooksBy = newSortBooksBy;
-            //         _dsError = null;
-            //         _authorInfo = null;
-            //       });
-            //       _getAuthorInfo();
-            //     },
-            //     itemBuilder: (context) {
-            //       List<PopupMenuEntry<SortBooksBy>> entries =
-            //           SortBooksBy.values.map((sortBooksBy) {
-            //         return PopupMenuItem<SortBooksBy>(
-            //           child: ListTile(
-            //             title: Text(
-            //               sortBooksByToString(sortBooksBy),
-            //             ),
-            //             trailing: sortBooksBy == _sortBooksBy
-            //                 ? Icon(
-            //                     Icons.check,
-            //                     color: kSecondaryColor(context),
-            //                   )
-            //                 : null,
-            //           ),
-            //           value: sortBooksBy,
-            //         );
-            //       }).toList();
-
-            //       return entries.expand((entry) {
-            //         if (entries.indexOf(entry) != entries.length - 1) {
-            //           return [
-            //             entry,
-            //             PopupMenuDivider(height: 1),
-            //           ];
-            //         }
-            //         return [entry];
-            //       }).toList();
-            //     },
-            //   ),
-            // ],
           ),
           body: body,
         );
       },
     );
+  }
+
+  bool _handleScrollNotification(
+    BuildContext context,
+    GridDataState gridDataState,
+    ScrollNotification notification,
+  ) {
+    if (notification.depth != 0) return false;
+
+    var uploadingMore = gridDataState?.uploadingMore;
+
+    if (gridDataState?.hasReachedMax != false ||
+        uploadingMore != false ||
+        gridDataState?.gridData?.isEmpty != false) {
+      return false;
+    }
+    double maxScroll = notification.metrics.maxScrollExtent;
+    double currentScroll = notification.metrics.pixels;
+    bool isScrollingDown =
+        notification.metrics.axisDirection == AxisDirection.down;
+    double delta = 100.0;
+    if ((gridDataState?.stateCode == GridDataStateCode.Normal ||
+            gridDataState?.stateCode == GridDataStateCode.Error) &&
+        isScrollingDown &&
+        maxScroll - currentScroll <= delta) {
+      _gridDataBloc.uploadMore();
+    }
+    return false;
   }
 
   @override
