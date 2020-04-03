@@ -1,6 +1,5 @@
 import 'package:flibusta/blocs/genres_list/genres_list_bloc.dart';
 import 'package:flibusta/constants.dart';
-import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
@@ -12,10 +11,12 @@ class AdvancedSearchDrawer extends StatefulWidget {
   static const String routeName = '/advanced_search';
 
   final AdvancedSearchParams advancedSearchParams;
+  final void Function() onSearch;
 
   AdvancedSearchDrawer({
     Key key,
-    this.advancedSearchParams,
+    @required this.advancedSearchParams,
+    @required this.onSearch,
   }) : super(key: key);
 
   @override
@@ -69,33 +70,47 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                         'Параметры поиска:',
                         style: Theme.of(context).textTheme.title,
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Название'),
+                      ),
                       TextField(
                         autocorrect: true,
                         controller: titleController,
-                        decoration: InputDecoration(
-                          labelText: "Название",
-                        ),
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Фамилия'),
+                      ),
                       TextField(
                         autocorrect: true,
                         controller: lastnameController,
-                        decoration: InputDecoration(labelText: "Фамилия"),
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Имя'),
+                      ),
                       TextField(
                         autocorrect: true,
                         controller: firstnameController,
-                        decoration: InputDecoration(labelText: "Имя"),
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Отчество'),
+                      ),
                       TextField(
                         autocorrect: true,
                         controller: middlenameController,
-                        decoration: InputDecoration(labelText: "Отчество"),
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Жанр(-ы)'),
+                      ),
                       TypeAheadField(
                         autoFlipDirection: true,
                         textFieldConfiguration: TextFieldConfiguration(
@@ -103,7 +118,6 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                           controller: genresTextFieldController,
                           enabled: allGenresListSnapshot.hasData,
                           decoration: InputDecoration(
-                            labelText: "Жанр(-ы)",
                             suffixIcon: allGenresListSnapshot.hasData
                                 ? null
                                 : Padding(
@@ -179,7 +193,9 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                           widget.advancedSearchParams.genres =
                               selectedGenresString;
 
-                          Navigator.of(context).pop();
+                          if (widget.onSearch != null) {
+                            widget.onSearch();
+                          }
                         },
                       ),
                     ],

@@ -142,10 +142,10 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
     return Column(
       children: [
         Text(
-          'Ассоциация по защите авторских прав в Интернете (АЗАПИ) вместе с Роскомнадзором (не запрещенная в России цензурирующая организация) '
-          'были бы рады, если бы ни сайта flibusta.is, ни этого приложения не существовало. Поэтому это приложение теперь, как любой бразуер, '
-          ' просто получает HTML страницу, по указанному адресу, обрабатывает её и отображает. Отправить теперь запрос на блокировку этого приложения, '
-          'всё равно что отправить запрос на блокировку Google Chrome или Opera browser.',
+          'Чтобы это приложение не было заблокировано на Play Market, Вам необходимо самим ввести сайт, которой хотите открыть. '
+          'Это приложение теперь, как любой бразуер, '
+          'просто получает HTML страницу, по указанному адресу, обрабатывает её и отображает. Отправить запрос на блокировку этого приложения '
+          'так же бессмысленно, как отправить запрос на блокировку Google Chrome или Opera browser.',
           textAlign: TextAlign.justify,
         ),
         SizedBox(height: 20),
@@ -171,7 +171,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
           TextField(
             controller: _urlController,
             decoration: InputDecoration(
-                helperText: 'Например, google.com',
+                helperText: 'Как пример: flibusta.is',
                 hintText: 'Вы знаете, что сюда вписать'),
             onEditingComplete: _onSubmit,
           ),

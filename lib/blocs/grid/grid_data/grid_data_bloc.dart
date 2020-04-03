@@ -22,19 +22,24 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
       );
 
   void fetchGridData([AdvancedSearchParams advancedSearchParams]) {
-    this.add(LoadGridDataEvent());
+    this.add(LoadGridDataEvent(
+      advancedSearchParams: advancedSearchParams,
+    ));
   }
 
   void searchByString(String searchString) {
     if (searchString == null || searchString == '') {
-      this.add(LoadGridDataEvent(searchString));
+      this.add(LoadGridDataEvent(searchString: searchString));
       return;
     }
     this.add(SearchGridDataEvent(searchString));
   }
 
-  void uploadMore() {
-    this.add(UploadMoreGridDataEvent(state.page + 1));
+  void uploadMore([AdvancedSearchParams advancedSearchParams]) {
+    this.add(UploadMoreGridDataEvent(
+      state.page + 1,
+      advancedSearchParams,
+    ));
   }
 
   @override
@@ -42,9 +47,6 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
     try {
       var searchString = state?.searchString;
       if (event is SearchGridDataEvent) {
-        if (searchString == event.searchString) {
-          return;
-        }
         searchString = event.searchString;
       }
       if (event is UploadMoreGridDataEvent) {

@@ -142,7 +142,7 @@ List<BookCard> parseHtmlFromMakeBookList(
       sequenceTitle: sequence?.text,
       translators: Translators(translators),
       size: size.text,
-      score: score,
+      fileScore: score,
       downloadFormats: DownloadFormats(downloadFormats),
     ));
   }

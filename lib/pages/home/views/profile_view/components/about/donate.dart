@@ -43,23 +43,6 @@ class DonatePage extends StatelessWidget {
                         size: 30.0,
                       ),
                     ),
-                    Divider(indent: 70),
-                    ListTile(
-                      title: Text('Рокетбанк'),
-                      subtitle: Text('5321 3045 5409 9306'),
-                      onTap: () {
-                        Clipboard.setData(
-                          ClipboardData(text: '5321304554099306'),
-                        );
-                        ToastManager().showToast(
-                          'Номер карты скопирован в буфер обмена',
-                        );
-                      },
-                      trailing: Icon(
-                        FontAwesomeIcons.clipboard,
-                        size: 30.0,
-                      ),
-                    ),
                   ],
                 ),
               ),

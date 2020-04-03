@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flibusta/model/connectionCheckResult.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 
@@ -94,7 +95,7 @@ class ProxyHttpClient {
     return _hostAddress;
   }
 
-  Future<int> connectionCheck(
+  Future<ConnectionCheckResult> connectionCheck(
     String hostPort, {
     CancelToken cancelToken,
   }) async {
@@ -122,7 +123,7 @@ class ProxyHttpClient {
       };
     }
 
-    var result = -1;
+    var result = ConnectionCheckResult(ping: -1);
     var stopWatch = new Stopwatch()..start();
 
     try {
@@ -136,15 +137,15 @@ class ProxyHttpClient {
 
       switch (response.statusCode) {
         case 200:
-          result = stopWatch.elapsedMilliseconds;
+          result.ping = stopWatch.elapsedMilliseconds;
           break;
         default:
-          result = -1;
+          result.ping = -1;
       }
-    } catch (error) {
+    } on DioError catch (dioError) {
       stopWatch.stop();
-      result = -1;
-      print(error);
+      result.ping = -1;
+      result.error = DsError.fromDioError(dioError: dioError);
     }
     dioForConnectionCheck.clear();
     dioForConnectionCheck.close();

@@ -81,7 +81,7 @@ class _AuthorPageState extends State<AuthorPage> {
                 _authorInfo.books[index]?.genres?.list?.map((genre) {
               return genre.values?.first;
             })?.toList();
-            var score = _authorInfo.books[index]?.score;
+            var score = _authorInfo.books[index]?.fileScore;
 
             return Material(
               type: MaterialType.card,

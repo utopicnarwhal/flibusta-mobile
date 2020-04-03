@@ -10,6 +10,7 @@ import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
@@ -48,7 +49,10 @@ class BookService {
     BookCard bookCard,
     void Function(double) downloadProgressCallback,
   ) async {
-    PermissionsUtils.storageAccess(context: context);
+    await PermissionsUtils.requestAccess(
+      context,
+      PermissionGroup.storage,
+    );
 
     Map<String, String> downloadFormat;
     var preferredBookExt = await LocalStorage().getPreferredBookExt();

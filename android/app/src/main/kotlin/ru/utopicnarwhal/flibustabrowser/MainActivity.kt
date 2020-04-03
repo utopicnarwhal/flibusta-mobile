@@ -1,4 +1,4 @@
-package ru.utopicnarwhal.flibusta
+package ru.utopicnarwhal.flibustabrowser
 
 import android.media.MediaScannerConnection
 import androidx.annotation.NonNull
@@ -9,7 +9,7 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 
 
 class MainActivity: FlutterFragmentActivity() {
-    private val CHANNEL = "ru.utopicnarwhal.flibusta/native_methods_channel"
+    private val CHANNEL = "ru.utopicnarwhal.flibustabrowser/native_methods_channel"
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)

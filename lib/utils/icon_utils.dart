@@ -24,6 +24,8 @@ IconData gridRowNameToIcon(String rowName) {
     case 'Количество книг':
     case 'Количество книг в серии':
       return Icons.confirmation_number;
+    case 'Оценка файла':
+      return FontAwesomeIcons.star;
     default:
       return FontAwesomeIcons.question;
   }

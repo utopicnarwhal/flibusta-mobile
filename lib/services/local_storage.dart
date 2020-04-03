@@ -52,6 +52,26 @@ class LocalStorage {
     return await prefs.setBool('Intro2Completed', true);
   }
 
+  Future<bool> getLongTapTutorialCompleted() async {
+    var prefs = await _prefs;
+    try {
+      var longTapTutorialCompleted = prefs.getBool('LongTapTutorialCompleted');
+      if (longTapTutorialCompleted == null) {
+        await prefs.setBool('LongTapTutorialCompleted', false);
+        longTapTutorialCompleted = false;
+      }
+      return longTapTutorialCompleted;
+    } catch (e) {
+      await prefs.setBool('LongTapTutorialCompleted', false);
+      return false;
+    }
+  }
+
+  Future<bool> setLongTapTutorialCompleted() async {
+    var prefs = await _prefs;
+    return await prefs.setBool('LongTapTutorialCompleted', true);
+  }
+
   Future<bool> putLatestHomeViewNum(int latestHomeView) async {
     try {
       var prefs = await _prefs;

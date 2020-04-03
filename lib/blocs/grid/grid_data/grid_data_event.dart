@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
@@ -17,8 +18,9 @@ abstract class GridDataEvent {
 
 class LoadGridDataEvent extends GridDataEvent {
   final String searchString;
+  final AdvancedSearchParams advancedSearchParams;
 
-  LoadGridDataEvent([this.searchString]);
+  LoadGridDataEvent({this.searchString, this.advancedSearchParams});
 
   @override
   String toString() => 'LoadGridDataEvent';
@@ -97,6 +99,14 @@ class LoadGridDataEvent extends GridDataEvent {
             _gridData = await _gridDataRepository.getSequences(1);
             hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           }
+          break;
+        case GridViewType.advancedSearch:
+          var searchResult = await _gridDataRepository.makeBookList(
+            1,
+            advancedSearchParams: advancedSearchParams,
+          );
+          _gridData = searchResult;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         default:
       }
@@ -210,8 +220,9 @@ class SearchGridDataEvent extends GridDataEvent {
 
 class UploadMoreGridDataEvent extends GridDataEvent {
   final int pageNumber;
+  final AdvancedSearchParams advancedSearchParams;
 
-  UploadMoreGridDataEvent(this.pageNumber);
+  UploadMoreGridDataEvent(this.pageNumber, [this.advancedSearchParams]);
 
   @override
   String toString() => 'UploadMoreGridDataEvent';
@@ -270,8 +281,8 @@ class UploadMoreGridDataEvent extends GridDataEvent {
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         case GridViewType.suquence:
-          var sequenceInfo =
-              await _gridDataRepository.getSequence(bloc.sequenceId, pageNumber);
+          var sequenceInfo = await _gridDataRepository.getSequence(
+              bloc.sequenceId, pageNumber);
           _gridData = sequenceInfo.books;
           sequenceTitle = sequenceInfo.title;
           hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
@@ -289,6 +300,14 @@ class UploadMoreGridDataEvent extends GridDataEvent {
             _gridData = await _gridDataRepository.getSequences(pageNumber);
             hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           }
+          break;
+        case GridViewType.advancedSearch:
+          var searchResult = await _gridDataRepository.makeBookList(
+            pageNumber,
+            advancedSearchParams: advancedSearchParams,
+          );
+          _gridData = searchResult;
+          hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
           break;
         default:
       }

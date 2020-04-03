@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
-import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
@@ -88,7 +87,7 @@ class GridDataRepository {
     bool isSequenceSearch = false,
   }) async {
     Map<String, String> queryParams = {
-      'page': (page + 1).toString(),
+      'page': (page - 1).toString(),
       'ask': searchQuery,
     };
     if (isAuthorSearch) {

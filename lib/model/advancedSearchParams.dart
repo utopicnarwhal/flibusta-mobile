@@ -22,5 +22,6 @@ class AdvancedSearchParams {
     this.issueYearMin,
     this.issueYearMax,
     this.format,
-    this.language});
+    this.language,
+  });
 }

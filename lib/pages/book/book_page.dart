@@ -3,14 +3,21 @@ import 'dart:io';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
+import 'package:flibusta/ds_controls/ui/show_modal_bottom_sheet.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
+import 'package:flibusta/pages/advanced_search/advanced_search.dart';
+import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/components/book_app_bar.dart';
+import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/services/transport/book_service.dart';
+import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/components/loading_indicator.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BookPage extends StatefulWidget {
@@ -56,6 +63,12 @@ class BookPageState extends State<BookPage> {
           });
         }
       });
+      if (bookInfo.coverImgSrc == null) {
+        setState(() {
+          _getBookCoverImageError = DsError(userMessage: 'Нет обложки');
+        });
+        return;
+      }
       BookService.getBookCoverImage(bookInfo.coverImgSrc).then((coverImgBytes) {
         if (!mounted) return;
         setState(() {
@@ -125,6 +138,36 @@ class BookPageState extends State<BookPage> {
               ),
               SliverList(
                 delegate: SliverChildListDelegate([
+                  Material(
+                    type: MaterialType.card,
+                    borderRadius: BorderRadius.zero,
+                    color: Colors.red.withOpacity(0.6),
+                    child: ListTile(
+                      dense: true,
+                      leading: Icon(
+                        FontAwesomeIcons.copyright,
+                        color: Colors.white,
+                      ),
+                      title: Text(
+                        'У меня есть права на это произведение и я хочу убрать её из библиотеки.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 0,
+                        horizontal: 16,
+                      ),
+                      onTap: () {
+                        DialogUtils.simpleAlert(
+                          context,
+                          'Права на произведение',
+                          content: Text(
+                            'Напишите администратору сайта "flibusta.is" по адресу lib.contact.email@gmail.com',
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Divider(),
                   ListTile(
                     title: Text(_bookInfo.title ?? ''),
                     subtitle: Text('Название произведения'),
@@ -133,6 +176,42 @@ class BookPageState extends State<BookPage> {
                   ListTile(
                     title: Text(_bookInfo.authors?.toString() ?? ''),
                     subtitle: Text('Автор(-ы)'),
+                    onTap: () async {
+                      if (_bookInfo.authors.isEmpty) {
+                        return;
+                      }
+                      Map<int, String> choosedAuthor;
+                      if (_bookInfo.authors.list.length == 1) {
+                        choosedAuthor = _bookInfo.authors.list.first;
+                      } else {
+                        choosedAuthor =
+                            await showDsModalBottomSheet<Map<int, String>>(
+                          context: context,
+                          title: 'Искать книги автора:',
+                          builder: (context) {
+                            return ListView(
+                              physics: kBouncingAlwaysScrollableScrollPhysics,
+                              addSemanticIndexes: false,
+                              children: _bookInfo.authors.list.map((author) {
+                                return ListTile(
+                                  title: Text(author.values.first),
+                                  onTap: () {
+                                    Navigator.of(context).pop(author);
+                                  },
+                                );
+                              }).toList(),
+                            );
+                          },
+                        );
+                      }
+                      if (choosedAuthor == null) {
+                        return;
+                      }
+                      Navigator.of(context).pushNamed(
+                        AuthorPage.routeName,
+                        arguments: choosedAuthor.keys.first,
+                      );
+                    },
                   ),
                   if (_bookInfo.translators?.isNotEmpty == true) ...[
                     Divider(indent: 16),
@@ -159,6 +238,15 @@ class BookPageState extends State<BookPage> {
                         _bookInfo.sequenceTitle,
                       ),
                       subtitle: Text('Серия произведений'),
+                      onTap: () async {
+                        if (_bookInfo.sequenceId == null) {
+                          return;
+                        }
+                        Navigator.of(context).pushNamed(
+                          SequencePage.routeName,
+                          arguments: _bookInfo.sequenceId,
+                        );
+                      },
                     ),
                   ],
                   if (_bookInfo.addedToLibraryDate?.isNotEmpty == true) ...[

@@ -1,6 +1,5 @@
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +10,6 @@ import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
-import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/services/local_storage.dart';
@@ -142,7 +140,7 @@ class _SequencePageState extends State<SequencePage> {
                       return genre.values?.first;
                     })?.toList();
                     var score =
-                        (gridDataState.gridData[index] as BookCard)?.score;
+                        (gridDataState.gridData[index] as BookCard)?.fileScore;
 
                     return Material(
                       type: MaterialType.card,

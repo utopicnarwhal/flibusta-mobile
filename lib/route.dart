@@ -40,7 +40,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         case SequencePage.routeName:
           return SequencePage(sequenceId: settings.arguments);
         case AdvancedSearchPage.routeName:
-          return AdvancedSearchPage();
+          return AdvancedSearchPage(advancedSearchParams: settings.arguments);
         case SequencePage.routeName:
           return SequencePage(sequenceId: settings.arguments);
         default:

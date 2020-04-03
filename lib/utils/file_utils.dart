@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
@@ -32,8 +33,9 @@ class FileUtils {
         return false;
       }
 
-      var storageAccess = await PermissionsUtils.storageAccess(
-        context: scaffoldKey.currentContext,
+      var storageAccess = await PermissionsUtils.requestAccess(
+        scaffoldKey.currentContext,
+        PermissionGroup.storage,
       );
 
       if (storageAccess != true) {

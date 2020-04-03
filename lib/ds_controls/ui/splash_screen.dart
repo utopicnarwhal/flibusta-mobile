@@ -17,6 +17,7 @@ const _filesToWarmup = [
   'assets/animations/like.flr',
   'assets/animations/roskomnadzor.flr',
   'assets/animations/books_placeholder.flr',
+  'assets/animations/long_tap.flr',
 ];
 
 class SplashScreen extends StatefulWidget {

@@ -1,12 +1,15 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:launch_review/launch_review.dart';
+import 'package:share/share.dart';
 
 class ProfileView extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -51,10 +54,8 @@ class ProfileView extends StatelessWidget {
                                   .display1
                                   .copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .body1
-                                        .color,
+                                    color:
+                                        Theme.of(context).textTheme.body1.color,
                                   ),
                             ),
                           ),
@@ -107,6 +108,41 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        ListFadeInSlideStagger(
+          index: 0,
+          child: Card(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(kCardBorderRadius),
+              child: Banner(
+                location: BannerLocation.topStart,
+                message: 'В работе',
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 18,
+                  ),
+                  trailing: CircleAvatar(
+                    radius: 30,
+                    child: Icon(
+                      EvaIcons.personOutline,
+                      size: 34,
+                    ),
+                  ),
+                  title: Text(
+                    'Имя пользователя',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  onTap: () {
+                    // Navigator.of(context).pushNamed(ProfilePage.routeName);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
         // BlocBuilder(
         //   bloc: ProfileDataBloc(),
         //   builder: (context, profileDataState) {
@@ -160,7 +196,7 @@ class ProfileScreen extends StatelessWidget {
         //     );
         //   },
         // ),
-        // SizedBox(height: 16),
+        SizedBox(height: 16),
         ListFadeInSlideStagger(
           index: 1,
           child: Card(
@@ -185,8 +221,18 @@ class ProfileScreen extends StatelessWidget {
                   trailing: kIconArrowForward,
                   onTap: () {
                     LaunchReview.launch(
-                      androidAppId: "ru.utopicnarwhal.flibusta",
+                      androidAppId: "ru.utopicnarwhal.flibustabrowser",
                     );
+                  },
+                ),
+                Divider(indent: 72),
+                ListTile(
+                  leading: Icon(FontAwesomeIcons.shareSquare, size: 26.0),
+                  title: Text('Поделиться ссылкой на приложение'),
+                  trailing: kIconArrowForward,
+                  onTap: () {
+                    Share.share(
+                        'https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser');
                   },
                 ),
                 Divider(indent: 72),

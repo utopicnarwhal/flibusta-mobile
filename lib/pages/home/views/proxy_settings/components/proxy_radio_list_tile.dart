@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flibusta/model/connectionCheckResult.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,23 +36,25 @@ class ProxyRadioListTile extends StatelessWidget {
       },
       child: RadioListTile(
         title: Text(_title),
-        subtitle: FutureBuilder(
+        subtitle: FutureBuilder<ConnectionCheckResult>(
           future: ProxyHttpClient()
               .connectionCheck(_value, cancelToken: _cancelToken),
-          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-            var subtitleText = "";
+          builder: (context, connectionCheckSnapshot) {
+            var subtitleText = '';
             var subtitleColor;
-            if (snapshot.data != null &&
-                snapshot.connectionState != ConnectionState.waiting) {
-              if (snapshot.data >= 0) {
-                subtitleText = "доступно (пинг: ${snapshot.data.toString()}мс)";
+            if (connectionCheckSnapshot.data != null &&
+                connectionCheckSnapshot.connectionState !=
+                    ConnectionState.waiting) {
+              if (connectionCheckSnapshot.data.ping >= 0) {
+                subtitleText =
+                    'Доступно (пинг: ${connectionCheckSnapshot.data.ping.toString()}мс)';
                 subtitleColor = Colors.green;
               } else {
-                subtitleText = "ошибка";
+                subtitleText = 'Ошибка. ${connectionCheckSnapshot.data.error}';
                 subtitleColor = Colors.red;
               }
             } else {
-              subtitleText = "проверка...";
+              subtitleText = 'Проверка...';
               subtitleColor = Colors.grey[400];
             }
             return Text(subtitleText, style: TextStyle(color: subtitleColor));

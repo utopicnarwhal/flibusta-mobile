@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 class NativeMethods {
-  static const _platform = const MethodChannel('ru.utopicnarwhal.flibusta/native_methods_channel');
+  static const _platform = const MethodChannel('ru.utopicnarwhal.flibustabrowser/native_methods_channel');
 
   static Future<void> rescanFolder(String dir) async {
     if (!Platform.isAndroid) {

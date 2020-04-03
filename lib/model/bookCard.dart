@@ -13,7 +13,7 @@ class BookCard extends GridData {
   String sequenceTitle;
   String title;
   String size;
-  int score;
+  int fileScore;
   DownloadFormats downloadFormats;
   Authors authors;
   Translators translators;
@@ -39,12 +39,29 @@ class BookCard extends GridData {
     this.authors,
     this.translators,
     this.localPath,
-    this.score,
+    this.fileScore,
   }) : assert(id != null);
 
   factory BookCard.fromJson(Map<String, dynamic> json) =>
       _$BookCardFromJson(json);
   Map<String, dynamic> toJson() => _$BookCardToJson(this);
+}
+
+String fileScoreToString(int fileScore) {
+  switch (fileScore) {
+    case 1:
+      return 'Файл на 1';
+    case 2:
+      return 'Файл на 2';
+    case 3:
+      return 'Файл на 3';
+    case 4:
+      return 'Файл на 4';
+    case 5:
+      return 'Файл на 5';
+    default:
+      return 'Файл не оценен';
+  }
 }
 
 @JsonSerializable()
@@ -160,7 +177,7 @@ class Translators {
     });
     return result;
   }
-  
+
   factory Translators.fromJson(Map<String, dynamic> json) =>
       _$TranslatorsFromJson(json);
   Map<String, dynamic> toJson() => _$TranslatorsToJson(this);
@@ -194,8 +211,7 @@ class Genres {
     });
     return result.replaceAll(RegExp(r'(\[|\])'), "");
   }
-  
-  factory Genres.fromJson(Map<String, dynamic> json) =>
-      _$GenresFromJson(json);
+
+  factory Genres.fromJson(Map<String, dynamic> json) => _$GenresFromJson(json);
   Map<String, dynamic> toJson() => _$GenresToJson(this);
 }

@@ -140,7 +140,7 @@ class GridTilesBuilder extends StatelessWidget {
                 (gridData[index] as BookCard)?.genres?.list?.map((genre) {
               return genre.values?.first;
             })?.toList();
-            score = (gridData[index] as BookCard)?.score;
+            score = (gridData[index] as BookCard)?.fileScore;
           }
 
           return GridDataTile(
@@ -192,13 +192,17 @@ class GridTilesBuilder extends StatelessWidget {
                     },
                   )
                 : null,
-            onTap: () {
+            onTap: () async {
               if (gridData[index] is BookCard) {
                 LocalStorage().addToLastOpenBooks(gridData[index]);
-                Navigator.of(context).pushNamed(
+                await Navigator.of(context).pushNamed(
                   BookPage.routeName,
                   arguments: gridData[index].id,
                 );
+                try {
+                  BlocProvider.of<GridDataBloc>(context)
+                      .searchByString(searchTextController?.text);
+                } on FlutterError catch (_) {}
                 return;
               }
               if (gridData[index] is AuthorCard) {
@@ -252,6 +256,43 @@ class GridTilesBuilder extends StatelessWidget {
             },
           );
         },
+      );
+
+      gridListView = Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          gridListView,
+          FutureBuilder<bool>(
+            future: LocalStorage().getLongTapTutorialCompleted(),
+            builder: (context, longTapTutorialCompletedSnapshot) {
+              if (longTapTutorialCompletedSnapshot?.data == false) {
+                return Padding(
+                  padding: EdgeInsets.only(top: 40),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          spreadRadius: -2,
+                          blurRadius: 6,
+                          color: Theme.of(context).cardColor,
+                        ),
+                      ],
+                    ),
+                    height: 70,
+                    width: 70,
+                    child: FlareActor(
+                      'assets/animations/long_tap.flr',
+                      animation: 'Animations',
+                      color: Colors.black,
+                    ),
+                  ),
+                );
+              }
+              return SizedBox();
+            },
+          ),
+        ],
       );
     } else {
       gridListView = ShimmerGridTileBuilder(

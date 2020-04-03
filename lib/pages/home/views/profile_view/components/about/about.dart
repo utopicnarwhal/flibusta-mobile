@@ -121,7 +121,7 @@ class AboutPage extends StatelessWidget {
                     ),
                     Divider(indent: 70),
                     ListTile(
-                      leading: Icon(FontAwesomeIcons.piggyBank, size: 30.0),
+                      leading: Icon(FontAwesomeIcons.donate, size: 30.0),
                       title: Text('Поддержать разработчика'),
                       trailing: kIconArrowForward,
                       onTap: () {

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flibusta/route.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 
 import 'utils/file_utils.dart';
@@ -42,7 +43,10 @@ main() async {
     var externalStorageDownloadDirectories = await FileUtils.getStorageDir();
     await LocalStorage().setBooksDirectory(externalStorageDownloadDirectories);
   }));
-  preparationFutures.add(PermissionsUtils.storageAccess());
+  preparationFutures.add(PermissionsUtils.requestAccess(
+    null,
+    PermissionGroup.storage,
+  ));
 
   await Future.wait(preparationFutures);
 

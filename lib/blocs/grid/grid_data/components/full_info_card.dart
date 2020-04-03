@@ -43,6 +43,7 @@ class _FullInfoCardState extends State<FullInfoCard> {
         }
       });
     }
+    LocalStorage().setLongTapTutorialCompleted();
   }
 
   @override
@@ -57,8 +58,10 @@ class _FullInfoCardState extends State<FullInfoCard> {
             margin: EdgeInsets.zero,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(kCardBorderRadius),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: ListView(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                padding: EdgeInsets.zero,
                 children: [
                   if (widget.data is BookCard)
                     Builder(
@@ -90,6 +93,11 @@ class _FullInfoCardState extends State<FullInfoCard> {
                             rowName: 'Размер книги',
                             value: widget.data.size,
                           ),
+                          if ((widget.data as BookCard).fileScore != null)
+                            GridCardRow(
+                              rowName: 'Оценка файла',
+                              value: fileScoreToString(widget.data.fileScore),
+                            ),
                           StreamBuilder<double>(
                             stream: _downloadProgressController,
                             builder: (context, downloadProgressSnapshot) {
