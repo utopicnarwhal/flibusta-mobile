@@ -35,7 +35,7 @@ class FileUtils {
 
       var storageAccess = await PermissionsUtils.requestAccess(
         scaffoldKey.currentContext,
-        PermissionGroup.storage,
+        Permission.storage,
       );
 
       if (storageAccess != true) {

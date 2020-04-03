@@ -1,5 +1,3 @@
-import 'package:flare_flutter/flare_actor.dart';
-import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 
 class FirstGridTile extends StatelessWidget {

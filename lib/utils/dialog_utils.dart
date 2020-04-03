@@ -167,7 +167,7 @@ class DialogUtils {
   //   var fileExplorerFunc = (BuildContext context) async {
   //     var storageAccess = await PermissionsUtils.requestAccess(
   //       context,
-  //       PermissionGroup.storage,
+  //       Permission.storage,
   //     );
 
   //     if (storageAccess != true) {
@@ -194,12 +194,12 @@ class DialogUtils {
   //     if (Platform.isIOS) {
   //       photosAccess = await PermissionsUtils.requestAccess(
   //         context,
-  //         PermissionGroup.photos,
+  //         Permission.photos,
   //       );
   //     } else {
   //       photosAccess = await PermissionsUtils.requestAccess(
   //         context,
-  //         PermissionGroup.storage,
+  //         Permission.storage,
   //       );
   //     }
 
@@ -223,7 +223,7 @@ class DialogUtils {
   //   var takeAPhotoFunc = (BuildContext context) async {
   //     var cameraAccess = await PermissionsUtils.requestAccess(
   //       context,
-  //       PermissionGroup.camera,
+  //       Permission.camera,
   //     );
 
   //     if (cameraAccess != true) {

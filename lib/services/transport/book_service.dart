@@ -51,7 +51,7 @@ class BookService {
   ) async {
     await PermissionsUtils.requestAccess(
       context,
-      PermissionGroup.storage,
+      Permission.storage,
     );
 
     Map<String, String> downloadFormat;

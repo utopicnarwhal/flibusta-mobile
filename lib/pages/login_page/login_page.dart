@@ -262,7 +262,7 @@
 
 //   Future<void> _onAuthSuccess(BuildContext context) async {
 //     // if (!mounted) return;
-//     // await PermissionsUtils.requestAccess(context, PermissionGroup.notification);
+//     // await PermissionsUtils.requestAccess(context, Permission.notification);
 
 //     if (!mounted) return;
 //     Navigator.of(context).pushReplacementNamed(

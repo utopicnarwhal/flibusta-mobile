@@ -45,7 +45,7 @@ main() async {
   }));
   preparationFutures.add(PermissionsUtils.requestAccess(
     null,
-    PermissionGroup.storage,
+    Permission.storage,
   ));
 
   await Future.wait(preparationFutures);

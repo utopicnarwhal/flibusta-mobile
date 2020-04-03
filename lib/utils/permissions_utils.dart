@@ -19,10 +19,9 @@ class _MessageMap {
 }
 
 class PermissionsUtils {
-  static _MessageMap _mapPermissionGroupToMessage(
-      PermissionGroup permissionGroup) {
-    switch (permissionGroup) {
-      case PermissionGroup.camera:
+  static _MessageMap _mapPermissionToMessage(Permission permission) {
+    switch (permission) {
+      case Permission.camera:
         return _MessageMap(
           disabled:
               'На вашем устройстве отключена возможность работы с камерой',
@@ -31,7 +30,7 @@ class PermissionsUtils {
               'Перейти в настройки, чтобы предоставить доступ к камере?',
           fail: 'Доступ к камере не предоставлен',
         );
-      case PermissionGroup.storage:
+      case Permission.storage:
         return _MessageMap(
           disabled:
               'На вашем устройстве отключена возможность работы с памятью',
@@ -40,7 +39,7 @@ class PermissionsUtils {
               'Перейти в настройки, чтобы предоставить доступ к памяти?',
           fail: 'Доступ к памяти не предоставлен',
         );
-      case PermissionGroup.photos:
+      case Permission.photos:
         return _MessageMap(
           disabled:
               'На вашем устройстве отключена возможность работы с галереей',
@@ -49,7 +48,7 @@ class PermissionsUtils {
               'Перейти в настройки, чтобы предоставить доступ к галерее?',
           fail: 'Доступ к галарее не предоставлен',
         );
-      case PermissionGroup.notification:
+      case Permission.notification:
         return _MessageMap(
           disabled:
               'На вашем устройстве отключена возможность отправки уведомлений',
@@ -64,11 +63,10 @@ class PermissionsUtils {
   }
 
   static Future<bool> requestAccess(
-      BuildContext context, PermissionGroup permissionGroup) async {
-    var permissionStatus =
-        await PermissionHandler().checkPermissionStatus(permissionGroup);
+      BuildContext context, Permission permission) async {
+    var permissionStatus = await permission.request();
 
-    final messageMap = _mapPermissionGroupToMessage(permissionGroup);
+    final messageMap = _mapPermissionToMessage(permission);
     if (messageMap.isAnyEmpty) {
       print('Нужно указать сообщения для данного разрешения');
       return false;
@@ -85,12 +83,11 @@ class PermissionsUtils {
         return true;
         break;
       case PermissionStatus.denied:
-      case PermissionStatus.neverAskAgain:
-      case PermissionStatus.unknown:
-        var permissionNames =
-            await PermissionHandler().requestPermissions([permissionGroup]);
+      case PermissionStatus.permanentlyDenied:
+      case PermissionStatus.undetermined:
+        var permissionNames = await permission.request();
 
-        if (permissionNames[permissionGroup] == PermissionStatus.granted) {
+        if (permissionNames == PermissionStatus.granted) {
           return true;
         }
 
@@ -118,7 +115,7 @@ class PermissionsUtils {
           );
         }
         if (result == true) {
-          await PermissionHandler().openAppSettings();
+          await openAppSettings();
           return false;
         }
 

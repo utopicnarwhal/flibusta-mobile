@@ -10,11 +10,13 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
+import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
+import 'package:flibusta/pages/advanced_search/advanced_search.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
@@ -221,6 +223,12 @@ class GridTilesBuilder extends StatelessWidget {
               }
               if (gridData[index] is Genre) {
                 print(gridData[index]);
+                Navigator.of(context).pushNamed(
+                  AdvancedSearchPage.routeName,
+                  arguments: AdvancedSearchParams(
+                    genres: (gridData[index] as Genre).code,
+                  ),
+                );
                 return;
               }
             },
@@ -239,20 +247,6 @@ class GridTilesBuilder extends StatelessWidget {
                 );
                 return;
               }
-              if (gridData[index] is AuthorCard) {
-                // Navigator.of(context).pushNamed(
-                //   AuthorPage.routeName,
-                //   arguments: gridData[index].id,
-                // );
-                return;
-              }
-              if (gridData[index] is SequenceCard) {
-                // Navigator.of(context).pushNamed(
-                //   SequencePage.routeName,
-                //   arguments: gridData[index].id,
-                // );
-                return;
-              }
             },
           );
         },
@@ -262,36 +256,62 @@ class GridTilesBuilder extends StatelessWidget {
         alignment: Alignment.topCenter,
         children: [
           gridListView,
-          FutureBuilder<bool>(
-            future: LocalStorage().getLongTapTutorialCompleted(),
-            builder: (context, longTapTutorialCompletedSnapshot) {
-              if (longTapTutorialCompletedSnapshot?.data == false) {
-                return Padding(
-                  padding: EdgeInsets.only(top: 40),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          spreadRadius: -2,
-                          blurRadius: 6,
-                          color: Theme.of(context).cardColor,
+          if (gridData[0] is BookCard)
+            FutureBuilder<bool>(
+              future: LocalStorage().getLongTapTutorialCompleted(),
+              builder: (context, longTapTutorialCompletedSnapshot) {
+                if (longTapTutorialCompletedSnapshot?.data == false) {
+                  return Padding(
+                    padding: EdgeInsets.only(top: 40),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                spreadRadius: -2,
+                                blurRadius: 6,
+                                color: Theme.of(context).cardColor,
+                              ),
+                            ],
+                          ),
+                          height: 70,
+                          width: 70,
+                          child: FlareActor(
+                            'assets/animations/long_tap.flr',
+                            animation: 'Animations',
+                            color: Colors.black,
+                          ),
+                        ),
+                        Material(
+                          type: MaterialType.card,
+                          borderRadius: BorderRadius.circular(5),
+                          elevation: 2,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                color: Theme.of(context).dividerColor,
+                              ),
+                              color: Theme.of(context).cardColor,
+                            ),
+                            padding: EdgeInsets.all(4),
+                            child: Text(
+                              'Зажмите, чтобы\n узнать больше',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    height: 70,
-                    width: 70,
-                    child: FlareActor(
-                      'assets/animations/long_tap.flr',
-                      animation: 'Animations',
-                      color: Colors.black,
-                    ),
-                  ),
-                );
-              }
-              return SizedBox();
-            },
-          ),
+                  );
+                }
+                return SizedBox();
+              },
+            ),
         ],
       );
     } else {

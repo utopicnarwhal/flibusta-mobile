@@ -4,10 +4,8 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/show_modal_bottom_sheet.dart';
-import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
-import 'package:flibusta/pages/advanced_search/advanced_search.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/components/book_app_bar.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
@@ -101,6 +99,7 @@ class BookPageState extends State<BookPage> {
           child: Text(
             _getBookInfoError.toString(),
             style: Theme.of(context).textTheme.headline,
+            textAlign: TextAlign.center,
           ),
         ),
       );
@@ -122,6 +121,7 @@ class BookPageState extends State<BookPage> {
               child: Text(
                 _getBookCoverImageError.toString(),
                 style: Theme.of(context).textTheme.headline,
+                textAlign: TextAlign.center,
               ),
             );
           } else if (_coverImage == null) {
