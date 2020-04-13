@@ -19,6 +19,19 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final scaffoldKey = new GlobalKey<ScaffoldState>();
+  TextEditingController hostController;
+
+  @override
+  void initState() {
+    super.initState();
+    hostController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    hostController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +140,68 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             onTap:
                 hasData ? () => _openSaveBooksDirectoryPicker(context) : null,
+          );
+        },
+      ),
+      Divider(indent: 72),
+      FutureBuilder<String>(
+        future: LocalStorage().getHostAddress(),
+        builder: (context, hostAddressSnapshot) {
+          return ListTile(
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(FontAwesomeIcons.server, size: 26.0),
+              ],
+            ),
+            title: Text('Адрес сайта'),
+            subtitle: Text(
+              hostAddressSnapshot.data ?? '',
+            ),
+            trailing: kIconArrowForward,
+            onTap: () async {
+              var result = await showDialog<String>(
+                context: context,
+                builder: (context) {
+                  hostController.text = hostAddressSnapshot.data ?? '';
+
+                  return SimpleDialog(
+                    title: Text('Адрес сайта'),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: TextField(
+                          controller: hostController,
+                        ),
+                      ),
+                      ButtonBar(
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Отмена'),
+                          ),
+                          FlatButton(
+                            child: Text('Применить'),
+                            onPressed: () {
+                              Navigator.of(context).pop(hostController.text);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (result == null || result == hostAddressSnapshot.data) {
+                return;
+              }
+              await LocalStorage().setHostAddress(result);
+              setState(() {});
+            },
           );
         },
       ),

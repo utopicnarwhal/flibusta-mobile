@@ -1,8 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
-import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
@@ -136,9 +134,6 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final actualProxy = ProxyHttpClient().getActualProxy();
-    final myProxy = 'flibustauser:ilovebooks@35.228.73.110:3128';
-
     return Column(
       children: [
         Text(
@@ -149,24 +144,6 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
           textAlign: TextAlign.justify,
         ),
         SizedBox(height: 20),
-        if (actualProxy != myProxy && !loading)
-          Text(
-            'Если необходимо, можно включить прокси создателя приложения',
-            textAlign: TextAlign.center,
-          ),
-        if (actualProxy != myProxy && !loading)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: RaisedButton(
-              child: Text('Включить прокси'),
-              onPressed: () {
-                setState(() {
-                  ProxyHttpClient().setProxy(myProxy);
-                  LocalStorage().setActualProxy(myProxy);
-                });
-              },
-            ),
-          ),
         if (!loading)
           TextField(
             controller: _urlController,
@@ -189,7 +166,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
   }
 
   _onSubmit() async {
-    final value = _urlController.text;
+    final value = _urlController.text.replaceAll(' ', '');
 
     if (value != null && !await canLaunch('https://$value')) {
       ToastManager().showToast('Извините, но этот путь нельзя открыть');
@@ -201,31 +178,12 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
       loading = true;
     });
 
-    Response response;
-    try {
-      response = await ProxyHttpClient().getDio().getUri(Uri.https(value, '/'));
-    } on DsError catch (dsError) {
-      ToastManager().showToast(
-        'Произошла ошибка, при открытии сайта, возможно надо включить прокси. ${dsError.userMessage}',
-      );
-      setState(() {
-        loading = false;
-      });
+    if (value == 'flibusta.is') {
+      ProxyHttpClient().setHostAddress(value);
+      LocalStorage().setHostAddress(value);
+      LocalStorage().setIntroCompleted();
+      Navigator.of(context).pushReplacementNamed(HomePage.routeName);
       return;
-    }
-
-    if (response.data is String) {
-      final isF = (response.data as String).contains(
-        'http://zmw2cyw2vj7f6obx3msmdvdepdhnw2ctc4okza2zjxlukkdfckhq.b32.i2p',
-      );
-      if (isF) {
-        if (!mounted) return;
-        ProxyHttpClient().setHostAddress(value);
-        LocalStorage().setHostAddress(value);
-        LocalStorage().setIntroCompleted();
-        Navigator.of(context).pushReplacementNamed(HomePage.routeName);
-        return;
-      }
     }
     launch(
       'https://$value',

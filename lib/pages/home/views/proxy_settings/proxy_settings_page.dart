@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/get_new_proxy_tile.dart';
@@ -84,111 +85,123 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
               ListFadeInSlideStagger(
                 index: 1,
                 child: Card(
-                  child: StreamBuilder(
-                    stream: _proxyListBloc.actualProxyStream,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<String> actualProxySnapshot) {
-                      if (!actualProxySnapshot.hasData ||
-                          !(actualProxySnapshot.data is String)) {
-                        return Container();
-                      }
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(kCardBorderRadius),
+                    child: Material(
+                      type: MaterialType.card,
+                      borderRadius: BorderRadius.circular(kCardBorderRadius),
+                      child: StreamBuilder(
+                        stream: _proxyListBloc.actualProxyStream,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> actualProxySnapshot) {
+                          if (!actualProxySnapshot.hasData ||
+                              !(actualProxySnapshot.data is String)) {
+                            return Container();
+                          }
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ProxyRadioListTile(
-                            title: 'Без прокси',
-                            value: '',
-                            groupValue: actualProxySnapshot.data,
-                            onChanged: _proxyListBloc.setActualProxy,
-                            cancelToken: _proxyListBloc.cancelToken,
-                          ),
-                          Divider(),
-                          ProxyRadioListTile(
-                            title: 'Прокси создателя приложения',
-                            value: 'flibustauser:ilovebooks@35.228.73.110:3128',
-                            groupValue: actualProxySnapshot.data,
-                            onChanged: _proxyListBloc.setActualProxy,
-                            cancelToken: _proxyListBloc.cancelToken,
-                          ),
-                          Divider(),
-                          StreamBuilder(
-                            stream: _proxyListBloc.proxyListStream,
-                            builder: (context,
-                                AsyncSnapshot<List<String>> snapshot) {
-                              if (snapshot.data == null ||
-                                  snapshot.data.isEmpty) {
-                                return Container();
-                              }
-
-                              return Column(
-                                children: ListTile.divideTiles(
-                                  context: context,
-                                  tiles: [
-                                    for (var proxyElement in snapshot.data)
-                                      ProxyRadioListTile(
-                                        title: proxyElement,
-                                        value: proxyElement,
-                                        groupValue: actualProxySnapshot.data,
-                                        onChanged:
-                                            _proxyListBloc.setActualProxy,
-                                        onDelete:
-                                            _proxyListBloc.removeFromProxyList,
-                                        cancelToken: _proxyListBloc.cancelToken,
-                                      ),
-                                  ],
-                                ).toList()
-                                  ..add(Divider()),
-                              );
-                            },
-                          ),
-                          GetNewProxyTile(
-                            callback: _proxyListBloc.addToProxyList,
-                          ),
-                          Divider(),
-                          ListTile(
-                            enabled: true,
-                            leading: Padding(
-                              padding: EdgeInsets.only(left: 8.0),
-                              child: Icon(
-                                Icons.add,
-                                color: Theme.of(context).accentColor,
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              ProxyRadioListTile(
+                                title: 'Без прокси',
+                                value: '',
+                                groupValue: actualProxySnapshot.data,
+                                onChanged: _proxyListBloc.setActualProxy,
+                                cancelToken: _proxyListBloc.cancelToken,
                               ),
-                            ),
-                            title: Text('Добавить свой прокси'),
-                            onTap: () async {
-                              var userProxy = await showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  final TextEditingController
-                                      proxyHostController =
-                                      TextEditingController();
-                                  return SimpleDialog(
-                                    title: Text('Добавить свой прокси'),
-                                    children: <Widget>[
-                                      TextField(
-                                        controller: proxyHostController,
-                                        autofocus: true,
-                                        onEditingComplete: () {
-                                          Navigator.pop(
-                                            context,
-                                            proxyHostController.text,
-                                          );
-                                        },
-                                      )
-                                    ],
+                              Divider(),
+                              ProxyRadioListTile(
+                                title:
+                                    'Прокси создателя приложения (не работает на мобильном интернете Yota)',
+                                value:
+                                    'flibustauser:ilovebooks@35.228.73.110:3128',
+                                groupValue: actualProxySnapshot.data,
+                                onChanged: _proxyListBloc.setActualProxy,
+                                cancelToken: _proxyListBloc.cancelToken,
+                              ),
+                              Divider(),
+                              StreamBuilder(
+                                stream: _proxyListBloc.proxyListStream,
+                                builder: (context,
+                                    AsyncSnapshot<List<String>> snapshot) {
+                                  if (snapshot.data == null ||
+                                      snapshot.data.isEmpty) {
+                                    return Container();
+                                  }
+
+                                  return Column(
+                                    children: ListTile.divideTiles(
+                                      context: context,
+                                      tiles: [
+                                        for (var proxyElement in snapshot.data)
+                                          ProxyRadioListTile(
+                                            title: proxyElement,
+                                            value: proxyElement,
+                                            groupValue:
+                                                actualProxySnapshot.data,
+                                            onChanged:
+                                                _proxyListBloc.setActualProxy,
+                                            onDelete: _proxyListBloc
+                                                .removeFromProxyList,
+                                            cancelToken:
+                                                _proxyListBloc.cancelToken,
+                                          ),
+                                      ],
+                                    ).toList()
+                                      ..add(Divider()),
                                   );
                                 },
-                              );
-                              if (userProxy != null && userProxy.isNotEmpty) {
-                                _proxyListBloc.addToProxyList(userProxy);
-                                _proxyListBloc.setActualProxy(userProxy);
-                              }
-                            },
-                          ),
-                        ],
-                      );
-                    },
+                              ),
+                              GetNewProxyTile(
+                                callback: _proxyListBloc.addToProxyList,
+                              ),
+                              Divider(),
+                              ListTile(
+                                enabled: true,
+                                leading: Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Icon(
+                                    Icons.add,
+                                    color: Theme.of(context).accentColor,
+                                  ),
+                                ),
+                                title: Text('Добавить свой прокси'),
+                                onTap: () async {
+                                  var userProxy = await showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      final TextEditingController
+                                          proxyHostController =
+                                          TextEditingController();
+                                      return SimpleDialog(
+                                        title: Text('Добавить свой прокси'),
+                                        children: <Widget>[
+                                          TextField(
+                                            controller: proxyHostController,
+                                            autofocus: true,
+                                            onEditingComplete: () {
+                                              Navigator.pop(
+                                                context,
+                                                proxyHostController.text,
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                  if (userProxy != null &&
+                                      userProxy.isNotEmpty) {
+                                    _proxyListBloc.addToProxyList(userProxy);
+                                    _proxyListBloc.setActualProxy(userProxy);
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),

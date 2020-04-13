@@ -7,7 +7,7 @@ import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
 import 'package:flibusta/constants.dart';
-import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
+import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
@@ -103,12 +103,11 @@ class GridTilesBuilder extends StatelessWidget {
         gridData == null) {
       gridListView = FirstGridTile(
         isFirst: true,
-        child: Center(
-          heightFactor: 7,
-          child: DsOutlineButton(
-            child: Text('Повторить'),
-            onPressed: () =>
-                BlocProvider.of<GridDataBloc>(context)?.fetchGridData(),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 40.0),
+          child: ErrorScreen(
+            errorMessage: gridDataState.message,
+            onTryAgain: BlocProvider.of<GridDataBloc>(context)?.fetchGridData,
           ),
         ),
       );

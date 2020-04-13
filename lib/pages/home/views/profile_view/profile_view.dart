@@ -113,31 +113,35 @@ class ProfileScreen extends StatelessWidget {
           child: Card(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(kCardBorderRadius),
-              child: Banner(
-                location: BannerLocation.topStart,
-                message: 'В работе',
-                child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 18,
-                  ),
-                  trailing: CircleAvatar(
-                    radius: 30,
-                    child: Icon(
-                      EvaIcons.personOutline,
-                      size: 34,
+              child: Material(
+                type: MaterialType.card,
+                borderRadius: BorderRadius.circular(kCardBorderRadius),
+                child: Banner(
+                  location: BannerLocation.topStart,
+                  message: 'В работе',
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 18,
                     ),
-                  ),
-                  title: Text(
-                    'Имя пользователя',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                    trailing: CircleAvatar(
+                      radius: 30,
+                      child: Icon(
+                        EvaIcons.personOutline,
+                        size: 34,
+                      ),
                     ),
+                    title: Text(
+                      'Имя пользователя',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    onTap: () {
+                      // Navigator.of(context).pushNamed(ProfilePage.routeName);
+                    },
                   ),
-                  onTap: () {
-                    // Navigator.of(context).pushNamed(ProfilePage.routeName);
-                  },
                 ),
               ),
             ),
@@ -201,50 +205,57 @@ class ProfileScreen extends StatelessWidget {
           index: 1,
           child: Card(
             margin: EdgeInsets.zero,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading: Icon(EvaIcons.settings2Outline, size: 26.0),
-                  title: Text('Настройки'),
-                  trailing: kIconArrowForward,
-                  onTap: () {
-                    Navigator.of(context).pushNamed(SettingsPage.routeName);
-                  },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(kCardBorderRadius),
+              child: Material(
+                type: MaterialType.card,
+                borderRadius: BorderRadius.circular(kCardBorderRadius),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      leading: Icon(EvaIcons.settings2Outline, size: 26.0),
+                      title: Text('Настройки'),
+                      trailing: kIconArrowForward,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(SettingsPage.routeName);
+                      },
+                    ),
+                    Divider(indent: 72),
+                    ListTile(
+                      leading: Icon(EvaIcons.starOutline, size: 26.0),
+                      title: Text('Оценить приложение'),
+                      trailing: kIconArrowForward,
+                      onTap: () {
+                        LaunchReview.launch(
+                          androidAppId: "ru.utopicnarwhal.flibustabrowser",
+                        );
+                      },
+                    ),
+                    Divider(indent: 72),
+                    ListTile(
+                      leading: Icon(FontAwesomeIcons.shareSquare, size: 26.0),
+                      title: Text('Поделиться ссылкой на приложение'),
+                      trailing: kIconArrowForward,
+                      onTap: () {
+                        Share.share(
+                            'https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser');
+                      },
+                    ),
+                    Divider(indent: 72),
+                    ListTile(
+                      leading: Icon(EvaIcons.infoOutline, size: 26.0),
+                      title: Text('О приложении'),
+                      trailing: kIconArrowForward,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AboutPage.routeName);
+                      },
+                    ),
+                  ],
                 ),
-                Divider(indent: 72),
-                ListTile(
-                  leading: Icon(EvaIcons.starOutline, size: 26.0),
-                  title: Text('Оценить приложение'),
-                  trailing: kIconArrowForward,
-                  onTap: () {
-                    LaunchReview.launch(
-                      androidAppId: "ru.utopicnarwhal.flibustabrowser",
-                    );
-                  },
-                ),
-                Divider(indent: 72),
-                ListTile(
-                  leading: Icon(FontAwesomeIcons.shareSquare, size: 26.0),
-                  title: Text('Поделиться ссылкой на приложение'),
-                  trailing: kIconArrowForward,
-                  onTap: () {
-                    Share.share(
-                        'https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser');
-                  },
-                ),
-                Divider(indent: 72),
-                ListTile(
-                  leading: Icon(EvaIcons.infoOutline, size: 26.0),
-                  title: Text('О приложении'),
-                  trailing: kIconArrowForward,
-                  onTap: () {
-                    Navigator.of(context).pushNamed(AboutPage.routeName);
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ),
