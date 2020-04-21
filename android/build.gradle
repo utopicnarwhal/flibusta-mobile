@@ -4,7 +4,7 @@ buildscript {
         targetSdkVersion    = 29
         appCompatVersion    = '1.1.0'
         kotlinVersion = '1.3.61'
-        gradleVersion = '3.6.1'
+        gradleVersion = '3.5.3'
     }
     repositories {
         google()

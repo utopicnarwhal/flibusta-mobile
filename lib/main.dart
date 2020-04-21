@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flibusta/ds_controls/dynamic_theme_mode.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/local_notification_service.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +17,11 @@ import 'package:utopic_toast/utopic_toast.dart';
 import 'utils/file_utils.dart';
 
 main() async {
+  await initialization();
+  runApp(FlibustaApp());
+}
+
+Future<void> initialization() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   WidgetsBinding.instance.renderView.automaticSystemUiAdjustment = false;
@@ -48,9 +54,14 @@ main() async {
     Permission.storage,
   ));
 
-  await Future.wait(preparationFutures);
+  NotificationService()
+    ..showNotification(
+      notificationId: UniqueKey().hashCode,
+      notificationBody: 'Описание',
+      notificationTitle: 'Новое уведомление',
+    );
 
-  runApp(FlibustaApp());
+  await Future.wait(preparationFutures);
 }
 
 class FlibustaApp extends StatelessWidget {
