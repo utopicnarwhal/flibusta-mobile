@@ -54,12 +54,7 @@ Future<void> initialization() async {
     Permission.storage,
   ));
 
-  NotificationService()
-    ..showNotification(
-      notificationId: UniqueKey().hashCode,
-      notificationBody: 'Описание',
-      notificationTitle: 'Новое уведомление',
-    );
+  NotificationService().init();
 
   await Future.wait(preparationFutures);
 }

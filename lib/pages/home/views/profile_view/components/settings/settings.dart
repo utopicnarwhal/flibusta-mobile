@@ -5,6 +5,7 @@ import 'package:flibusta/components/directory_picker/directory_picker.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/dynamic_theme_mode.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
+import 'package:flibusta/model/enums/sortBooksByEnum.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -246,6 +247,72 @@ class _SettingsPageState extends State<SettingsPage> {
                           groupValue: preferredBookExtSnapshot.data,
                           value: value,
                           title: Text(fileExtension),
+                        );
+                      }).toList(),
+                      ButtonBar(
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Отмена'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+              if (result == null) {
+                return;
+              }
+              if (result == 'Спрашивать меня при скачивании') {
+                result = null;
+              }
+              await LocalStorage().setPreferredBookExt(result);
+              setState(() {});
+            },
+          );
+        },
+      ),
+      Divider(indent: 72),
+      FutureBuilder<SortBooksBy>(
+        future: LocalStorage().getPreferredAuthorBookSort(),
+        builder: (context, preferredSortBooksBySnapshot) {
+          return ListTile(
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(FontAwesomeIcons.fileDownload, size: 26.0),
+              ],
+            ),
+            title: Text('Сортировка книг автора по умолчанию'),
+            subtitle: Text(
+              preferredSortBooksBySnapshot.data ??
+                  'Спрашивать меня при скачивании',
+            ),
+            trailing: kIconArrowForward,
+            onTap: () async {
+              var result = await showDialog(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    title: Text(
+                        'Выберите предпочитаемый формат книги для скачивания'),
+                    children: [
+                      ...SortBooksBy.values.map((sortBooksBy) {
+                        SortBooksBy value;
+                        if (sortBooksBy != null) {
+                          value = sortBooksBy;
+                        }
+                        return RadioListTile<SortBooksBy>(
+                          onChanged: (_) {
+                            Navigator.of(context).pop(sortBooksBy);
+                          },
+                          groupValue: preferredSortBooksBySnapshot.data,
+                          value: value,
+                          title: Text(sortBooksByToString(sortBooksBy)),
                         );
                       }).toList(),
                       ButtonBar(

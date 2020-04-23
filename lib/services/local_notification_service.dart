@@ -2,7 +2,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  NotificationDetails platformChannelSpecifics;
 
   static final NotificationService _notificationServiceSingleton =
       NotificationService._internal();
@@ -13,50 +12,52 @@ class NotificationService {
   NotificationService._internal();
 
   void init() {
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
-    var initializationSettingsIOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(
-      initializationSettingsAndroid,
-      initializationSettingsIOS,
+      AndroidInitializationSettings('app_icon'),
+      IOSInitializationSettings(),
     );
 
-    var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onSelectNotification: onSelectNotification,
-    );
-
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'ru.utopicnarwhal.flibustabrowser',
-      'downloading progress',
-      'displaying download progress',
-    );
-
-    platformChannelSpecifics = NotificationDetails(
-      androidPlatformChannelSpecifics,
-      iOSPlatformChannelSpecifics,
     );
   }
 
   static Future onSelectNotification(String payload) async {}
 
-  Future showNotification({
+  Future showNotificationWithProgress({
     int notificationId,
     String notificationTitle,
     String notificationBody,
-    String payload,
+    double progress,
   }) async {
     if (flutterLocalNotificationsPlugin == null)
       throw Exception('NotificationService is not initialized');
+
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'ru.utopicnarwhal.flibustabrowser',
+      'Прогресс скачивания',
+      'Отображение прогресса скачивания книги',
+      playSound: false,
+      enableVibration: false,
+      autoCancel: false,
+      ongoing: true,
+      showProgress: true,
+      maxProgress: 100,
+      progress: progress.round(),
+    );
+
+    var platformChannelSpecifics = NotificationDetails(
+      androidPlatformChannelSpecifics,
+      iOSPlatformChannelSpecifics,
+    );
 
     await flutterLocalNotificationsPlugin.show(
       notificationId,
       notificationTitle,
       notificationBody,
       platformChannelSpecifics,
-      payload: payload,
     );
   }
 

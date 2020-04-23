@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:flibusta/model/bookCard.dart';
+import 'package:flibusta/model/enums/sortBooksByEnum.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -144,6 +145,35 @@ class LocalStorage {
     var prefs = await _prefs;
     try {
       await prefs.setString('PreferredBookExt', preferredBookExt);
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<SortBooksBy> getPreferredAuthorBookSort() async {
+    var prefs = await _prefs;
+    try {
+      var preferredAuthorBookSort =
+          prefs.getInt('PreferredAuthorBookSort') ?? 0;
+      if (SortBooksBy.values.length > preferredAuthorBookSort) {
+        return SortBooksBy.values[preferredAuthorBookSort];
+      }
+      return SortBooksBy.values[0];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> setPreferredAuthorBookSort(
+      SortBooksBy preferredAuthorBookSort) async {
+    var prefs = await _prefs;
+    try {
+      await prefs.setInt(
+        'PreferredAuthorBookSort',
+        preferredAuthorBookSort.index,
+      );
       return true;
     } catch (e) {
       print(e);
