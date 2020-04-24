@@ -33,7 +33,7 @@ class _AuthorPageState extends State<AuthorPage> {
 
   AuthorInfo _authorInfo;
   DsError _dsError;
-  SortBooksBy _sortBooksBy = SortBooksBy.sequence;
+  SortBooksBy _sortBooksBy;
 
   @override
   void initState() {
@@ -183,6 +183,10 @@ class _AuthorPageState extends State<AuthorPage> {
 
   Future<void> _getAuthorInfo() async {
     AuthorInfo result;
+
+    if (_sortBooksBy == null) {
+      _sortBooksBy = await LocalStorage().getPreferredAuthorBookSort();
+    }
 
     try {
       var queryParams = {

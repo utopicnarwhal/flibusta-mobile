@@ -141,7 +141,11 @@ class _FullInfoCardState extends State<FullInfoCard> {
                                     },
                                   ),
                                 if (widget.data is BookCard &&
-                                    (widget.data.localPath != null))
+                                    (widget.data as BookCard).localPath !=
+                                        null &&
+                                    (widget.data as BookCard)
+                                            .downloadProgress ==
+                                        null)
                                   FutureBuilder(
                                     future:
                                         File(widget.data.localPath).exists(),

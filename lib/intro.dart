@@ -4,6 +4,7 @@ import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:intro_slider/dot_animation_enum.dart';
@@ -124,7 +125,6 @@ class _OpenSiteBlock extends StatefulWidget {
 
 class _OpenSiteBlockState extends State<_OpenSiteBlock> {
   TextEditingController _urlController;
-  bool loading = false;
 
   @override
   void initState() {
@@ -144,23 +144,20 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
           textAlign: TextAlign.justify,
         ),
         SizedBox(height: 20),
-        if (!loading)
-          TextField(
-            controller: _urlController,
-            decoration: InputDecoration(
-                helperText: 'Как пример: flibusta.is',
-                hintText: 'Вы знаете, что сюда вписать'),
-            onEditingComplete: _onSubmit,
+        TextField(
+          controller: _urlController,
+          decoration: InputDecoration(
+              helperText: 'Как пример: flibusta.is',
+              hintText: 'Вы знаете, что сюда вписать'),
+          onEditingComplete: _onSubmit,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: RaisedButton(
+            child: Text('Открыть сайт'),
+            onPressed: _onSubmit,
           ),
-        if (!loading)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: RaisedButton(
-              child: Text('Открыть сайт'),
-              onPressed: _onSubmit,
-            ),
-          ),
-        if (loading) DsCircularProgressIndicator(),
+        ),
       ],
     );
   }
@@ -173,15 +170,37 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
       return;
     }
 
-    if (!mounted) return;
-    setState(() {
-      loading = true;
-    });
+    if (value == 'flibusta.appspot.com') {
+      DialogUtils.simpleAlert(
+        context,
+        'Предупреждение',
+        content: Text(
+          'Не рекомендую использовать данный сайт, так как он содержит некорректную верстку и перенаправляет на рекламу',
+        ),
+      );
+      return;
+    }
 
     if (value == 'flibusta.is') {
       ProxyHttpClient().setHostAddress(value);
       LocalStorage().setHostAddress(value);
       LocalStorage().setIntroCompleted();
+      var turnProxyOn = await DialogUtils.confirmationDialog(
+        context,
+        'Включить прокси создателя приложения?',
+        builder: (context) {
+          return Text(
+              'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране');
+        },
+        builderPadding: true,
+        barrierDismissible: false,
+      );
+      if (turnProxyOn == true) {
+        LocalStorage()
+            .setActualProxy('flibustauser:ilovebooks@35.217.29.210:1194');
+        ProxyHttpClient()
+            .setProxy('flibustauser:ilovebooks@35.217.29.210:1194');
+      }
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
       return;
     }
@@ -189,11 +208,6 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
       'https://$value',
       forceWebView: true,
     );
-
-    if (!mounted) return;
-    setState(() {
-      loading = false;
-    });
   }
 
   @override

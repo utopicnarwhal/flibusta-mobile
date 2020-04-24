@@ -26,14 +26,14 @@ class DsError extends DioError {
                 this.response.data['Message'] != null) {
               userMessage = '${this.response.data['Message'].toString()}';
             } else {
-              userMessage = 'Ошибка подключения к серверу Росбанк ДомPro';
+              userMessage = 'Ошибка подключения к серверу';
             }
             break;
           case 500:
-            userMessage = 'Произошла внутренняя ошибка сервера Росбанк ДомPro';
+            userMessage = 'Произошла внутренняя ошибка сервера';
             break;
           default:
-            userMessage = 'Ошибка подключения к серверу Росбанк ДомPro';
+            userMessage = 'Ошибка подключения к серверу';
             break;
         }
         break;

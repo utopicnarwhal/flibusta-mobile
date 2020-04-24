@@ -85,13 +85,13 @@ class _LastOpenBooksCardState extends State<LastOpenBooksCard> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(
-                          lastOpenBooks[index].tileTitle,
+                          lastOpenBooks[index].tileTitle ?? '',
                           maxLines: 1,
                           softWrap: false,
                           overflow: TextOverflow.fade,
                         ),
                         subtitle: Text(
-                          lastOpenBooks[index].tileSubtitle,
+                          lastOpenBooks[index].tileSubtitle ?? '',
                           maxLines: 1,
                           softWrap: false,
                           overflow: TextOverflow.fade,
