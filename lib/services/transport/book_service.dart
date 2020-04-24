@@ -5,6 +5,7 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
 import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/local_notification_service.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/file_utils.dart';
 import 'package:flibusta/utils/html_parsers.dart';
@@ -83,6 +84,12 @@ class BookService {
     String fileUri = '';
     CancelToken cancelToken = CancelToken();
 
+    NotificationService().showNotificationWithProgress(
+      notificationId: bookCard.id,
+      notificationTitle: bookCard.title,
+      notificationBody: '',
+      progress: 0.0,
+    );
     downloadProgressCallback(0.0);
     var prepareToDownloadToastFuture = _alertsCallback(
       'Подготовка к загрузке',
@@ -108,6 +115,7 @@ class BookService {
 
             var contentDisposition = responseHeaders['content-disposition'];
             if (contentDisposition == null) {
+              NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
               cancelToken.cancel(
                 'Доступ к книге ограничен по требованию правоторговца',
@@ -122,6 +130,7 @@ class BookService {
                       .split('filename=')[1]
                       .replaceAll('\"', '');
             } catch (e) {
+              NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
               cancelToken.cancel('Не удалось получить имя файла');
               return fileUri;
@@ -129,6 +138,7 @@ class BookService {
 
             var myFile = File(fileUri);
             if (myFile.existsSync()) {
+              NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
               cancelToken.cancel('Файл с таким именем уже есть');
               return fileUri;
@@ -145,8 +155,15 @@ class BookService {
           ),
           onReceiveProgress: (int count, int total) {
             if (cancelToken.isCancelled) {
+              NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
             } else {
+              NotificationService().showNotificationWithProgress(
+                notificationId: bookCard.id,
+                notificationTitle: bookCard.title,
+                notificationBody: 'Скачивание',
+                progress: (count / total) * 100,
+              );
               downloadProgressCallback(count / total);
             }
           },
@@ -163,6 +180,7 @@ class BookService {
 
     if (response == null || response.statusCode != 200) {
       ToastManager().hideToast(prepareToDownloadToastFuture);
+      NotificationService().cancelNotification(bookCard.id);
       downloadProgressCallback(null);
       return;
     }
@@ -182,6 +200,7 @@ class BookService {
       ),
     );
 
+    NotificationService().cancelNotification(bookCard.id);
     downloadProgressCallback(null);
   }
 

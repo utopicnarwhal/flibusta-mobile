@@ -288,62 +288,55 @@ class BookPageState extends State<BookPage> {
                       ),
                     ),
                   ],
-                  if (_bookInfo.downloadFormats != null &&
-                      _bookInfo.localPath == null)
-                    StreamBuilder<double>(
-                      builder: (context, downloadProgressSnapshot) {
-                        if (!downloadProgressSnapshot.hasData) {
-                          return Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: DsOutlineButton(
-                              child: Text('Скачать'),
-                              onPressed: () => _onDownloadBookClick(_bookInfo),
-                            ),
-                          );
-                        }
+                  StreamBuilder<double>(
+                    stream: _downloadProgressController,
+                    builder: (context, downloadProgressSnapshot) {
+                      if (downloadProgressSnapshot.hasData) {
                         return LinearProgressIndicator(
                           value: downloadProgressSnapshot.data == 0.0
                               ? null
                               : downloadProgressSnapshot.data,
                         );
-                      },
-                    ),
-                  if (_bookInfo.localPath != null)
-                    FutureBuilder(
-                      future: File(_bookInfo.localPath).exists(),
-                      builder: (context, bookFileExistsSnapshot) {
-                        if (bookFileExistsSnapshot.data != true) {
-                          return StreamBuilder<double>(
-                            builder: (context, downloadProgressSnapshot) {
-                              if (!downloadProgressSnapshot.hasData) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(14.0),
-                                  child: DsOutlineButton(
-                                    child: Text('Скачать'),
-                                    onPressed: () =>
-                                        _onDownloadBookClick(_bookInfo),
-                                  ),
-                                );
-                              }
-                              return LinearProgressIndicator(
-                                value: downloadProgressSnapshot.data == 0.0
-                                    ? null
-                                    : downloadProgressSnapshot.data,
+                      }
+                      if (_bookInfo.localPath != null) {
+                        return FutureBuilder(
+                          future: File(_bookInfo.localPath).exists(),
+                          builder: (context, bookFileExistsSnapshot) {
+                            if (bookFileExistsSnapshot.data != true) {
+                              return Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: DsOutlineButton(
+                                  child: Text('Скачать'),
+                                  onPressed: () =>
+                                      _onDownloadBookClick(_bookInfo),
+                                ),
                               );
-                            },
-                          );
-                        }
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child: DsOutlineButton(
+                                child: Text('Открыть'),
+                                onPressed: () => FileUtils.openFile(
+                                  _bookInfo.localPath,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                      if (_bookInfo.downloadFormats != null ??
+                          !downloadProgressSnapshot.hasData) {
                         return Padding(
                           padding: const EdgeInsets.all(14.0),
                           child: DsOutlineButton(
-                            child: Text('Открыть'),
-                            onPressed: () => FileUtils.openFile(
-                              _bookInfo.localPath,
-                            ),
+                            child: Text('Скачать'),
+                            onPressed: () => _onDownloadBookClick(_bookInfo),
                           ),
                         );
-                      },
-                    ),
+                      }
+                      return Container();
+                    },
+                  ),
                   SizedBox(height: 56),
                 ]),
               ),

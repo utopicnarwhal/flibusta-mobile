@@ -112,6 +112,16 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                               Divider(),
                               ProxyRadioListTile(
                                 title:
+                                    'Прокси создателя приложения (проверка работы на Yota)',
+                                value:
+                                    'flibustauser:ilovebooks@35.217.29.210:1194',
+                                groupValue: actualProxySnapshot.data,
+                                onChanged: _proxyListBloc.setActualProxy,
+                                cancelToken: _proxyListBloc.cancelToken,
+                              ),
+                              Divider(),
+                              ProxyRadioListTile(
+                                title:
                                     'Прокси создателя приложения (не работает на мобильном интернете Yota)',
                                 value:
                                     'flibustauser:ilovebooks@35.228.73.110:3128',

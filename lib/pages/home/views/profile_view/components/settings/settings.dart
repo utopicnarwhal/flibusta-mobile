@@ -5,10 +5,13 @@ import 'package:flibusta/components/directory_picker/directory_picker.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/dynamic_theme_mode.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
+import 'package:flibusta/model/enums/sortBooksByEnum.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   static const String routeName = '/Settings';
@@ -185,8 +188,27 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           FlatButton(
                             child: Text('Применить'),
-                            onPressed: () {
-                              Navigator.of(context).pop(hostController.text);
+                            onPressed: () async {
+                              var value = hostController.text;
+                              if (value == null) {
+                                return;
+                              }
+                              if (!await canLaunch('https://$value')) {
+                                DialogUtils.simpleAlert(context,
+                                    'Извините, но этот путь нельзя открыть');
+                                return;
+                              }
+                              if (value == 'flibusta.appspot.com') {
+                                DialogUtils.simpleAlert(
+                                  context,
+                                  'Предупреждение',
+                                  content: Text(
+                                    'Не рекомендую использовать данный сайт, так как он содержит некорректную верстку и перенаправляет на рекламу',
+                                  ),
+                                );
+                                return;
+                              }
+                              Navigator.of(context).pop(value);
                             },
                           ),
                         ],
@@ -276,7 +298,76 @@ class _SettingsPageState extends State<SettingsPage> {
         },
       ),
       Divider(indent: 72),
+      FutureBuilder<SortBooksBy>(
+        future: LocalStorage().getPreferredAuthorBookSort(),
+        builder: (context, preferredSortBooksBySnapshot) {
+          return ListTile(
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(FontAwesomeIcons.sort, size: 26.0),
+              ],
+            ),
+            title: Text('Сортировка книг автора по'),
+            subtitle: Text(
+              sortBooksByToString(preferredSortBooksBySnapshot.data),
+            ),
+            trailing: kIconArrowForward,
+            onTap: () async {
+              var result = await showDialog<SortBooksBy>(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    title: Text(
+                      'Выберите предпочитаемую сортировку книг автора',
+                    ),
+                    children: [
+                      ...SortBooksBy.values.map((sortBooksBy) {
+                        SortBooksBy value;
+                        if (sortBooksBy != null) {
+                          value = sortBooksBy;
+                        }
+                        return RadioListTile<SortBooksBy>(
+                          onChanged: (_) {
+                            Navigator.of(context).pop(sortBooksBy);
+                          },
+                          groupValue: preferredSortBooksBySnapshot.data,
+                          value: value,
+                          title: Text(sortBooksByToString(sortBooksBy)),
+                        );
+                      }).toList(),
+                      ButtonBar(
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Отмена'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+              if (result == null) {
+                return;
+              }
+              await LocalStorage().setPreferredAuthorBookSort(result);
+              setState(() {});
+            },
+          );
+        },
+      ),
+      Divider(indent: 72),
       ListTile(
+        leading: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(FontAwesomeIcons.trash, size: 24.0),
+          ],
+        ),
         title: Text('Очистить историю поиска'),
         onTap: () {
           LocalStorage().setPreviousBookSearches([]);
@@ -284,6 +375,12 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       Divider(indent: 72),
       ListTile(
+        leading: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(FontAwesomeIcons.trash, size: 24.0),
+          ],
+        ),
         title: Text('Очистить список скачанных книг'),
         onTap: () {
           LocalStorage().clearDownloadedBook();
@@ -296,7 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
       key: scaffoldKey,
       appBar: DsAppBar(title: Text('Настройки')),
       body: SafeArea(
-        child: ListView?.builder(
+        child: ListView.builder(
           physics: kBouncingAlwaysScrollableScrollPhysics,
           addSemanticIndexes: false,
           padding: EdgeInsets.only(top: 20.0),
