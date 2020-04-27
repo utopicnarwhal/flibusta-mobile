@@ -151,8 +151,16 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                                 actualProxySnapshot.data,
                                             onChanged:
                                                 _proxyListBloc.setActualProxy,
-                                            onDelete: _proxyListBloc
-                                                .removeFromProxyList,
+                                            onDelete: (proxyHost) {
+                                              _proxyListBloc
+                                                  .removeFromProxyList(
+                                                      proxyHost);
+                                              if (actualProxySnapshot.data ==
+                                                  proxyHost) {
+                                                _proxyListBloc
+                                                    .setActualProxy('');
+                                              }
+                                            },
                                             cancelToken:
                                                 _proxyListBloc.cancelToken,
                                           ),

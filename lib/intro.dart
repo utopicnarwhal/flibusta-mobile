@@ -1,6 +1,5 @@
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
-import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';

@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ProxyHttpClient {
   static final ProxyHttpClient _httpClientSingleton =
@@ -22,6 +25,9 @@ class ProxyHttpClient {
   );
   Dio _dio = Dio(defaultDioOptions);
 
+  PersistCookieJar _persistCookieJar;
+  CookieManager _cookieManager;
+
   String _proxyHostPort = '';
   Uri _proxyApiUri = Uri.http('pubproxy.com', '/api/proxy', {
     'https': 'true',
@@ -36,12 +42,21 @@ class ProxyHttpClient {
     return _dio;
   }
 
+  Future<void> initCookieJar() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+    _persistCookieJar = PersistCookieJar(dir: appDocPath + '/.cookies/');
+
+    _cookieManager = CookieManager(_persistCookieJar);
+    _dio.interceptors.add(_cookieManager);
+  }
+
   void _init() {
     if (_dio.interceptors.isNotEmpty) {
       return;
     }
 
-    _dio.interceptors.add(
+    _dio.interceptors.addAll([
       InterceptorsWrapper(
         onRequest: (RequestOptions options) async {
           if (kReleaseMode == false) {
@@ -52,10 +67,11 @@ class ProxyHttpClient {
           return DsError.fromDioError(dioError: dioError);
         },
       ),
-    );
+      if (_cookieManager != null) _cookieManager,
+    ]);
   }
 
-  void setProxy(String hostPort) {
+  Future<void> setProxy(String hostPort) async {
     if (_proxyHostPort == hostPort) {
       return;
     }
@@ -181,5 +197,21 @@ class ProxyHttpClient {
     }
     dioForGetProxyAPI.close();
     return result;
+  }
+
+  void signOut() {
+    _persistCookieJar.deleteAll();
+  }
+
+  String getCookies() {
+    return _persistCookieJar
+        .loadForRequest(Uri.https('flibusta', ''))
+        .toString();
+  }
+
+  bool isAuthorized() {
+    return _persistCookieJar
+        .loadForRequest(Uri.https('flibusta', ''))
+        .isNotEmpty;
   }
 }

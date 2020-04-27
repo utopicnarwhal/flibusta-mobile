@@ -5,6 +5,9 @@ import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
+import 'package:flibusta/pages/login_page/login_page.dart';
+import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxdart/rxdart.dart';
@@ -31,7 +34,7 @@ class ProfileView extends StatelessWidget {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 physics: kBouncingAlwaysScrollableScrollPhysics,
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 42),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Container(
                   constraints: BoxConstraints(
                     minHeight: constraints.maxHeight,
@@ -45,6 +48,7 @@ class ProfileView extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          SizedBox(height: 16),
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 12.0),
                             child: Text(
@@ -61,31 +65,31 @@ class ProfileView extends StatelessWidget {
                           ),
                           SizedBox(height: 16),
                           ProfileScreen(),
-                          SizedBox(height: 16),
                         ],
                       ),
-                      // ListFadeInSlideStagger(
-                      //   index: 2,
-                      //   child: Card(
-                      //     margin: EdgeInsets.zero,
-                      //     child: ListTile(
-                      //       title: Text(
-                      //         'Выйти',
-                      //         textAlign: TextAlign.center,
-                      //       ),
-                      //       onTap: () async {
-                      //         var signOutConfirm =
-                      //             await DialogUtils.confirmationDialog(
-                      //           context,
-                      //           'Выйти из аккаунта?',
-                      //         );
-                      //         if (signOutConfirm == true) {
-                      //           AuthenticationBloc().signOut();
-                      //         }
-                      //       },
-                      //     ),
-                      //   ),
-                      // ),
+                      if (ProxyHttpClient().isAuthorized())
+                        ListFadeInSlideStagger(
+                          index: 2,
+                          child: Card(
+                            margin: EdgeInsets.zero,
+                            child: ListTile(
+                              title: Text(
+                                'Выйти',
+                                textAlign: TextAlign.center,
+                              ),
+                              onTap: () async {
+                                var signOutConfirm =
+                                    await DialogUtils.confirmationDialog(
+                                  context,
+                                  'Выйти из аккаунта?',
+                                );
+                                if (signOutConfirm == true) {
+                                  ProxyHttpClient().signOut();
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -139,7 +143,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      // Navigator.of(context).pushNamed(ProfilePage.routeName);
+                      Navigator.of(context).pushNamed(LoginPage.routeName);
                     },
                   ),
                 ),

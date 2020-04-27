@@ -5,6 +5,7 @@ import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/donate.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
+import 'package:flibusta/pages/login_page/login_page.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flutter/material.dart';
 import './pages/home/home_page.dart';
@@ -23,8 +24,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         case '/':
         case HomePage.routeName:
           return HomePage();
-        // case Login.routeName:
-        //   return Login();
+        case LoginPage.routeName:
+          return LoginPage();
         case IntroPage.routeName:
           return IntroPage();
         case AboutPage.routeName:

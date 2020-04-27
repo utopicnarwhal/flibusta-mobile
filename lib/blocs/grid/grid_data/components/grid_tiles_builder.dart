@@ -282,7 +282,7 @@ class GridTilesBuilder extends StatelessWidget {
                           child: FlareActor(
                             'assets/animations/long_tap.flr',
                             animation: 'Animations',
-                            color: Colors.black,
+                            color: Theme.of(context).textTheme.body1.color,
                           ),
                         ),
                         Material(

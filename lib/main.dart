@@ -53,6 +53,7 @@ Future<void> initialization() async {
     null,
     Permission.storage,
   ));
+  preparationFutures.add(ProxyHttpClient().initCookieJar());
 
   NotificationService().init();
 
