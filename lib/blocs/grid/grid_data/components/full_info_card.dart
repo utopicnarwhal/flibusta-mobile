@@ -155,6 +155,7 @@ class _FullInfoCardState extends State<FullInfoCard> {
                                           book: widget.data,
                                           downloadBookCallback:
                                               (downloadProgress) {
+                                            if (!mounted) return;
                                             setState(() {
                                               widget.data.downloadProgress =
                                                   downloadProgress;

@@ -30,13 +30,32 @@ class LoginPageState extends State<LoginPage> {
   TextEditingController _passwordTextController;
   final FocusNode _passwordFocus = FocusNode();
 
-  bool isAuthorizing = false;
+  bool _isAuthorizing = false;
+  String _formBuildId;
 
   @override
   void initState() {
     super.initState();
     _loginTextController = TextEditingController();
     _passwordTextController = TextEditingController();
+
+    _getFormBuildId();
+  }
+
+  Future<void> _getFormBuildId() async {
+    Uri url = Uri.https(ProxyHttpClient().getHostAddress(), '/');
+
+    try {
+      var response = await ProxyHttpClient().getDio().getUri(url);
+
+      if (response.data is String) {
+        print((response.data as String)
+            .matchAsPrefix(r'/(?<=name="form_build_id" id=")form--[^"]+/gm'));
+      }
+    } on DsError catch (dsError) {
+      ToastManager().showToast(dsError.userMessage);
+    }
+    // _formBuildId = ;
   }
 
   @override
@@ -81,7 +100,7 @@ class LoginPageState extends State<LoginPage> {
                         children: <Widget>[
                           DsTextField(
                             focusNode: _loginFocus,
-                            isDisabled: isAuthorizing,
+                            isDisabled: _isAuthorizing,
                             customTextEditingController: _loginTextController,
                             initValue: '',
                             labelText: 'Логин',
@@ -97,7 +116,7 @@ class LoginPageState extends State<LoginPage> {
                           ),
                           DsTextField(
                             focusNode: _passwordFocus,
-                            isDisabled: isAuthorizing,
+                            isDisabled: _isAuthorizing,
                             customTextEditingController:
                                 _passwordTextController,
                             initValue: '',
@@ -107,14 +126,14 @@ class LoginPageState extends State<LoginPage> {
                             textInputAction: TextInputAction.done,
                             type: DsTextFieldType.password,
                             onEditingComplete: () {
-                              if (!isAuthorizing) {
+                              if (!_isAuthorizing) {
                                 _loginClick();
                               }
                             },
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
-                            child: isAuthorizing
+                            child: _isAuthorizing
                                 ? Center(
                                     child: DsCircularProgressIndicator(),
                                   )
@@ -126,7 +145,7 @@ class LoginPageState extends State<LoginPage> {
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     onPressed:
-                                        !isAuthorizing ? _loginClick : null,
+                                        !_isAuthorizing ? _loginClick : null,
                                   ),
                           ),
                           SizedBox(height: 40),

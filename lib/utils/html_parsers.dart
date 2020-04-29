@@ -73,9 +73,9 @@ List<BookCard> parseHtmlFromMakeBookList(
     }
 
     var title = bookCardDivs[i]
-        .getElementsByTagName('input')
-        ?.first
-        ?.nextElementSibling;
+        .getElementsByTagName('a')
+        .where((element) => element.attributes['href'].contains('/b/'))
+        ?.first;
 
     var translators = List<Map<int, String>>();
     htmldom.Element sequence;
@@ -127,11 +127,7 @@ List<BookCard> parseHtmlFromMakeBookList(
     }
 
     result.add(BookCard(
-      id: int.tryParse(bookCardDivs[i]
-          .getElementsByTagName('input')
-          ?.first
-          ?.attributes['name']
-          ?.replaceAll('bchk', '')),
+      id: int.tryParse(title?.attributes['href']?.replaceAll('/b/', '')),
       genres: Genres(genres),
       title: title?.text,
       authors: Authors(authors),
