@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/enums/text_field_types.dart';
 import 'package:flibusta/ds_controls/fields/text_field.dart';
@@ -32,6 +33,7 @@ class LoginPageState extends State<LoginPage> {
 
   bool _isAuthorizing = false;
   String _formBuildId;
+  DsError _getFormBuildIdDsError;
 
   @override
   void initState() {
@@ -49,13 +51,26 @@ class LoginPageState extends State<LoginPage> {
       var response = await ProxyHttpClient().getDio().getUri(url);
 
       if (response.data is String) {
-        print((response.data as String)
-            .matchAsPrefix(r'/(?<=name="form_build_id" id=")form--[^"]+/gm'));
+        var formBuildIdMatch = RegExp(
+          '(?<=name="form_build_id" id=")form-[^"]+',
+          multiLine: true,
+        ).firstMatch(response.data as String);
+
+        if (formBuildIdMatch != null) {
+          if (!mounted) return;
+          setState(() {
+            _formBuildId = formBuildIdMatch.group(0);
+            print(_formBuildId);
+          });
+          return;
+        }
+
+        ToastManager().showToast('Скорее всего, вы уже авторизованы');
       }
     } on DsError catch (dsError) {
+      _getFormBuildIdDsError = dsError;
       ToastManager().showToast(dsError.userMessage);
     }
-    // _formBuildId = ;
   }
 
   @override
@@ -240,20 +255,23 @@ class LoginPageState extends State<LoginPage> {
 
     try {
       var response = await ProxyHttpClient().getDio().postUri(
-        url,
-        data: {
-          'grant_type': 'password',
-          'name': userCredentials.login,
-          'pass': userCredentials.password,
-          'persistent_login': 1,
-          'op': 'Вход+в+систему',
-          'form_id': 'user_login_block',
-          'openid_identifier': '',
-          'form_build_id': '',
-        },
-      );
+            url,
+            data: FormData.fromMap(
+              {
+                'name': userCredentials.login,
+                'pass': userCredentials.password,
+                'persistent_login': 1,
+                'op': 'Вход+в+систему',
+                'form_id': 'user_login_block',
+                'openid_identifier': '',
+                'form_build_id': _formBuildId,
+                'openid.return_to':
+                    'https://${ProxyHttpClient().getHostAddress()}/openid/authenticate?destination=node',
+              },
+            ),
+          );
       if (response.data is String) {
-        print((response.data as String).contains('messages error'));
+        print((response.data as String).contains('error'));
       }
     } on DsError catch (dsError) {
       ToastManager().showToast(dsError.userMessage);

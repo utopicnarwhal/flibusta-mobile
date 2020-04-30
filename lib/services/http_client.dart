@@ -205,13 +205,13 @@ class ProxyHttpClient {
 
   String getCookies() {
     return _persistCookieJar
-        .loadForRequest(Uri.https('flibusta', ''))
+        .loadForRequest(Uri.https(getHostAddress(), ''))
         .toString();
   }
 
   bool isAuthorized() {
     return _persistCookieJar
-        .loadForRequest(Uri.https('flibusta', ''))
+        .loadForRequest(Uri.https(getHostAddress(), ''))
         .isNotEmpty;
   }
 }

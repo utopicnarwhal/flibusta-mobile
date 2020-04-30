@@ -71,11 +71,15 @@ class ProfileView extends StatelessWidget {
                         ListFadeInSlideStagger(
                           index: 2,
                           child: Card(
-                            margin: EdgeInsets.zero,
+                            margin: EdgeInsets.only(bottom: 16),
                             child: ListTile(
                               title: Text(
                                 'Выйти',
                                 textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .button
+                                    .copyWith(fontSize: 16),
                               ),
                               onTap: () async {
                                 var signOutConfirm =
