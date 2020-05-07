@@ -1,28 +1,9 @@
-// Copyright 2016 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-/// The part of a material design [AppBar] that expands and collapses.
-///
-/// Most commonly used in in the [SliverAppBar.flexibleSpace] field, a flexible
-/// space bar expands and contracts as the app scrolls so that the [AppBar]
-/// reaches from the top of the app to the top of the scrolling contents of the
-/// app.
-///
-/// The widget that sizes the [AppBar] must wrap it in the widget returned by
-/// [DsFlexibleSpaceBar.createSettings], to convey sizing information down to the
-/// [DsFlexibleSpaceBar].
-///
-/// See also:
-///
-///  * [SliverAppBar], which implements the expanding and contracting.
-///  * [AppBar], which is used by [SliverAppBar].
-///  * <https://material.io/design/components/app-bars-top.html#behavior>
 class DsFlexibleSpaceBar extends StatefulWidget {
   /// Creates a flexible space bar.
   ///
@@ -32,9 +13,10 @@ class DsFlexibleSpaceBar extends StatefulWidget {
     this.title,
     this.background,
     this.centerTitle,
-    this.scaleTitle,
     this.titlePadding,
+    this.scaleTitle = true,
     this.collapseMode = CollapseMode.parallax,
+    this.stretchModes = const <StretchMode>[StretchMode.zoomBackground],
   })  : assert(collapseMode != null),
         super(key: key);
 
@@ -51,7 +33,7 @@ class DsFlexibleSpaceBar extends StatefulWidget {
   /// Whether the title should be centered.
   ///
   /// By default this property is true if the current target platform
-  /// is [TargetPlatform.iOS], false otherwise.
+  /// is [TargetPlatform.iOS] or [TargetPlatform.macOS], false otherwise.
   final bool centerTitle;
 
   final bool scaleTitle;
@@ -60,6 +42,11 @@ class DsFlexibleSpaceBar extends StatefulWidget {
   ///
   /// Defaults to [CollapseMode.parallax].
   final CollapseMode collapseMode;
+
+  /// Stretch effect while over-scrolling,
+  ///
+  /// Defaults to include [StretchMode.zoomBackground].
+  final List<StretchMode> stretchModes;
 
   /// Defines how far the [title] is inset from either the widget's
   /// bottom-left or its center.
@@ -70,7 +57,7 @@ class DsFlexibleSpaceBar extends StatefulWidget {
   ///
   /// By default the value of this property is
   /// `EdgeInsetsDirectional.only(start: 72, bottom: 16)` if the title is
-  /// not centered, `EdgeInsetsDirectional.only(start 0, bottom: 16)` otherwise.
+  /// not centered, `EdgeInsetsDirectional.only(start: 0, bottom: 16)` otherwise.
   final EdgeInsetsGeometry titlePadding;
 
   /// Wraps a widget that contains an [AppBar] to convey sizing information down
@@ -118,8 +105,11 @@ class _DsFlexibleSpaceBarState extends State<DsFlexibleSpaceBar> {
     switch (theme.platform) {
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
         return false;
       case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
         return true;
     }
     return null;
@@ -153,104 +143,170 @@ class _DsFlexibleSpaceBarState extends State<DsFlexibleSpaceBar> {
 
   @override
   Widget build(BuildContext context) {
-    final FlexibleSpaceBarSettings settings =
-        context.dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
-    assert(settings != null,
-        'A DsFlexibleSpaceBar must be wrapped in the widget returned by DsFlexibleSpaceBar.createSettings().');
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      final FlexibleSpaceBarSettings settings = context
+          .dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
+      assert(
+        settings != null,
+        'A DsFlexibleSpaceBar must be wrapped in the widget returned by DsFlexibleSpaceBar.createSettings().',
+      );
 
-    final List<Widget> children = <Widget>[];
+      final List<Widget> children = <Widget>[];
 
-    final double deltaExtent = settings.maxExtent - settings.minExtent;
+      final double deltaExtent = settings.maxExtent - settings.minExtent;
 
-    // 0.0 -> Expanded
-    // 1.0 -> Collapsed to toolbar
-    final double t =
-        (1.0 - (settings.currentExtent - settings.minExtent) / deltaExtent)
-            .clamp(0.0, 1.0);
+      // 0.0 -> Expanded
+      // 1.0 -> Collapsed to toolbar
+      final double t =
+          (1.0 - (settings.currentExtent - settings.minExtent) / deltaExtent)
+              .clamp(0.0, 1.0) as double;
 
-    // background image
-    if (widget.background != null) {
-      final double fadeStart =
-          math.max(0.0, 1.0 - kToolbarHeight / deltaExtent);
-      const double fadeEnd = 1.0;
-      assert(fadeStart <= fadeEnd);
-      final double opacity = 1.0 - Interval(fadeStart, fadeEnd).transform(t);
-      if (opacity > 0.0) {
-        children.add(Positioned(
-          top: _getCollapsePadding(t, settings),
-          left: 0.0,
-          right: 0.0,
-          height: settings.maxExtent,
-          child: Opacity(
-            opacity: opacity,
-            child: widget.background,
-          ),
-        ));
-      }
-    }
+      // background
+      if (widget.background != null) {
+        final double fadeStart =
+            math.max(0.0, 1.0 - kToolbarHeight / deltaExtent);
+        const double fadeEnd = 1.0;
+        assert(fadeStart <= fadeEnd);
+        final double opacity = 1.0 - Interval(fadeStart, fadeEnd).transform(t);
+        if (opacity > 0.0) {
+          double height = settings.maxExtent;
 
-    if (widget.title != null) {
-      Widget title;
-      switch (defaultTargetPlatform) {
-        case TargetPlatform.iOS:
-          title = widget.title;
-          break;
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.android:
-          title = Semantics(
-            namesRoute: true,
-            child: widget.title,
-          );
-      }
+          // StretchMode.zoomBackground
+          if (widget.stretchModes.contains(StretchMode.zoomBackground) &&
+              constraints.maxHeight > height) {
+            height = constraints.maxHeight;
+          }
 
-      final ThemeData theme = Theme.of(context);
-      final double opacity = settings.toolbarOpacity;
-      if (opacity > 0.0) {
-        TextStyle titleStyle = theme.primaryTextTheme.title;
-        titleStyle =
-            titleStyle.copyWith(color: titleStyle.color.withOpacity(opacity));
-        final bool effectiveCenterTitle = _getEffectiveCenterTitle(theme);
-        final EdgeInsetsGeometry padding = widget.titlePadding ??
-            EdgeInsetsDirectional.only(
-              start: effectiveCenterTitle ? 0.0 : 72.0,
-              bottom: 16.0,
-            );
-        final double scaleValue =
-            Tween<double>(begin: 1.5, end: 1.0).transform(t);
-        final Matrix4 scaleTransform = Matrix4.identity()
-          ..scale(scaleValue, scaleValue, 1.0);
-        final Alignment titleAlignment =
-            _getTitleAlignment(effectiveCenterTitle);
-        if (widget.scaleTitle != false) {
-          children.add(Container(
-            padding: padding,
-            child: Transform(
-              alignment: titleAlignment,
-              transform: scaleTransform,
-              child: Align(
-                alignment: titleAlignment,
-                child: DefaultTextStyle(
-                  style: titleStyle,
-                  child: title,
-                ),
-              ),
+          children.add(Positioned(
+            top: _getCollapsePadding(t, settings),
+            left: 0.0,
+            right: 0.0,
+            height: height,
+            child: Opacity(
+              opacity: opacity,
+              child: widget.background,
             ),
           ));
-        } else {
-          children.add(Container(
-            padding: padding,
-            child: Align(
-              alignment: titleAlignment,
-              child: DefaultTextStyle(
-                style: titleStyle,
-                child: title,
-              ),
-            ),
-          ));
+
+          // StretchMode.blurBackground
+          if (widget.stretchModes.contains(StretchMode.blurBackground) &&
+              constraints.maxHeight > settings.maxExtent) {
+            final double blurAmount =
+                (constraints.maxHeight - settings.maxExtent) / 10;
+            children.add(Positioned.fill(
+                child: BackdropFilter(
+                    child: Container(
+                      color: Colors.transparent,
+                    ),
+                    filter: ui.ImageFilter.blur(
+                      sigmaX: blurAmount,
+                      sigmaY: blurAmount,
+                    ))));
+          }
         }
       }
-    }
 
-    return ClipRect(child: Stack(children: children));
+      // title
+      if (widget.title != null) {
+        final ThemeData theme = Theme.of(context);
+
+        Widget title;
+        switch (theme.platform) {
+          case TargetPlatform.iOS:
+          case TargetPlatform.macOS:
+            title = widget.title;
+            break;
+          case TargetPlatform.android:
+          case TargetPlatform.fuchsia:
+          case TargetPlatform.linux:
+          case TargetPlatform.windows:
+            title = Semantics(
+              namesRoute: true,
+              child: widget.title,
+            );
+            break;
+        }
+
+        // StretchMode.fadeTitle
+        if (widget.stretchModes.contains(StretchMode.fadeTitle) &&
+            constraints.maxHeight > settings.maxExtent) {
+          final double stretchOpacity = 1 -
+              (((constraints.maxHeight - settings.maxExtent) / 100)
+                  .clamp(0.0, 1.0) as double);
+          title = Opacity(
+            opacity: stretchOpacity,
+            child: title,
+          );
+        }
+
+        final double opacity = settings.toolbarOpacity;
+        if (opacity > 0.0) {
+          TextStyle titleStyle = theme.primaryTextTheme.headline6;
+          titleStyle =
+              titleStyle.copyWith(color: titleStyle.color.withOpacity(opacity));
+          final bool effectiveCenterTitle = _getEffectiveCenterTitle(theme);
+          final EdgeInsetsGeometry padding = widget.titlePadding ??
+              EdgeInsetsDirectional.only(
+                start: effectiveCenterTitle ? 0.0 : 72.0,
+                bottom: 16.0,
+              );
+          final double scaleValue =
+              Tween<double>(begin: 1.5, end: 1.0).transform(t);
+          final Matrix4 scaleTransform = Matrix4.identity()
+            ..scale(scaleValue, scaleValue, 1.0);
+          final Alignment titleAlignment =
+              _getTitleAlignment(effectiveCenterTitle);
+
+          if (widget.scaleTitle != false) {
+            children.add(
+              Container(
+                padding: padding,
+                child: Transform(
+                  alignment: titleAlignment,
+                  transform: scaleTransform,
+                  child: Align(
+                    alignment: titleAlignment,
+                    child: DefaultTextStyle(
+                      style: titleStyle,
+                      child: LayoutBuilder(builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        return Container(
+                          width: constraints.maxWidth / scaleValue,
+                          alignment: titleAlignment,
+                          child: title,
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            children.add(
+              Container(
+                padding: padding,
+                child: Align(
+                  alignment: titleAlignment,
+                  child: DefaultTextStyle(
+                    style: titleStyle,
+                    child: LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return Container(
+                        width: constraints.maxWidth,
+                        alignment: titleAlignment,
+                        child: title,
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+      }
+
+      return ClipRect(child: Stack(children: children));
+    });
   }
 }

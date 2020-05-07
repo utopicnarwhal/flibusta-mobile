@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomePage extends StatefulWidget {
-  static const routeName = "/Home";
+  static const routeName = '/Home';
 
   @override
   createState() => _HomePageState();

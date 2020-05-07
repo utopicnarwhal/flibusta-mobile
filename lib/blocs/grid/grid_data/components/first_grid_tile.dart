@@ -18,7 +18,7 @@ class FirstGridTile extends StatelessWidget {
       type: MaterialType.canvas,
       child: ListTileTheme(
         selectedColor:
-            Theme.of(context).textTheme.subhead.color.withOpacity(0.5),
+            Theme.of(context).textTheme.subtitle1.color.withOpacity(0.5),
         child: child,
       ),
       color: isSelected

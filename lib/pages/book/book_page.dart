@@ -98,7 +98,7 @@ class BookPageState extends State<BookPage> {
         body: Center(
           child: Text(
             _getBookInfoError.toString(),
-            style: Theme.of(context).textTheme.headline,
+            style: Theme.of(context).textTheme.headline5,
             textAlign: TextAlign.center,
           ),
         ),
@@ -120,7 +120,7 @@ class BookPageState extends State<BookPage> {
             appBarBackground = Center(
               child: Text(
                 _getBookCoverImageError.toString(),
-                style: Theme.of(context).textTheme.headline,
+                style: Theme.of(context).textTheme.headline5,
                 textAlign: TextAlign.center,
               ),
             );
@@ -275,7 +275,7 @@ class BookPageState extends State<BookPage> {
                       ),
                       child: Text(
                         'Аннотация:',
-                        style: Theme.of(context).textTheme.headline,
+                        style: Theme.of(context).textTheme.headline5,
                       ),
                     ),
                     Padding(

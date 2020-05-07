@@ -16,12 +16,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     builder: (context) {
       // return CotrolsDemoPage();
 
-      if (settings.isInitialRoute) {
-        return SplashScreen();
-      }
-
       switch (settings.name) {
         case '/':
+          return SplashScreen();
         case HomePage.routeName:
           return HomePage();
         case LoginPage.routeName:

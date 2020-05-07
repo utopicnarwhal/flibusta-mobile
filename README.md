@@ -35,6 +35,10 @@ Prod: `flutter build apk`
 Bundle: `flutter build appbundle --release --no-shrink`  
 
 
+## Проверка обновлений пакетов
+
+`flutter pub outdated`
+
 ## Версия приложения
 
 Версия приложения меняется в файле `pubspec.yaml`.  

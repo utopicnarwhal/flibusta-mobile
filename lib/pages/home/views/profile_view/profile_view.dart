@@ -55,11 +55,11 @@ class ProfileView extends StatelessWidget {
                               'Профиль',
                               style: Theme.of(context)
                                   .textTheme
-                                  .display1
+                                  .headline4
                                   .copyWith(
                                     fontWeight: FontWeight.w600,
                                     color:
-                                        Theme.of(context).textTheme.body1.color,
+                                        Theme.of(context).textTheme.bodyText2.color,
                                   ),
                             ),
                           ),

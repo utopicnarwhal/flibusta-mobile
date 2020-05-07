@@ -21,6 +21,7 @@ const _filesToWarmup = [
 ];
 
 class SplashScreen extends StatefulWidget {
+  static const routeName = '/SplashScreen';
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }

@@ -21,7 +21,7 @@ Future<T> showDsModalBottomSheet<T>({
               child: Text(
                 title ?? '',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.title.copyWith(
+                style: Theme.of(context).textTheme.headline6.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
               ),

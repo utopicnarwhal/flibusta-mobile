@@ -99,11 +99,11 @@ class _DsTextFieldState extends State<DsTextField>
       labelStyle = TextStyle(color: Theme.of(context).disabledColor);
       textStyle = Theme.of(context)
           .textTheme
-          .subhead
+          .subtitle1
           .copyWith(color: kDisabledFieldTextColor(context));
     } else {
       labelStyle = TextStyle(color: Theme.of(context).hintColor);
-      textStyle = Theme.of(context).textTheme.subhead;
+      textStyle = Theme.of(context).textTheme.subtitle1;
     }
 
     Widget suffixIcon;

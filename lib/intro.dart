@@ -20,19 +20,19 @@ class IntroPage extends StatelessWidget {
       Slide(
         title: 'Добро пожаловать!',
         maxLineTitle: 3,
-        styleTitle: Theme.of(context).textTheme.display1,
+        styleTitle: Theme.of(context).textTheme.headline4,
         centerWidget: Center(
           child: FlibustaLogo(
             sideHeight: MediaQuery.of(context).size.width / 2,
           ),
         ),
-        styleDescription: Theme.of(context).textTheme.body1,
+        styleDescription: Theme.of(context).textTheme.bodyText2,
         backgroundColor: Colors.transparent,
       ),
       Slide(
         title: 'Отказ от ответственности',
         maxLineTitle: 3,
-        styleTitle: Theme.of(context).textTheme.display1,
+        styleTitle: Theme.of(context).textTheme.headline4,
         widgetDescription: Text(
           'ПРОДОЛЖАЯ ПОЛЬЗОВАТЬСЯ ДАННЫМ ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ, ВЫ СОГЛАШАЕТЕСЬ С ТЕМ, '
           'ЧТО ДАННОЕ ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ», БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, '
@@ -58,7 +58,7 @@ class IntroPage extends StatelessWidget {
       ),
       Slide(
         title: 'Поддержка',
-        styleTitle: Theme.of(context).textTheme.display1,
+        styleTitle: Theme.of(context).textTheme.headline4,
         centerWidget: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 150),
           child: AspectRatio(
@@ -75,12 +75,12 @@ class IntroPage extends StatelessWidget {
 
 Приятного пользования приложением!
               """,
-        styleDescription: Theme.of(context).textTheme.body1,
+        styleDescription: Theme.of(context).textTheme.bodyText2,
         backgroundColor: Colors.transparent,
       ),
       Slide(
         title: 'Укажите адрес сайта, к которому хотите подключиться',
-        styleTitle: Theme.of(context).textTheme.headline,
+        styleTitle: Theme.of(context).textTheme.headline5,
         maxLineTitle: 4,
         centerWidget: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 200),

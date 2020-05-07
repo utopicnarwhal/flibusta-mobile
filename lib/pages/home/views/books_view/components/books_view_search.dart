@@ -93,7 +93,7 @@ class BooksViewSearch extends StatelessWidget {
           decoration: InputDecoration(
             hintText: 'Поиск',
             isDense: true,
-            hasFloatingPlaceholder: false,
+            floatingLabelBehavior: FloatingLabelBehavior.never,
             fillColor: Theme.of(context).cardColor,
             filled: true,
             suffixIcon: ValueListenableBuilder<TextEditingValue>(

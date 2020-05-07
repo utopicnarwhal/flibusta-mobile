@@ -53,9 +53,9 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                   children: <Widget>[
                     Text(
                       'Прокси',
-                      style: Theme.of(context).textTheme.display1.copyWith(
+                      style: Theme.of(context).textTheme.headline4.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).textTheme.body1.color,
+                            color: Theme.of(context).textTheme.bodyText2.color,
                           ),
                     ),
                     IconButton(
@@ -71,14 +71,14 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
               SizedBox(height: 8),
               Text(
                 'Использование прокси-сервера может помочь, если Флибуста заблокирована Вашим интернет-провайдером.',
-                style: Theme.of(context).textTheme.body1,
+                style: Theme.of(context).textTheme.bodyText2,
               ),
               SizedBox(height: 8),
               Text(
                 'Соединения:',
                 style: Theme.of(context)
                     .textTheme
-                    .subhead
+                    .subtitle1
                     .copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),

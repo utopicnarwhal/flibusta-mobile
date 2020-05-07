@@ -32,7 +32,7 @@ class DsUploadFileButton extends StatelessWidget {
               contentPadding: EdgeInsets.fromLTRB(16, 0, 8, 0),
               title: Text(
                 buttonLabel,
-                style: Theme.of(context).textTheme.subhead.copyWith(
+                style: Theme.of(context).textTheme.subtitle1.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                       color: onPressed == null

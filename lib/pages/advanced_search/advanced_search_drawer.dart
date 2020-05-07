@@ -68,7 +68,7 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                     children: <Widget>[
                       Text(
                         'Параметры поиска:',
-                        style: Theme.of(context).textTheme.title,
+                        style: Theme.of(context).textTheme.headline6,
                       ),
                       SizedBox(height: 8),
                       Padding(
