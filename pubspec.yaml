@@ -14,7 +14,7 @@ dependencies:
   dio_cookie_manager: ^1.0.0
   cookie_jar: ^1.0.1
 
-  flutter_typeahead: ^1.8.0
+  flutter_typeahead: ^1.8.1
   mask_text_input_formatter: ^1.0.6
 
   flutter_secure_storage: ^3.3.3
