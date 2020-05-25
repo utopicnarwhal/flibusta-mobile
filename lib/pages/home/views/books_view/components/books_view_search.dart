@@ -106,7 +106,7 @@ class BooksViewSearch extends StatelessWidget {
                   icon: Icon(
                     EvaIcons.close,
                     size: 24,
-                    color: Colors.black87,
+                    color: Theme.of(context).textTheme.bodyText2.color,
                   ),
                   onPressed: () {
                     SchedulerBinding.instance.addPostFrameCallback((_) {

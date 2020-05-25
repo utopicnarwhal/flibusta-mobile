@@ -195,17 +195,13 @@ class _DsTextFieldState extends State<DsTextField>
         break;
       case DsTextFieldType.text:
       case DsTextFieldType.password:
-        // Изменено на TextInputType.visiblePassword так как
-        // Bug 31613: МП. На клавиатуре samsung дубликация строки в полях ввода после символов . @ (Если включен режим T9 интеллектуальный набор)
-        _keyboardType = TextInputType.visiblePassword;
+        _keyboardType = TextInputType.text;
         _textController ??= TextEditingController(
           text: widget.initValue,
         );
         break;
       case DsTextFieldType.email:
-        // Изменено на TextInputType.visiblePassword так как
-        // Bug 31613: МП. На клавиатуре samsung дубликация строки в полях ввода после символов . @ (Если включен режим T9 интеллектуальный набор)
-        _keyboardType = TextInputType.visiblePassword;
+        _keyboardType = TextInputType.emailAddress;
         _textController ??= TextEditingController(
           text: widget.initValue,
         );

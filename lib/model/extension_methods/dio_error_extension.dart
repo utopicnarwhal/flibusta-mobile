@@ -58,6 +58,7 @@ class DsError extends DioError {
         break;
     }
     this.userMessage = userMessage;
+    print(this.error);
   }
 
   @override

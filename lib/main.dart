@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flibusta/ds_controls/dynamic_theme_mode.dart';
+import 'package:flibusta/ds_controls/internet_checker.dart';
 import 'package:flibusta/ds_controls/theme.dart';
-import 'package:flibusta/ds_controls/ui/splash_screen.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_notification_service.dart';
 import 'package:flibusta/services/local_storage.dart';
@@ -108,7 +108,9 @@ class FlibustaApp extends StatelessWidget {
                 ),
               );
             }
-            return ToastOverlay(child: child);
+            return ToastOverlay(
+              child: InternetChecker(child: child),
+            );
           },
           themeMode: themeMode,
           theme: kFlibustaLightTheme,

@@ -19,7 +19,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BookPage extends StatefulWidget {
-  static const routeName = "/BookPage";
+  static const routeName = '/BookPage';
 
   final int bookId;
 

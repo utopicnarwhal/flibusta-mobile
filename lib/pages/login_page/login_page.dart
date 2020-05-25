@@ -4,11 +4,14 @@ import 'package:flibusta/ds_controls/enums/text_field_types.dart';
 import 'package:flibusta/ds_controls/fields/text_field.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/buttons/raised_button.dart';
+import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/model/userCredentials.dart';
 import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/utils/dialog_utils.dart';
+import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:utopic_toast/utopic_toast.dart';
@@ -45,6 +48,11 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _getFormBuildId() async {
+    setState(() {
+      _formBuildId = null;
+      _getFormBuildIdDsError = null;
+    });
+
     Uri url = Uri.https(ProxyHttpClient().getHostAddress(), '/');
 
     try {
@@ -60,7 +68,6 @@ class LoginPageState extends State<LoginPage> {
           if (!mounted) return;
           setState(() {
             _formBuildId = formBuildIdMatch.group(0);
-            print(_formBuildId);
           });
           return;
         }
@@ -68,7 +75,10 @@ class LoginPageState extends State<LoginPage> {
         ToastManager().showToast('Скорее всего, вы уже авторизованы');
       }
     } on DsError catch (dsError) {
-      _getFormBuildIdDsError = dsError;
+      if (!mounted) return;
+      setState(() {
+        _getFormBuildIdDsError = dsError;
+      });
       ToastManager().showToast(dsError.userMessage);
     }
   }
@@ -101,124 +111,96 @@ class LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: FlibustaLogo(
-                        sideHeight: 200,
+                    if (_getFormBuildIdDsError == null && _formBuildId == null)
+                      DsCircularProgressIndicator(),
+                    if (_getFormBuildIdDsError != null)
+                      ErrorScreen(
+                        errorMessage: _getFormBuildIdDsError.userMessage,
+                        onTryAgain: _getFormBuildId,
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          DsTextField(
-                            focusNode: _loginFocus,
-                            isDisabled: _isAuthorizing,
-                            customTextEditingController: _loginTextController,
-                            initValue: '',
-                            labelText: 'Логин',
-                            onSave: (_) {},
-                            isRequired: true,
-                            type: DsTextFieldType.email,
-                            textInputAction: TextInputAction.next,
-                            onEditingComplete: () {
-                              _loginFocus.unfocus();
-                              FocusScope.of(context)
-                                  .requestFocus(_passwordFocus);
-                            },
-                          ),
-                          DsTextField(
-                            focusNode: _passwordFocus,
-                            isDisabled: _isAuthorizing,
-                            customTextEditingController:
-                                _passwordTextController,
-                            initValue: '',
-                            labelText: 'Пароль',
-                            onSave: (_) {},
-                            isRequired: true,
-                            textInputAction: TextInputAction.done,
-                            type: DsTextFieldType.password,
-                            onEditingComplete: () {
-                              if (!_isAuthorizing) {
-                                _loginClick();
-                              }
-                            },
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
-                            child: _isAuthorizing
-                                ? Center(
-                                    child: DsCircularProgressIndicator(),
-                                  )
-                                : DsRaisedButton(
-                                    padding: EdgeInsets.symmetric(vertical: 14),
-                                    borderRadius: 20,
-                                    child: Text(
-                                      'Войти',
-                                      style: TextStyle(fontSize: 18),
+                    if (_formBuildId != null)
+                      Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: FlibustaLogo(
+                          sideHeight: 200,
+                        ),
+                      ),
+                    if (_formBuildId != null)
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            DsTextField(
+                              focusNode: _loginFocus,
+                              isDisabled: _isAuthorizing,
+                              customTextEditingController: _loginTextController,
+                              initValue: '',
+                              labelText: 'Логин',
+                              onSave: (_) {},
+                              isRequired: true,
+                              type: DsTextFieldType.email,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () {
+                                _loginFocus.unfocus();
+                                FocusScope.of(context)
+                                    .requestFocus(_passwordFocus);
+                              },
+                            ),
+                            DsTextField(
+                              focusNode: _passwordFocus,
+                              isDisabled: _isAuthorizing,
+                              customTextEditingController:
+                                  _passwordTextController,
+                              initValue: '',
+                              labelText: 'Пароль',
+                              onSave: (_) {},
+                              isRequired: true,
+                              textInputAction: TextInputAction.done,
+                              type: DsTextFieldType.password,
+                              onEditingComplete: () {
+                                if (!_isAuthorizing) {
+                                  _loginClick();
+                                }
+                              },
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
+                              child: _isAuthorizing
+                                  ? Center(
+                                      child: DsCircularProgressIndicator(),
+                                    )
+                                  : DsRaisedButton(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 14),
+                                      borderRadius: 20,
+                                      child: Text(
+                                        'Войти',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      onPressed:
+                                          !_isAuthorizing ? _loginClick : null,
                                     ),
-                                    onPressed:
-                                        !_isAuthorizing ? _loginClick : null,
+                            ),
+                            SizedBox(height: 40),
+                            FlatButton(
+                              child: Text(
+                                'Регистрация',
+                              ),
+                              onPressed: () {
+                                DialogUtils.simpleAlert(
+                                  context,
+                                  'Регистрация',
+                                  content: Text(
+                                    'Так как после регистрации приходит письмо для подтверждения e-mail, и вам всё-таки придётся зайти на сайт, поэтому регистрация не реализована в данном приложении.',
                                   ),
-                          ),
-                          SizedBox(height: 40),
-                          // Wrap(
-                          //     alignment: WrapAlignment.spaceBetween,
-                          //     crossAxisAlignment:
-                          //         WrapCrossAlignment.center,
-                          //     spacing: 20,
-                          //     runSpacing: 20,
-                          //     children: <Widget>[
-                          // FlatButton(
-                          //   child: Text(
-                          //     'Регистрация',
-                          //     style: TextStyle(
-                          //       decoration:
-                          //           TextDecoration.underline,
-                          //       color: kSecondaryColor(context),
-                          //     ),
-                          //   ),
-                          //   onPressed: () async {
-                          //     const registrationUrl =
-                          //     if (await canLaunch(
-                          //         registrationUrl)) {
-                          //       launch(
-                          //         registrationUrl,
-                          //         forceSafariVC: false,
-                          //         forceWebView: false,
-                          //       );
-                          //     }
-                          //   },
-                          // ),
-                          // FlatButton(
-                          //   child: Text(
-                          //     'Забыли пароль?',
-                          //     maxLines: 2,
-                          //     style: TextStyle(
-                          //       decoration:
-                          //           TextDecoration.underline,
-                          //       color: kSecondaryColor(context),
-                          //     ),
-                          //   ),
-                          //   onPressed: () async {
-                          //     const forgetPasswordUrl =
-                          //     if (await canLaunch(
-                          //         forgetPasswordUrl)) {
-                          //       launch(
-                          //         forgetPasswordUrl,
-                          //         forceSafariVC: false,
-                          //         forceWebView: false,
-                          //       );
-                          //     }
-                          //   },
-                          // ),
-                          //   ],
-                          // ),
-                        ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -242,12 +224,17 @@ class LoginPageState extends State<LoginPage> {
       );
       return;
     }
+
+    setState(() {
+      _isAuthorizing = true;
+    });
+
     var userCredentials = UserCredentials(
       login: login,
       password: _passwordTextController.text,
     );
 
-    Uri url = Uri.https(
+    var url = Uri.https(
       ProxyHttpClient().getHostAddress(),
       '/node',
       {'destination': 'node'},
@@ -269,15 +256,53 @@ class LoginPageState extends State<LoginPage> {
                     'https://${ProxyHttpClient().getHostAddress()}/openid/authenticate?destination=node',
               },
             ),
+            options: Options(
+              followRedirects: true,
+              validateStatus: (status) => status == 302 || status == 200,
+            ),
           );
-      if (response.data is String) {
-        print((response.data as String).contains('error'));
+      if (response.data is String &&
+          (response.data as String).contains('error')) {
+        if (!mounted) return;
+        ToastManager().showToast('Неправильный логин или пароль');
+
+        setState(() {
+          _isAuthorizing = false;
+        });
+        return;
       }
     } on DsError catch (dsError) {
+      if (!mounted) return;
+      ToastManager().showToast(dsError.userMessage);
+
+      setState(() {
+        _isAuthorizing = false;
+      });
+      return;
+    }
+
+    var profileUrl = Uri.https(
+      ProxyHttpClient().getHostAddress(),
+      '/user/me/edit',
+    );
+
+    try {
+      var response = await ProxyHttpClient().getDio().getUri(profileUrl);
+      if (response.data is String) {
+        var userData = parseHtmlFromUserMeEdit(response.data);
+
+        print(userData.nickname);
+        print(userData.email);
+        print(userData.profileImgSrc);
+      }
+    } on DsError catch (dsError) {
+      if (!mounted) return;
       ToastManager().showToast(dsError.userMessage);
     }
 
-    print(ProxyHttpClient().getCookies());
+    setState(() {
+      _isAuthorizing = false;
+    });
   }
 
   @override

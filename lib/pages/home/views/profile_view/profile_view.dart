@@ -14,7 +14,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:share/share.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final BehaviorSubject<int> selectedNavItemController;
 
@@ -25,9 +25,14 @@ class ProfileView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
+      key: widget.scaffoldKey,
       body: SafeArea(
         child: Scrollbar(
           child: LayoutBuilder(
@@ -47,7 +52,7 @@ class ProfileView extends StatelessWidget {
                     children: <Widget>[
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
+                        children: [
                           SizedBox(height: 16),
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 12.0),
@@ -58,8 +63,10 @@ class ProfileView extends StatelessWidget {
                                   .headline4
                                   .copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color:
-                                        Theme.of(context).textTheme.bodyText2.color,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        .color,
                                   ),
                             ),
                           ),
@@ -88,7 +95,9 @@ class ProfileView extends StatelessWidget {
                                   'Выйти из аккаунта?',
                                 );
                                 if (signOutConfirm == true) {
-                                  ProxyHttpClient().signOut();
+                                  setState(() {
+                                    ProxyHttpClient().signOut();
+                                  });
                                 }
                               },
                             ),
@@ -105,7 +114,7 @@ class ProfileView extends StatelessWidget {
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
         index: 3,
-        selectedNavItemController: selectedNavItemController,
+        selectedNavItemController: widget.selectedNavItemController,
       ),
     );
   }
@@ -124,90 +133,33 @@ class ProfileScreen extends StatelessWidget {
               child: Material(
                 type: MaterialType.card,
                 borderRadius: BorderRadius.circular(kCardBorderRadius),
-                child: Banner(
-                  location: BannerLocation.topStart,
-                  message: 'В работе',
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 18,
-                    ),
-                    trailing: CircleAvatar(
-                      radius: 30,
-                      child: Icon(
-                        EvaIcons.personOutline,
-                        size: 34,
-                      ),
-                    ),
-                    title: Text(
-                      'Имя пользователя',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pushNamed(LoginPage.routeName);
-                    },
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 18,
                   ),
+                  trailing: CircleAvatar(
+                    radius: 30,
+                    child: Icon(
+                      EvaIcons.personOutline,
+                      size: 34,
+                    ),
+                  ),
+                  title: Text(
+                    'Имя пользователя',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(LoginPage.routeName);
+                  },
                 ),
               ),
             ),
           ),
         ),
-        // BlocBuilder(
-        //   bloc: ProfileDataBloc(),
-        //   builder: (context, profileDataState) {
-        //     Widget child = profileDataState is InProfileDataState
-        //         ? Card(
-        //             child: ListTile(
-        //               contentPadding: EdgeInsets.symmetric(
-        //                 vertical: 10,
-        //                 horizontal: 18,
-        //               ),
-        //               trailing: CircleAvatar(
-        //                 radius: 30,
-        //                 child: Text(
-        //                   StringUtils.getInitials(
-        //                       firstname:
-        //                           profileDataState.profileData?.firstName,
-        //                       lastname: profileDataState.profileData?.lastName),
-        //                   style: TextStyle(
-        //                     fontSize: 24,
-        //                     fontWeight: FontWeight.w400,
-        //                   ),
-        //                 ),
-        //               ),
-        //               title: Text(
-        //                 StringUtils.getShortName(
-        //                     firstname: profileDataState.profileData?.firstName,
-        //                     lastname: profileDataState.profileData?.lastName),
-        //                 style: TextStyle(
-        //                   fontSize: 16,
-        //                   fontWeight: FontWeight.w800,
-        //                 ),
-        //               ),
-        //               subtitle: Padding(
-        //                 padding: const EdgeInsets.only(top: 8.0),
-        //                 child: Text(
-        //                   UserUtils.getUserCustomerType(
-        //                       customerTypeCode: profileDataState
-        //                           .profileData?.customerTypeCode),
-        //                 ),
-        //               ),
-        //               onTap: () {
-        //                 Navigator.of(context).pushNamed(ProfilePage.routeName);
-        //               },
-        //             ),
-        //           )
-        //         : Container();
-
-        //     return ListFadeInSlideStagger(
-        //       index: 1,
-        //       child: child,
-        //     );
-        //   },
-        // ),
         SizedBox(height: 16),
         ListFadeInSlideStagger(
           index: 1,

@@ -1,3 +1,4 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:utopic_toast/utopic_toast.dart';
@@ -21,6 +22,22 @@ class DonatePage extends StatelessWidget {
             addSemanticIndexes: false,
             padding: EdgeInsets.symmetric(vertical: 20),
             children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 150,
+                child: FlareActor(
+                  'assets/animations/cloud.flr',
+                  animation: 'Animations',
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                child: Text(
+                  'Не стоит отправлять мне деньги, если они нужны вам самим.',
+                ),
+              ),
               Divider(),
               Material(
                 type: MaterialType.card,

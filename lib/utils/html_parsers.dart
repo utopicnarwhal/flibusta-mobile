@@ -3,6 +3,7 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
+import 'package:flibusta/model/userData.dart';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
@@ -681,6 +682,29 @@ List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
       sequenceBookCount = null;
     }
   }
+
+  return result;
+}
+
+UserData parseHtmlFromUserMeEdit(String htmlString) {
+  var result = UserData();
+
+  htmldom.Document document = parse(htmlString);
+
+  result.nickname = document
+      .getElementsByTagName('h1')
+      .firstWhere((element) => element.className == 'title', orElse: null)
+      .innerHtml;
+
+  result.email = document.getElementById('edit-mail').attributes['value'];
+
+  result.profileImgSrc = document
+      .getElementById('user-profile-form')
+      .getElementsByClassName('picture')
+      .first
+      .getElementsByTagName('img')
+      .first
+      .attributes['src'];
 
   return result;
 }

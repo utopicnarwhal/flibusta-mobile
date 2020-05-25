@@ -19,7 +19,7 @@ import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 
 class AuthorPage extends StatefulWidget {
-  static const routeName = "/author_page";
+  static const routeName = '/author_page';
 
   final int authorId;
 

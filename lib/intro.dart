@@ -189,7 +189,8 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
         'Включить прокси создателя приложения?',
         builder: (context) {
           return Text(
-              'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране');
+            'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране. Но оно не работает на мобильном интернете Yota. Если вы знаете, как сделать так, чтобы оно работало, напишите мне на почту gigok@bk.ru',
+          );
         },
         builderPadding: true,
         barrierDismissible: false,

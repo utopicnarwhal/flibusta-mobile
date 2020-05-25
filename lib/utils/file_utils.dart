@@ -8,7 +8,7 @@ import 'package:flibusta/utils/permissions_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
+import 'package:utopic_open_file/utopic_open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum DirectoryType {

@@ -124,11 +124,11 @@ class BookService {
             }
 
             try {
-              fileUri = saveDocDir.path +
-                  '/' +
-                  contentDisposition[0]
-                      .split('filename=')[1]
-                      .replaceAll('\"', '');
+              var fileName = contentDisposition[0]
+                  .split('filename=')[1]
+                  .replaceAll('\"', '')
+                  .replaceAll('.zip', '');
+              fileUri = saveDocDir.path + '/' + fileName;
             } catch (e) {
               NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
