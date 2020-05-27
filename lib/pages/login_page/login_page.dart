@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flibusta/blocs/user_contact_data/user_contact_data_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/enums/text_field_types.dart';
 import 'package:flibusta/ds_controls/fields/text_field.dart';
@@ -73,6 +74,8 @@ class LoginPageState extends State<LoginPage> {
         }
 
         ToastManager().showToast('Скорее всего, вы уже авторизованы');
+
+        Navigator.of(context).pop();
       }
     } on DsError catch (dsError) {
       if (!mounted) return;
@@ -188,15 +191,17 @@ class LoginPageState extends State<LoginPage> {
                               child: Text(
                                 'Регистрация',
                               ),
-                              onPressed: () {
-                                DialogUtils.simpleAlert(
-                                  context,
-                                  'Регистрация',
-                                  content: Text(
-                                    'Так как после регистрации приходит письмо для подтверждения e-mail, и вам всё-таки придётся зайти на сайт, поэтому регистрация не реализована в данном приложении.',
-                                  ),
-                                );
-                              },
+                              onPressed: !_isAuthorizing
+                                  ? () {
+                                      DialogUtils.simpleAlert(
+                                        context,
+                                        'Регистрация',
+                                        content: Text(
+                                          'Так как после регистрации приходит письмо для подтверждения e-mail, и вам всё-таки придётся зайти на сайт, поэтому регистрация не реализована в данном приложении.',
+                                        ),
+                                      );
+                                    }
+                                  : null,
                             ),
                           ],
                         ),
@@ -209,10 +214,6 @@ class LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  void _onAuthSuccess(BuildContext context) {
-    Navigator.of(context).pop();
   }
 
   Future<void> _loginClick() async {
@@ -258,13 +259,14 @@ class LoginPageState extends State<LoginPage> {
             ),
             options: Options(
               followRedirects: true,
-              validateStatus: (status) => status == 302 || status == 200,
             ),
           );
       if (response.data is String &&
           (response.data as String).contains('error')) {
         if (!mounted) return;
-        ToastManager().showToast('Неправильный логин или пароль');
+        ToastManager().showToast(
+          'Извините, это имя пользователя или пароль неверны',
+        );
 
         setState(() {
           _isAuthorizing = false;
@@ -281,28 +283,13 @@ class LoginPageState extends State<LoginPage> {
       return;
     }
 
-    var profileUrl = Uri.https(
-      ProxyHttpClient().getHostAddress(),
-      '/user/me/edit',
-    );
-
-    try {
-      var response = await ProxyHttpClient().getDio().getUri(profileUrl);
-      if (response.data is String) {
-        var userData = parseHtmlFromUserMeEdit(response.data);
-
-        print(userData.nickname);
-        print(userData.email);
-        print(userData.profileImgSrc);
-      }
-    } on DsError catch (dsError) {
-      if (!mounted) return;
-      ToastManager().showToast(dsError.userMessage);
-    }
-
     setState(() {
       _isAuthorizing = false;
     });
+
+    UserContactDataBloc().fetchUserContactData();
+
+    Navigator.of(context).pop();
   }
 
   @override

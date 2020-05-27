@@ -22,6 +22,8 @@ class ProxyHttpClient {
   static BaseOptions defaultDioOptions = BaseOptions(
     connectTimeout: 10000,
     receiveTimeout: 6000,
+    validateStatus: (status) => status == 302 || status == 200,
+    followRedirects: true,
   );
   Dio _dio = Dio(defaultDioOptions);
 

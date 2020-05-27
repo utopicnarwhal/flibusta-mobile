@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/blocs/grid/selected_view_type/selected_view_type_bloc.dart';
+import 'package:flibusta/blocs/user_contact_data/user_contact_data_bloc.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/pages/home/views/books_view/books_view.dart';
 import 'package:flibusta/pages/home/views/general_view/general_view.dart';
 import 'package:flibusta/pages/home/views/profile_view/profile_view.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/proxy_settings_page.dart';
+import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -35,6 +37,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _initNavItemController();
     _initGridData();
+    if (ProxyHttpClient().isAuthorized()) {
+      UserContactDataBloc().fetchUserContactData();
+    }
     _favoriteGenreCodesController = BehaviorSubject<List<String>>();
   }
 

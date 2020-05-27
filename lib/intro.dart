@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:flibusta/components/directory_picker/directory_picker.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
@@ -184,6 +187,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
       ProxyHttpClient().setHostAddress(value);
       LocalStorage().setHostAddress(value);
       LocalStorage().setIntroCompleted();
+
       var turnProxyOn = await DialogUtils.confirmationDialog(
         context,
         'Включить прокси создателя приложения?',
@@ -195,12 +199,64 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
         builderPadding: true,
         barrierDismissible: false,
       );
+
       if (turnProxyOn == true) {
         LocalStorage()
             .setActualProxy('flibustauser:ilovebooks@35.217.29.210:1194');
         ProxyHttpClient()
             .setProxy('flibustauser:ilovebooks@35.217.29.210:1194');
       }
+
+      var downloadPath = await LocalStorage().getBooksDirectory();
+
+      var chooseDownloadPath = await DialogUtils.confirmationDialog(
+        context,
+        'Папка для загрузки книг',
+        builder: (context) {
+          return Text(
+            'Сейчас файлы будут загружаться в папку "${downloadPath.path}". Хотите ли указать свой путь? Вы всегда можете изменить этот путь в настройках.',
+          );
+        },
+        builderPadding: true,
+        barrierDismissible: false,
+      );
+
+      if (chooseDownloadPath == true) {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return SimpleDialog(
+              title: Text('Учтите'),
+              contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 16),
+              children: <Widget>[
+                Text(
+                  'В следующем окне с выбором папки будут отображаться ТОЛЬКО папки (без каких-либо файлов). \nА также, если у Вас Android 4.4 или ниже, то не стоит менять этот параметр.',
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: FlatButton(
+                    child: Text('Понятно'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        Directory newDirectory = await DirectoryPicker.pick(
+          allowFolderCreation: true,
+          context: context,
+          rootDirectory: downloadPath,
+        );
+
+        if (newDirectory != null) {
+          await LocalStorage().setBooksDirectory(newDirectory);
+        }
+      }
+
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
       return;
     }

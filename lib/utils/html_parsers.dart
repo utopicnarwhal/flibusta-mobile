@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
-import 'package:flibusta/model/userData.dart';
+import 'package:flibusta/model/userContactData.dart';
+import 'package:flibusta/services/http_client.dart';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
@@ -104,14 +107,17 @@ List<BookCard> parseHtmlFromMakeBookList(
             temp.attributes['href'] != null &&
             temp.attributes['href'].contains('/b/');
         temp = temp.nextElementSibling) {
-      var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
-      if (downloadFormatName == 'читать') {
-        continue;
+      if (!ProxyHttpClient().isAuthorized()) {
+        var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
+        if (downloadFormatName == 'читать' || downloadFormatName == 'mail') {
+          continue;
+        }
+        downloadFormatName =
+            downloadFormatName.replaceAll('скачать ', '').trim();
+        var downloadFormatType =
+            temp.attributes['href'].split('/').last.split('?')[0];
+        downloadFormats.add({downloadFormatName: downloadFormatType});
       }
-      downloadFormatName = downloadFormatName.replaceAll('скачать ', '');
-      var downloadFormatType =
-          temp.attributes['href'].split('/').last.split('?')[0];
-      downloadFormats.add({downloadFormatName: downloadFormatType});
     }
 
     var authors = List<Map<int, String>>();
@@ -292,7 +298,13 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   downloadFormatsA.forEach((downloadFormatA) {
     var downloadFormatName = downloadFormatA.text
         .replaceAll(RegExp(r'(\(|\))'), '')
-        .replaceAll('скачать ', '');
+        .replaceAll('скачать ', '')
+        .trim();
+    if (downloadFormatName == 'mail' ||
+        downloadFormatName == 'исправить' ||
+        downloadFormatName.contains('пожаловаться')) {
+      return;
+    }
     var downloadFormatType =
         downloadFormatA.attributes['href'].split('/').last.split('?')[0];
     downloadFormatsList.add({downloadFormatName: downloadFormatType});
@@ -318,13 +330,19 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
       })
       ?.first
       ?.text;
+
   var addedToLibraryDateStringStarts = mainNode.text.indexOf('Добавлена:');
   bookInfo.addedToLibraryDate = mainNode.text.substring(
       addedToLibraryDateStringStarts, addedToLibraryDateStringStarts + 21);
+
   var lemmaStringStarts = mainNode.text.indexOf('Аннотация') + 10;
-  var lemmaStringEnds = mainNode.text.indexOf('Рекомендации:');
+  var lemmaStringEndsOnComplain = mainNode.text.indexOf('(пожаловаться');
+  var lemmaStringEndsOnRecommendations = mainNode.text.indexOf('Рекомендации:');
+  var lemmaStringEnds =
+      min(lemmaStringEndsOnComplain, lemmaStringEndsOnRecommendations);
+
   bookInfo.lemma =
-      mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trimRight();
+      mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trim();
 
   var fb2infoContent = mainElement.getElementsByClassName('fb2info-content');
   if (fb2infoContent.isEmpty) {
@@ -686,8 +704,8 @@ List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
   return result;
 }
 
-UserData parseHtmlFromUserMeEdit(String htmlString) {
-  var result = UserData();
+UserContactData parseHtmlFromUserMeEdit(String htmlString) {
+  var result = UserContactData();
 
   htmldom.Document document = parse(htmlString);
 
@@ -698,13 +716,18 @@ UserData parseHtmlFromUserMeEdit(String htmlString) {
 
   result.email = document.getElementById('edit-mail').attributes['value'];
 
-  result.profileImgSrc = document
-      .getElementById('user-profile-form')
-      .getElementsByClassName('picture')
-      .first
-      .getElementsByTagName('img')
-      .first
-      .attributes['src'];
+  var elementsClassPicture = document
+      ?.getElementById('user-profile-form')
+      ?.getElementsByClassName('picture');
+
+  if (elementsClassPicture?.isNotEmpty == true) {
+    var elementsClassImg =
+        elementsClassPicture.first?.getElementsByTagName('img');
+
+    if (elementsClassImg?.isNotEmpty == true) {
+      result.profileImgSrc = elementsClassImg.first?.attributes['src'];
+    }
+  }
 
   return result;
 }
