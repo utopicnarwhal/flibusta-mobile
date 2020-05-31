@@ -280,10 +280,6 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
     return a.attributes['href'] != null &&
         a.attributes['href'].contains(RegExp(r'^(/g/)[0-9]*'));
   });
-  var downloadFormatsA = allA.where((a) {
-    return a.attributes['href'] != null &&
-        a.attributes['href'].contains(RegExp('^(/b/$bookId/)(?!read).*'));
-  });
 
   var genresList = List<Map<int, String>>();
   genresA.forEach((genreA) {
@@ -295,20 +291,39 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   bookInfo.genres = Genres(genresList);
 
   var downloadFormatsList = List<Map<String, String>>();
-  downloadFormatsA.forEach((downloadFormatA) {
-    var downloadFormatName = downloadFormatA.text
-        .replaceAll(RegExp(r'(\(|\))'), '')
-        .replaceAll('скачать ', '')
-        .trim();
-    if (downloadFormatName == 'mail' ||
-        downloadFormatName == 'исправить' ||
-        downloadFormatName.contains('пожаловаться')) {
-      return;
-    }
-    var downloadFormatType =
-        downloadFormatA.attributes['href'].split('/').last.split('?')[0];
-    downloadFormatsList.add({downloadFormatName: downloadFormatType});
-  });
+
+  var useroptSelector = document.getElementById('useropt');
+  if (useroptSelector != null) {
+    var downloadFormatOptions = useroptSelector.children
+        .where((element) => element.localName == 'option')
+        .toList();
+
+    downloadFormatOptions.forEach((option) {
+      var downloadFormatName = option.text.trim();
+      var downloadFormatType = option.attributes['value'];
+      downloadFormatsList.add({downloadFormatName: downloadFormatType});
+    });
+  } else {
+    var downloadFormatsA = allA.where((a) {
+      return a.attributes['href'] != null &&
+          a.attributes['href'].contains(RegExp('^(/b/$bookId/)(?!read).*'));
+    });
+
+    downloadFormatsA.forEach((downloadFormatA) {
+      var downloadFormatName = downloadFormatA.text
+          .replaceAll(RegExp(r'(\(|\))'), '')
+          .replaceAll('скачать ', '')
+          .trim();
+      if (downloadFormatName == 'mail' ||
+          downloadFormatName == 'исправить' ||
+          downloadFormatName.contains('пожаловаться')) {
+        return;
+      }
+      var downloadFormatType =
+          downloadFormatA.attributes['href'].split('/').last.split('?')[0];
+      downloadFormatsList.add({downloadFormatName: downloadFormatType});
+    });
+  }
   bookInfo.downloadFormats = DownloadFormats(downloadFormatsList);
 
   var sequenceA = allA.where((a) {
@@ -338,8 +353,19 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   var lemmaStringStarts = mainNode.text.indexOf('Аннотация') + 10;
   var lemmaStringEndsOnComplain = mainNode.text.indexOf('(пожаловаться');
   var lemmaStringEndsOnRecommendations = mainNode.text.indexOf('Рекомендации:');
-  var lemmaStringEnds =
-      min(lemmaStringEndsOnComplain, lemmaStringEndsOnRecommendations);
+
+  var lemmaStringEnds = mainNode.text.length;
+  if (lemmaStringEndsOnComplain == -1 &&
+      lemmaStringEndsOnRecommendations != -1) {
+    lemmaStringEnds = lemmaStringEndsOnRecommendations;
+  } else if (lemmaStringEndsOnComplain != -1 &&
+      lemmaStringEndsOnRecommendations == -1) {
+    lemmaStringEnds = lemmaStringEndsOnComplain;
+  } else if (lemmaStringEndsOnComplain != -1 &&
+      lemmaStringEndsOnRecommendations != -1) {
+    lemmaStringEnds =
+        min(lemmaStringEndsOnComplain, lemmaStringEndsOnRecommendations);
+  }
 
   bookInfo.lemma =
       mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trim();
@@ -489,6 +515,14 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
   sequenceInfo.title = mainElement.getElementsByTagName('h1').first.innerHtml;
 
   var mainElementChildren = mainElement.children;
+  if (ProxyHttpClient().isAuthorized()) {
+    var formsInMainElement = mainElement.getElementsByTagName('form');
+    for (var form in formsInMainElement) {
+      if (form.attributes['name'] == 'bk') {
+        mainElementChildren = form.children;
+      }
+    }
+  }
   int actualSequenceId;
   String actualSequenceTitle;
   Genres actualGenres = Genres(List());

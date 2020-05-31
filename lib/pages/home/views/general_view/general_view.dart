@@ -1,6 +1,7 @@
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
+import 'package:flibusta/pages/home/views/general_view/components/favorites.dart';
 import 'package:flibusta/pages/home/views/general_view/components/last_open_books.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -31,6 +32,11 @@ class GeneralView extends StatelessWidget {
       SizedBox(height: 8),
       ListFadeInSlideStagger(
         index: 0,
+        child: FavoritesCard(),
+      ),
+      SizedBox(height: 24),
+      ListFadeInSlideStagger(
+        index: 1,
         child: LastOpenBooksCard(),
       ),
       SizedBox(height: 8),
@@ -39,10 +45,6 @@ class GeneralView extends StatelessWidget {
     return Scaffold(
       key: scaffoldKey,
       body: SafeArea(
-        // child: RefreshIndicator(
-        //   onRefresh: () async {
-        //     UserContactDataBloc().refreshUserContactData();
-        //   },
         child: Scrollbar(
           child: ListView(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 42),
@@ -51,7 +53,6 @@ class GeneralView extends StatelessWidget {
             children: children,
           ),
         ),
-        // ),
       ),
       bottomNavigationBar: HomeBottomNavBar(
         index: 0,

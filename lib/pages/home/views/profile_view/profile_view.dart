@@ -150,18 +150,21 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 4),
-          Align(
-            alignment: Alignment.topRight,
-            child: FlatButton(
-              child: Text('Что позволяет авторизация?'),
-              onPressed: () {
-                DialogUtils.simpleAlert(
-                  context,
-                  'Что позволяет авторизация?',
-                  content: Text(
-                      'Вроде бы, вам становится доступна иностранная литература.'),
-                );
-              },
+          ListFadeInSlideStagger(
+            index: 0,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: FlatButton(
+                child: Text('Что позволяет авторизация?'),
+                onPressed: () {
+                  DialogUtils.simpleAlert(
+                    context,
+                    'Что позволяет авторизация?',
+                    content: Text(
+                        'Вроде бы, вам становится доступна иностранная литература.'),
+                  );
+                },
+              ),
             ),
           ),
         ],

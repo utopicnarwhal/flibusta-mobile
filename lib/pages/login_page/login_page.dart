@@ -12,7 +12,6 @@ import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/model/userCredentials.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/utils/dialog_utils.dart';
-import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:utopic_toast/utopic_toast.dart';
@@ -259,6 +258,7 @@ class LoginPageState extends State<LoginPage> {
             ),
             options: Options(
               followRedirects: true,
+              validateStatus: (status) => status == 200 || status == 302,
             ),
           );
       if (response.data is String &&

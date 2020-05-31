@@ -1,6 +1,9 @@
 import 'package:flibusta/model/bookCard.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'grid_data/grid_data.dart';
+
+part 'searchResults.g.dart';
 
 class SearchResults {
   List<BookCard> books;
@@ -10,6 +13,7 @@ class SearchResults {
   SearchResults({this.books, this.authors, this.sequences});
 }
 
+@JsonSerializable()
 class AuthorCard extends GridData {
   int id;
   String name;
@@ -22,8 +26,13 @@ class AuthorCard extends GridData {
 
   @override
   String get tileTitle => name;
+
+  factory AuthorCard.fromJson(Map<String, dynamic> json) =>
+      _$AuthorCardFromJson(json);
+  Map<String, dynamic> toJson() => _$AuthorCardToJson(this);
 }
 
+@JsonSerializable()
 class SequenceCard extends GridData {
   int id;
   String title;
@@ -36,4 +45,8 @@ class SequenceCard extends GridData {
 
   @override
   String get tileTitle => title;
+
+  factory SequenceCard.fromJson(Map<String, dynamic> json) =>
+      _$SequenceCardFromJson(json);
+  Map<String, dynamic> toJson() => _$SequenceCardToJson(this);
 }

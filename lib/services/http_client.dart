@@ -22,7 +22,6 @@ class ProxyHttpClient {
   static BaseOptions defaultDioOptions = BaseOptions(
     connectTimeout: 10000,
     receiveTimeout: 6000,
-    validateStatus: (status) => status == 302 || status == 200,
     followRedirects: true,
   );
   Dio _dio = Dio(defaultDioOptions);
@@ -66,6 +65,22 @@ class ProxyHttpClient {
           }
         },
         onError: (dioError) {
+          if (dioError?.message
+                  ?.contains('Proxy failed to establish tunnel (302 Found)') ==
+              true) {
+            return _dio.requestUri(
+              dioError.request.uri,
+              data: dioError.request.data,
+              options: Options(
+                method: dioError.request.method,
+                responseType: dioError.request.responseType,
+                contentType: dioError.request.contentType,
+              ),
+              onReceiveProgress: dioError.request.onReceiveProgress,
+              onSendProgress: dioError.request.onSendProgress,
+              cancelToken: dioError.request.cancelToken,
+            );
+          }
           return DsError.fromDioError(dioError: dioError);
         },
       ),
@@ -80,20 +95,44 @@ class ProxyHttpClient {
     _proxyHostPort = hostPort;
     var newDio = Dio(defaultDioOptions);
 
+    newDio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (dioError) {
+          if (dioError?.message
+                  ?.contains('Proxy failed to establish tunnel (302 Found)') ==
+              true) {
+            return _dio.requestUri(
+              dioError.request.uri,
+              data: dioError.request.data,
+              options: Options(
+                method: dioError.request.method,
+                responseType: dioError.request.responseType,
+                contentType: dioError.request.contentType,
+              ),
+              onReceiveProgress: dioError.request.onReceiveProgress,
+              onSendProgress: dioError.request.onSendProgress,
+              cancelToken: dioError.request.cancelToken,
+            );
+          }
+          return DsError.fromDioError(dioError: dioError);
+        },
+      ),
+    );
+
     (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) =>
+              host == 'flibusta.is';
+
       if (hostPort == '') {
         client.findProxy = null;
-        return;
+        return client;
       }
       client.findProxy = (url) {
-        return HttpClient.findProxyFromEnvironment(url, environment: {
-          'HTTPS_PROXY': hostPort,
-          'HTTP_PROXY': hostPort,
-          'https_proxy': hostPort,
-          'http_proxy': hostPort
-        });
+        return 'PROXY $hostPort';
       };
+      return client;
     };
     _dio.clear();
     _dio.close();
@@ -127,16 +166,11 @@ class ProxyHttpClient {
     if (hostPort != '') {
       (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) =>
+                host == 'flibusta.is';
         client.findProxy = (url) {
-          return HttpClient.findProxyFromEnvironment(
-            url,
-            environment: {
-              'HTTPS_PROXY': hostPort,
-              'HTTP_PROXY': hostPort,
-              'https_proxy': hostPort,
-              'http_proxy': hostPort
-            },
-          );
+          return 'PROXY $hostPort';
         };
       };
     }
@@ -154,6 +188,7 @@ class ProxyHttpClient {
       stopWatch.stop();
 
       switch (response.statusCode) {
+        case 302:
         case 200:
           result.ping = stopWatch.elapsedMilliseconds;
           break;

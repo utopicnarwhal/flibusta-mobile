@@ -13,7 +13,10 @@ class BookCard extends GridData {
   String sequenceTitle;
   String title;
   String size;
+
+  @JsonKey(ignore: true)
   int fileScore;
+
   DownloadFormats downloadFormats;
   Authors authors;
   Translators translators;

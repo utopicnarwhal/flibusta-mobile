@@ -2,6 +2,7 @@ import 'package:flibusta/ds_controls/ui/splash_screen.dart';
 import 'package:flibusta/pages/advanced_search/advanced_search.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flibusta/pages/favorites/favorites_page.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/donate.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
@@ -41,6 +42,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           return AdvancedSearchPage(advancedSearchParams: settings.arguments);
         case SequencePage.routeName:
           return SequencePage(sequenceId: settings.arguments);
+        case FavoritesPage.routeName:
+          return FavoritesPage(favoritesType: settings.arguments);
         default:
           print('undefined route');
       }
