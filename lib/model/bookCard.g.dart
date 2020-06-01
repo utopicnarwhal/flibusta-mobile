@@ -30,19 +30,28 @@ BookCard _$BookCardFromJson(Map<String, dynamic> json) {
   )..downloadProgress = (json['downloadProgress'] as num)?.toDouble();
 }
 
-Map<String, dynamic> _$BookCardToJson(BookCard instance) => <String, dynamic>{
-      'id': instance.id,
-      'genres': instance.genres?.toJson(),
-      'sequenceId': instance.sequenceId,
-      'sequenceTitle': instance.sequenceTitle,
-      'title': instance.title,
-      'size': instance.size,
-      'downloadFormats': instance.downloadFormats?.toJson(),
-      'authors': instance.authors?.toJson(),
-      'translators': instance.translators?.toJson(),
-      'downloadProgress': instance.downloadProgress,
-      'localPath': instance.localPath,
-    };
+Map<String, dynamic> _$BookCardToJson(BookCard instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('id', instance.id);
+  writeNotNull('genres', instance.genres?.toJson());
+  writeNotNull('sequenceId', instance.sequenceId);
+  writeNotNull('sequenceTitle', instance.sequenceTitle);
+  writeNotNull('title', instance.title);
+  writeNotNull('size', instance.size);
+  writeNotNull('downloadFormats', instance.downloadFormats?.toJson());
+  writeNotNull('authors', instance.authors?.toJson());
+  writeNotNull('translators', instance.translators?.toJson());
+  writeNotNull('downloadProgress', instance.downloadProgress);
+  writeNotNull('localPath', instance.localPath);
+  return val;
+}
 
 DownloadFormats _$DownloadFormatsFromJson(Map<String, dynamic> json) {
   return DownloadFormats(
@@ -54,10 +63,18 @@ DownloadFormats _$DownloadFormatsFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$DownloadFormatsToJson(DownloadFormats instance) =>
-    <String, dynamic>{
-      'list': instance.list,
-    };
+Map<String, dynamic> _$DownloadFormatsToJson(DownloadFormats instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('list', instance.list);
+  return val;
+}
 
 Authors _$AuthorsFromJson(Map<String, dynamic> json) {
   return Authors(
@@ -69,11 +86,22 @@ Authors _$AuthorsFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$AuthorsToJson(Authors instance) => <String, dynamic>{
-      'list': instance.list
+Map<String, dynamic> _$AuthorsToJson(Authors instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull(
+      'list',
+      instance.list
           ?.map((e) => e?.map((k, e) => MapEntry(k.toString(), e)))
-          ?.toList(),
-    };
+          ?.toList());
+  return val;
+}
 
 Translators _$TranslatorsFromJson(Map<String, dynamic> json) {
   return Translators(
@@ -85,12 +113,22 @@ Translators _$TranslatorsFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$TranslatorsToJson(Translators instance) =>
-    <String, dynamic>{
-      'list': instance.list
+Map<String, dynamic> _$TranslatorsToJson(Translators instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull(
+      'list',
+      instance.list
           ?.map((e) => e?.map((k, e) => MapEntry(k.toString(), e)))
-          ?.toList(),
-    };
+          ?.toList());
+  return val;
+}
 
 Genres _$GenresFromJson(Map<String, dynamic> json) {
   return Genres(
@@ -102,8 +140,19 @@ Genres _$GenresFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$GenresToJson(Genres instance) => <String, dynamic>{
-      'list': instance.list
+Map<String, dynamic> _$GenresToJson(Genres instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull(
+      'list',
+      instance.list
           ?.map((e) => e?.map((k, e) => MapEntry(k.toString(), e)))
-          ?.toList(),
-    };
+          ?.toList());
+  return val;
+}

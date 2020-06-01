@@ -22,7 +22,7 @@ class AuthorCard extends GridData {
   AuthorCard({this.id, this.name, this.booksCount}) : assert(id != null);
 
   @override
-  String get tileSubtitle => '$booksCount';
+  String get tileSubtitle => booksCount ?? '';
 
   @override
   String get tileTitle => name;
@@ -41,7 +41,7 @@ class SequenceCard extends GridData {
   SequenceCard({this.id, this.title, this.booksCount}) : assert(id != null);
 
   @override
-  String get tileSubtitle => '$booksCount книг';
+  String get tileSubtitle => booksCount != null ? '$booksCount книг' : '';
 
   @override
   String get tileTitle => title;

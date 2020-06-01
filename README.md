@@ -32,7 +32,7 @@ Prod: `flutter build apk`
 
 ### Команды сборки AppBundle
 
-Bundle: `flutter build appbundle --release --no-shrink`  
+Bundle: `flutter build appbundle`  
 
 
 ## Проверка обновлений пакетов
