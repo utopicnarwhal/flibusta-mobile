@@ -2,6 +2,7 @@ import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/utils/icon_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class GridDataTile extends StatelessWidget {
   final String title;
@@ -16,6 +17,9 @@ class GridDataTile extends StatelessWidget {
   final Widget trailingIcon;
   final bool showTopDivider;
   final bool showBottomDivier;
+  final bool isSlidable;
+  final SlidableController slidableController;
+  final Function onDismissed;
 
   GridDataTile({
     @required this.title,
@@ -30,6 +34,9 @@ class GridDataTile extends StatelessWidget {
     this.trailingIcon,
     this.showTopDivider = false,
     this.showBottomDivier = false,
+    this.isSlidable = false,
+    this.slidableController,
+    this.onDismissed,
   });
 
   @override
@@ -40,48 +47,73 @@ class GridDataTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           if (showTopDivider) Divider(),
-          InkWell(
-            onLongPress: onLongPress,
-            onTap: onTap,
-            splashColor: Theme.of(context).accentColor.withOpacity(0.4),
-            child: ListTile(
-              title: Text(
-                title ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.fade,
-                softWrap: false,
+          Slidable(
+            key: ValueKey(title),
+            controller: slidableController,
+            actionPane: SlidableDrawerActionPane(),
+            actionExtentRatio: 0.25,
+            enabled: isSlidable,
+            dismissal: SlidableDismissal(
+              child: SlidableDrawerDismissal(),
+              onDismissed: (actionType) async {
+                if (actionType == SlideActionType.primary) {
+                  return;
+                }
+                onDismissed();
+              },
+            ),
+            secondaryActions: <Widget>[
+              IconSlideAction(
+                caption: 'Убрать',
+                color: Theme.of(context).scaffoldBackgroundColor,
+                foregroundColor: Theme.of(context).accentColor,
+                icon: Icons.delete,
+                onTap: onDismissed,
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (subtitle != null)
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                    ),
-                  if (genres?.isNotEmpty == true || score != null) ...[
-                    _genresAndScoreBuilder(context, genres, score)
+            ],
+            child: InkWell(
+              onLongPress: onLongPress,
+              onTap: onTap,
+              splashColor: Theme.of(context).accentColor.withOpacity(0.4),
+              child: ListTile(
+                title: Text(
+                  title ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (subtitle != null)
+                      Text(
+                        subtitle ?? '',
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                      ),
+                    if (genres?.isNotEmpty == true || score != null) ...[
+                      _genresAndScoreBuilder(context, genres, score)
+                    ],
                   ],
-                ],
+                ),
+                isThreeLine: genres?.isNotEmpty == true && subtitle != null,
+                trailing: trailingIcon != null || onTap != null
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (trailingIcon != null) trailingIcon,
+                              if (onTap != null) kIconArrowForward,
+                            ],
+                          ),
+                        ],
+                      )
+                    : SizedBox(),
               ),
-              isThreeLine: genres?.isNotEmpty == true && subtitle != null,
-              trailing: trailingIcon != null || onTap != null
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (trailingIcon != null) trailingIcon,
-                            if (onTap != null) kIconArrowForward,
-                          ],
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
             ),
           ),
           if (!isLast || isFirst) Divider(indent: 16),

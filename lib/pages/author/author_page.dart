@@ -9,6 +9,7 @@ import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/sortBooksByEnum.dart';
+import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
@@ -17,9 +18,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:flibusta/ds_controls/theme.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AuthorPage extends StatefulWidget {
-  static const routeName = "/author_page";
+  static const routeName = '/author_page';
 
   final int authorId;
 
@@ -173,6 +175,36 @@ class _AuthorPageState extends State<AuthorPage> {
                 }
                 return [entry];
               }).toList();
+            },
+          ),
+          FutureBuilder<bool>(
+            future: LocalStorage().isFavoriteAuthor(widget.authorId),
+            builder: (context, isFavoriteAuthorSnapshot) {
+              return IconButton(
+                tooltip: isFavoriteAuthorSnapshot.data == true
+                    ? 'Убрать из избранного'
+                    : 'Добавить в избранное',
+                icon: Icon(
+                  isFavoriteAuthorSnapshot.data == true
+                      ? FontAwesomeIcons.solidHeart
+                      : FontAwesomeIcons.heart,
+                  color:
+                      isFavoriteAuthorSnapshot.data == true ? Colors.red : null,
+                ),
+                onPressed: () async {
+                  if (isFavoriteAuthorSnapshot.data == true) {
+                    await LocalStorage().deleteFavoriteAuthor(widget.authorId);
+                  } else {
+                    await LocalStorage().addFavoriteAuthor(
+                      AuthorCard(
+                        id: _authorInfo.id,
+                        name: _authorInfo.name,
+                      ),
+                    );
+                  }
+                  setState(() {});
+                },
+              );
             },
           ),
         ],

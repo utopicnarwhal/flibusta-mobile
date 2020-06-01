@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
+import 'package:flibusta/model/userContactData.dart';
+import 'package:flibusta/services/http_client.dart';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
@@ -73,9 +77,9 @@ List<BookCard> parseHtmlFromMakeBookList(
     }
 
     var title = bookCardDivs[i]
-        .getElementsByTagName('input')
-        ?.first
-        ?.nextElementSibling;
+        .getElementsByTagName('a')
+        .where((element) => element.attributes['href'].contains('/b/'))
+        ?.first;
 
     var translators = List<Map<int, String>>();
     htmldom.Element sequence;
@@ -103,14 +107,17 @@ List<BookCard> parseHtmlFromMakeBookList(
             temp.attributes['href'] != null &&
             temp.attributes['href'].contains('/b/');
         temp = temp.nextElementSibling) {
-      var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
-      if (downloadFormatName == 'читать') {
-        continue;
+      if (!ProxyHttpClient().isAuthorized()) {
+        var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
+        if (downloadFormatName == 'читать' || downloadFormatName == 'mail') {
+          continue;
+        }
+        downloadFormatName =
+            downloadFormatName.replaceAll('скачать ', '').trim();
+        var downloadFormatType =
+            temp.attributes['href'].split('/').last.split('?')[0];
+        downloadFormats.add({downloadFormatName: downloadFormatType});
       }
-      downloadFormatName = downloadFormatName.replaceAll('скачать ', '');
-      var downloadFormatType =
-          temp.attributes['href'].split('/').last.split('?')[0];
-      downloadFormats.add({downloadFormatName: downloadFormatType});
     }
 
     var authors = List<Map<int, String>>();
@@ -127,11 +134,7 @@ List<BookCard> parseHtmlFromMakeBookList(
     }
 
     result.add(BookCard(
-      id: int.tryParse(bookCardDivs[i]
-          .getElementsByTagName('input')
-          ?.first
-          ?.attributes['name']
-          ?.replaceAll('bchk', '')),
+      id: int.tryParse(title?.attributes['href']?.replaceAll('/b/', '')),
       genres: Genres(genres),
       title: title?.text,
       authors: Authors(authors),
@@ -277,10 +280,6 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
     return a.attributes['href'] != null &&
         a.attributes['href'].contains(RegExp(r'^(/g/)[0-9]*'));
   });
-  var downloadFormatsA = allA.where((a) {
-    return a.attributes['href'] != null &&
-        a.attributes['href'].contains(RegExp('^(/b/$bookId/)(?!read).*'));
-  });
 
   var genresList = List<Map<int, String>>();
   genresA.forEach((genreA) {
@@ -292,14 +291,39 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   bookInfo.genres = Genres(genresList);
 
   var downloadFormatsList = List<Map<String, String>>();
-  downloadFormatsA.forEach((downloadFormatA) {
-    var downloadFormatName = downloadFormatA.text
-        .replaceAll(RegExp(r'(\(|\))'), '')
-        .replaceAll('скачать ', '');
-    var downloadFormatType =
-        downloadFormatA.attributes['href'].split('/').last.split('?')[0];
-    downloadFormatsList.add({downloadFormatName: downloadFormatType});
-  });
+
+  var useroptSelector = document.getElementById('useropt');
+  if (useroptSelector != null) {
+    var downloadFormatOptions = useroptSelector.children
+        .where((element) => element.localName == 'option')
+        .toList();
+
+    downloadFormatOptions.forEach((option) {
+      var downloadFormatName = option.text.trim();
+      var downloadFormatType = option.attributes['value'];
+      downloadFormatsList.add({downloadFormatName: downloadFormatType});
+    });
+  } else {
+    var downloadFormatsA = allA.where((a) {
+      return a.attributes['href'] != null &&
+          a.attributes['href'].contains(RegExp('^(/b/$bookId/)(?!read).*'));
+    });
+
+    downloadFormatsA.forEach((downloadFormatA) {
+      var downloadFormatName = downloadFormatA.text
+          .replaceAll(RegExp(r'(\(|\))'), '')
+          .replaceAll('скачать ', '')
+          .trim();
+      if (downloadFormatName == 'mail' ||
+          downloadFormatName == 'исправить' ||
+          downloadFormatName.contains('пожаловаться')) {
+        return;
+      }
+      var downloadFormatType =
+          downloadFormatA.attributes['href'].split('/').last.split('?')[0];
+      downloadFormatsList.add({downloadFormatName: downloadFormatType});
+    });
+  }
   bookInfo.downloadFormats = DownloadFormats(downloadFormatsList);
 
   var sequenceA = allA.where((a) {
@@ -321,13 +345,30 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
       })
       ?.first
       ?.text;
+
   var addedToLibraryDateStringStarts = mainNode.text.indexOf('Добавлена:');
   bookInfo.addedToLibraryDate = mainNode.text.substring(
       addedToLibraryDateStringStarts, addedToLibraryDateStringStarts + 21);
+
   var lemmaStringStarts = mainNode.text.indexOf('Аннотация') + 10;
-  var lemmaStringEnds = mainNode.text.indexOf('Рекомендации:');
+  var lemmaStringEndsOnComplain = mainNode.text.indexOf('(пожаловаться');
+  var lemmaStringEndsOnRecommendations = mainNode.text.indexOf('Рекомендации:');
+
+  var lemmaStringEnds = mainNode.text.length;
+  if (lemmaStringEndsOnComplain == -1 &&
+      lemmaStringEndsOnRecommendations != -1) {
+    lemmaStringEnds = lemmaStringEndsOnRecommendations;
+  } else if (lemmaStringEndsOnComplain != -1 &&
+      lemmaStringEndsOnRecommendations == -1) {
+    lemmaStringEnds = lemmaStringEndsOnComplain;
+  } else if (lemmaStringEndsOnComplain != -1 &&
+      lemmaStringEndsOnRecommendations != -1) {
+    lemmaStringEnds =
+        min(lemmaStringEndsOnComplain, lemmaStringEndsOnRecommendations);
+  }
+
   bookInfo.lemma =
-      mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trimRight();
+      mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trim();
 
   var fb2infoContent = mainElement.getElementsByClassName('fb2info-content');
   if (fb2infoContent.isEmpty) {
@@ -474,6 +515,14 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
   sequenceInfo.title = mainElement.getElementsByTagName('h1').first.innerHtml;
 
   var mainElementChildren = mainElement.children;
+  if (ProxyHttpClient().isAuthorized()) {
+    var formsInMainElement = mainElement.getElementsByTagName('form');
+    for (var form in formsInMainElement) {
+      if (form.attributes['name'] == 'bk') {
+        mainElementChildren = form.children;
+      }
+    }
+  }
   int actualSequenceId;
   String actualSequenceTitle;
   Genres actualGenres = Genres(List());
@@ -683,6 +732,34 @@ List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
       sequenceName = null;
       sequenceId = null;
       sequenceBookCount = null;
+    }
+  }
+
+  return result;
+}
+
+UserContactData parseHtmlFromUserMeEdit(String htmlString) {
+  var result = UserContactData();
+
+  htmldom.Document document = parse(htmlString);
+
+  result.nickname = document
+      .getElementsByTagName('h1')
+      .firstWhere((element) => element.className == 'title', orElse: null)
+      .innerHtml;
+
+  result.email = document.getElementById('edit-mail').attributes['value'];
+
+  var elementsClassPicture = document
+      ?.getElementById('user-profile-form')
+      ?.getElementsByClassName('picture');
+
+  if (elementsClassPicture?.isNotEmpty == true) {
+    var elementsClassImg =
+        elementsClassPicture.first?.getElementsByTagName('img');
+
+    if (elementsClassImg?.isNotEmpty == true) {
+      result.profileImgSrc = elementsClassImg.first?.attributes['src'];
     }
   }
 

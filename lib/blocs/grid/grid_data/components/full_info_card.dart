@@ -120,59 +120,65 @@ class _FullInfoCardState extends State<FullInfoCard> {
                               rowName: 'Путь к файлу',
                               value: widget.data.localPath,
                             ),
-                          ButtonBarTheme(
-                            data: ButtonBarThemeData(
-                              layoutBehavior:
-                                  ButtonBarLayoutBehavior.constrained,
-                            ),
-                            child: ButtonBar(
-                              alignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                if (widget.data is BookCard &&
-                                    widget.data.downloadFormats != null &&
-                                    widget.data.localPath == null)
-                                  DownloadBookButton(
-                                    book: widget.data,
-                                    downloadBookCallback: (downloadProgress) {
-                                      setState(() {
-                                        widget.data.downloadProgress =
-                                            downloadProgress;
-                                      });
-                                    },
-                                  ),
-                                if (widget.data is BookCard &&
-                                    (widget.data as BookCard).localPath !=
-                                        null &&
-                                    (widget.data as BookCard)
-                                            .downloadProgress ==
-                                        null)
-                                  FutureBuilder(
-                                    future:
-                                        File(widget.data.localPath).exists(),
-                                    builder: (context, bookFileExistsSnapshot) {
-                                      if (bookFileExistsSnapshot.data != true) {
-                                        return DownloadBookButton(
-                                          book: widget.data,
-                                          downloadBookCallback:
-                                              (downloadProgress) {
-                                            setState(() {
-                                              widget.data.downloadProgress =
-                                                  downloadProgress;
-                                            });
-                                          },
+                          if (widget.data is BookCard &&
+                                  widget.data.downloadFormats != null ||
+                              widget.data.localPath != null)
+                            ButtonBarTheme(
+                              data: ButtonBarThemeData(
+                                layoutBehavior:
+                                    ButtonBarLayoutBehavior.constrained,
+                              ),
+                              child: ButtonBar(
+                                alignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  if (widget.data is BookCard &&
+                                      widget.data.downloadFormats != null &&
+                                      widget.data.localPath == null)
+                                    DownloadBookButton(
+                                      book: widget.data,
+                                      downloadBookCallback: (downloadProgress) {
+                                        setState(() {
+                                          widget.data.downloadProgress =
+                                              downloadProgress;
+                                        });
+                                      },
+                                    ),
+                                  if (widget.data is BookCard &&
+                                      (widget.data as BookCard).localPath !=
+                                          null &&
+                                      (widget.data as BookCard)
+                                              .downloadProgress ==
+                                          null)
+                                    FutureBuilder(
+                                      future:
+                                          File(widget.data.localPath).exists(),
+                                      builder:
+                                          (context, bookFileExistsSnapshot) {
+                                        if (bookFileExistsSnapshot.data !=
+                                            true) {
+                                          return DownloadBookButton(
+                                            book: widget.data,
+                                            downloadBookCallback:
+                                                (downloadProgress) {
+                                              if (!mounted) return;
+                                              setState(() {
+                                                widget.data.downloadProgress =
+                                                    downloadProgress;
+                                              });
+                                            },
+                                          );
+                                        }
+                                        return FlatButton(
+                                          child: Text('Открыть'),
+                                          onPressed: () => FileUtils.openFile(
+                                            widget.data.localPath,
+                                          ),
                                         );
-                                      }
-                                      return FlatButton(
-                                        child: Text('Открыть'),
-                                        onPressed: () => FileUtils.openFile(
-                                          widget.data.localPath,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                              ],
+                                      },
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
                         ];
                         return ListTile(
                           title: Column(

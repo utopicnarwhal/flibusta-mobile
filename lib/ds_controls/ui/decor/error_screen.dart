@@ -35,14 +35,14 @@ class ErrorScreen extends StatelessWidget {
           child: Text(
             errorMessage,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
         ),
         if (showTextToCheckInternet)
           Padding(
             padding: const EdgeInsets.all(18),
             child: Text(
-              'Пожалуйста, проверьте свое подключение к${'\u00A0'}интернету и работоспособность прокси.',
+              'Пожалуйста, проверьте свое подключение к${'\u00A0'}интернету, работоспособность сайта и прокси.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.caption.copyWith(
                     fontSize: 15,

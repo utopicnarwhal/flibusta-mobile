@@ -1,14 +1,13 @@
 import 'dart:convert' show base64, utf8;
 import 'dart:io';
 
-// import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/native_methods.dart';
 import 'package:flibusta/utils/permissions_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
+import 'package:utopic_open_file/utopic_open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum DirectoryType {
@@ -72,13 +71,13 @@ class FileUtils {
               label: 'Открыть',
               textColor: Theme.of(scaffoldKey.currentContext).cardColor,
               onPressed: (hideToast) {
-                openFile(myFile.path);
+                FileUtils.openFile(myFile.path);
                 hideToast();
               },
             ),
           );
         } else if (Platform.isIOS) {
-          openFile(myFile.path);
+          FileUtils.openFile(myFile.path);
         }
         return false;
       }
@@ -93,12 +92,12 @@ class FileUtils {
               label: 'Открыть',
               textColor: Colors.black87,
               onPressed: (hideToast) {
-                openFile(myFile.path);
+                FileUtils.openFile(myFile.path);
                 hideToast();
               }),
         );
       } else if (Platform.isIOS) {
-        openFile(myFile.path);
+        FileUtils.openFile(myFile.path);
       }
       return true;
     } catch (e) {
@@ -183,8 +182,12 @@ class FileUtils {
         ToastManager().showToast('Файл не найден.');
         break;
       case ResultType.noAppToOpen:
-        ToastManager()
-            .showToast('Не найдено приложение для открытия этого типа файлов.');
+        var userMessage =
+            'Не найдено приложение для открытия этого типа файлов.';
+        if (path.split('.').last == 'zip') {
+          userMessage += ' Данный файл является архивом. Используйте приложение проводника.';
+        }
+        ToastManager().showToast(userMessage);
         break;
       case ResultType.permissionDenied:
         ToastManager().showToast('Нет доступа к файлу.');

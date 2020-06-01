@@ -80,7 +80,7 @@ class GridTilesBuilder extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 fit: BoxFit.contain,
                 animation: 'idle',
-                color: Theme.of(context).textTheme.body1.color,
+                color: Theme.of(context).textTheme.bodyText2.color,
               ),
             ),
             Padding(
@@ -282,7 +282,7 @@ class GridTilesBuilder extends StatelessWidget {
                           child: FlareActor(
                             'assets/animations/long_tap.flr',
                             animation: 'Animations',
-                            color: Colors.black,
+                            color: Theme.of(context).textTheme.bodyText2.color,
                           ),
                         ),
                         Material(

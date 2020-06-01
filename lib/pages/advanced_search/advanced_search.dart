@@ -87,7 +87,7 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
                   alignment: Alignment.topCenter,
                   fit: BoxFit.contain,
                   animation: 'idle',
-                  color: Theme.of(context).textTheme.body1.color,
+                  color: Theme.of(context).textTheme.bodyText2.color,
                 ),
               ),
               Padding(

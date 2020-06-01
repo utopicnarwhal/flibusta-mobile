@@ -9,9 +9,9 @@ class ViewTypesTabBar extends StatelessWidget {
     return DsTabBar(
       indicatorWeight: 1.5,
       physics: kBouncingAlwaysScrollableScrollPhysics,
-      labelColor: Theme.of(context).textTheme.title.color,
+      labelColor: Theme.of(context).textTheme.headline6.color,
       unselectedLabelColor:
-          Theme.of(context).textTheme.title.color.withOpacity(0.47),
+          Theme.of(context).textTheme.headline6.color.withOpacity(0.47),
       indicatorSize: TabBarIndicatorSize.label,
       isScrollable: true,
       tabs: [

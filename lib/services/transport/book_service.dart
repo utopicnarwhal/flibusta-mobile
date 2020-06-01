@@ -124,11 +124,12 @@ class BookService {
             }
 
             try {
-              fileUri = saveDocDir.path +
-                  '/' +
-                  contentDisposition[0]
-                      .split('filename=')[1]
-                      .replaceAll('\"', '');
+              var fileName = contentDisposition[0]
+                  .split('filename=')[1]
+                  .replaceAll('\"', '')
+                  .replaceAll('.fb2.zip', '.fb2');
+
+              fileUri = saveDocDir.path + '/' + fileName;
             } catch (e) {
               NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
@@ -178,7 +179,8 @@ class BookService {
       }
     });
 
-    if (response == null || response.statusCode != 200) {
+    if (response == null ||
+        (response.statusCode != 200 && response.statusCode != 302)) {
       ToastManager().hideToast(prepareToDownloadToastFuture);
       NotificationService().cancelNotification(bookCard.id);
       downloadProgressCallback(null);

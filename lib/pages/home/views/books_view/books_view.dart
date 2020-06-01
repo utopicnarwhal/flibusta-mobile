@@ -51,7 +51,7 @@ class BooksView extends StatelessWidget {
                   handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                     context,
                   ),
-                  child: BooksViewSliverAppBar(
+                  sliver: BooksViewSliverAppBar(
                     scafffoldKey: scaffoldKey,
                     selectedViewTypeBloc: selectedViewTypeBloc,
                     gridDataBlocsList: gridDataBlocsList,

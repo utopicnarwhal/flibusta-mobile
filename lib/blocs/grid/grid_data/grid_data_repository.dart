@@ -209,8 +209,6 @@ class GridDataRepository {
       return result;
     }
 
-    var _dio = ProxyHttpClient().getDio();
-
     var result = List<Genre>();
     Map<String, String> queryParams = {
       'op': 'getList',
@@ -221,7 +219,7 @@ class GridDataRepository {
       queryParams,
     );
 
-    var response = await _dio.getUri(url);
+    var response = await ProxyHttpClient().getDio().getUri(url);
 
     if (response.data == null || !(response.data is Map<String, dynamic>)) {
       return null;

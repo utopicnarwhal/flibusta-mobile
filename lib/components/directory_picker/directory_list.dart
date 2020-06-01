@@ -88,7 +88,7 @@ class _DirectoryListState extends State<DirectoryList> {
           Expanded(
             child: Column(
               children: [
-                Text('Выберите путь к папке', style: theme.textTheme.subtitle),
+                Text('Выберите путь к папке', style: theme.textTheme.subtitle2),
                 SizedBox(height: spacing / 2),
                 Text(currentDirectory?.path ?? '',
                     style: theme.textTheme.caption)

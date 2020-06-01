@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ProxyHttpClient {
   static final ProxyHttpClient _httpClientSingleton =
@@ -19,8 +22,12 @@ class ProxyHttpClient {
   static BaseOptions defaultDioOptions = BaseOptions(
     connectTimeout: 10000,
     receiveTimeout: 6000,
+    followRedirects: true,
   );
   Dio _dio = Dio(defaultDioOptions);
+
+  PersistCookieJar _persistCookieJar;
+  CookieManager _cookieManager;
 
   String _proxyHostPort = '';
   Uri _proxyApiUri = Uri.http('pubproxy.com', '/api/proxy', {
@@ -36,12 +43,21 @@ class ProxyHttpClient {
     return _dio;
   }
 
+  Future<void> initCookieJar() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+    _persistCookieJar = PersistCookieJar(dir: appDocPath + '/.cookies/');
+
+    _cookieManager = CookieManager(_persistCookieJar);
+    _dio.interceptors.add(_cookieManager);
+  }
+
   void _init() {
     if (_dio.interceptors.isNotEmpty) {
       return;
     }
 
-    _dio.interceptors.add(
+    _dio.interceptors.addAll([
       InterceptorsWrapper(
         onRequest: (RequestOptions options) async {
           if (kReleaseMode == false) {
@@ -49,33 +65,74 @@ class ProxyHttpClient {
           }
         },
         onError: (dioError) {
+          if (dioError?.message
+                  ?.contains('Proxy failed to establish tunnel (302 Found)') ==
+              true) {
+            return _dio.requestUri(
+              dioError.request.uri,
+              data: dioError.request.data,
+              options: Options(
+                method: dioError.request.method,
+                responseType: dioError.request.responseType,
+                contentType: dioError.request.contentType,
+              ),
+              onReceiveProgress: dioError.request.onReceiveProgress,
+              onSendProgress: dioError.request.onSendProgress,
+              cancelToken: dioError.request.cancelToken,
+            );
+          }
           return DsError.fromDioError(dioError: dioError);
         },
       ),
-    );
+      if (_cookieManager != null) _cookieManager,
+    ]);
   }
 
-  void setProxy(String hostPort) {
+  Future<void> setProxy(String hostPort) async {
     if (_proxyHostPort == hostPort) {
       return;
     }
     _proxyHostPort = hostPort;
     var newDio = Dio(defaultDioOptions);
 
+    newDio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (dioError) {
+          if (dioError?.message
+                  ?.contains('Proxy failed to establish tunnel (302 Found)') ==
+              true) {
+            return _dio.requestUri(
+              dioError.request.uri,
+              data: dioError.request.data,
+              options: Options(
+                method: dioError.request.method,
+                responseType: dioError.request.responseType,
+                contentType: dioError.request.contentType,
+              ),
+              onReceiveProgress: dioError.request.onReceiveProgress,
+              onSendProgress: dioError.request.onSendProgress,
+              cancelToken: dioError.request.cancelToken,
+            );
+          }
+          return DsError.fromDioError(dioError: dioError);
+        },
+      ),
+    );
+
     (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) =>
+              host == 'flibusta.is';
+
       if (hostPort == '') {
         client.findProxy = null;
-        return;
+        return client;
       }
       client.findProxy = (url) {
-        return HttpClient.findProxyFromEnvironment(url, environment: {
-          'HTTPS_PROXY': hostPort,
-          'HTTP_PROXY': hostPort,
-          'https_proxy': hostPort,
-          'http_proxy': hostPort
-        });
+        return 'PROXY $hostPort';
       };
+      return client;
     };
     _dio.clear();
     _dio.close();
@@ -109,16 +166,11 @@ class ProxyHttpClient {
     if (hostPort != '') {
       (dioForConnectionCheck.httpClientAdapter as DefaultHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) =>
+                host == 'flibusta.is';
         client.findProxy = (url) {
-          return HttpClient.findProxyFromEnvironment(
-            url,
-            environment: {
-              'HTTPS_PROXY': hostPort,
-              'HTTP_PROXY': hostPort,
-              'https_proxy': hostPort,
-              'http_proxy': hostPort
-            },
-          );
+          return 'PROXY $hostPort';
         };
       };
     }
@@ -136,6 +188,7 @@ class ProxyHttpClient {
       stopWatch.stop();
 
       switch (response.statusCode) {
+        case 302:
         case 200:
           result.ping = stopWatch.elapsedMilliseconds;
           break;
@@ -181,5 +234,21 @@ class ProxyHttpClient {
     }
     dioForGetProxyAPI.close();
     return result;
+  }
+
+  void signOut() {
+    _persistCookieJar.deleteAll();
+  }
+
+  String getCookies() {
+    return _persistCookieJar
+        .loadForRequest(Uri.https(getHostAddress(), ''))
+        .toString();
+  }
+
+  bool isAuthorized() {
+    return _persistCookieJar
+        .loadForRequest(Uri.https(getHostAddress(), ''))
+        .isNotEmpty;
   }
 }

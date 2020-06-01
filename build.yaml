@@ -17,5 +17,5 @@ targets:
           disallow_unrecognized_keys: false
           explicit_to_json: true
           field_rename: none
-          include_if_null: true
+          include_if_null: false
           nullable: true

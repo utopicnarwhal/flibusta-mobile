@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/sortBooksByEnum.dart';
+import 'package:flibusta/model/searchResults.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -303,6 +304,290 @@ class LocalStorage {
     return await prefs.setStringList('FavoriteGenreCodes', favoriteGenreCodes);
   }
 
+  Future<List<BookCard>> getFavoriteBooks() async {
+    var prefs = await _prefs;
+    try {
+      var result = List<BookCard>();
+
+      var favoriteBooksJson = prefs.getStringList('FavoriteBooks');
+      if (favoriteBooksJson?.isNotEmpty != true) {
+        return result;
+      }
+
+      favoriteBooksJson.forEach((element) {
+        result.add(BookCard.fromJson(json.decode(element)));
+      });
+      return result;
+    } catch (e) {
+      await prefs.setStringList('FavoriteBooks', List<String>());
+      return List<BookCard>();
+    }
+  }
+
+  Future<bool> setFavoriteBooks(List<BookCard> bookCards) async {
+    if (bookCards == null) return true;
+
+    var prefs = await _prefs;
+    try {
+      var favoritesBooksJsonStrings = List<String>();
+      bookCards.forEach((element) {
+        favoritesBooksJsonStrings.add(json.encode(element.toJson()));
+      });
+      return await prefs.setStringList(
+        'FavoriteBooks',
+        favoritesBooksJsonStrings,
+      );
+    } catch (e) {
+      return await prefs.setStringList('FavoriteBooks', List<String>());
+    }
+  }
+
+  Future<bool> isFavoriteBook(int bookId) async {
+    var prefs = await _prefs;
+    try {
+      var favoriteBookIds = prefs.getStringList('FavoriteBooks');
+      if (favoriteBookIds?.isNotEmpty != true) {
+        return false;
+      }
+
+      return favoriteBookIds.any((element) {
+        return BookCard.fromJson(json.decode(element)).id == bookId;
+      });
+    } catch (e) {
+      await prefs.setStringList('FavoriteBooks', List<String>());
+      return false;
+    }
+  }
+
+  Future<bool> addFavoriteBook(BookCard bookCard) async {
+    var favoriteBooks = await getFavoriteBooks();
+    if (favoriteBooks.any((element) => element.id == bookCard.id)) return true;
+
+    favoriteBooks.add(bookCard);
+    return await setFavoriteBooks(favoriteBooks);
+  }
+
+  Future<bool> deleteFavoriteBook(int bookId) async {
+    var favoriteBooks = await getFavoriteBooks();
+    if (!favoriteBooks.any((element) => element.id == bookId)) return true;
+
+    favoriteBooks.removeWhere((element) => element.id == bookId);
+    return await setFavoriteBooks(favoriteBooks);
+  }
+
+  Future<List<BookCard>> getPostponeBooks() async {
+    var prefs = await _prefs;
+    try {
+      var result = List<BookCard>();
+
+      var postponeBooksJson = prefs.getStringList('PostponeBooks');
+      if (postponeBooksJson?.isNotEmpty != true) {
+        return result;
+      }
+
+      postponeBooksJson.forEach((element) {
+        result.add(BookCard.fromJson(json.decode(element)));
+      });
+      return result;
+    } catch (e) {
+      await prefs.setStringList('PostponeBooks', List<String>());
+      return List<BookCard>();
+    }
+  }
+
+  Future<bool> setPostponeBooks(List<BookCard> bookCards) async {
+    if (bookCards == null) return true;
+
+    var prefs = await _prefs;
+    try {
+      var postponesBooksJsonStrings = List<String>();
+      bookCards.forEach((element) {
+        postponesBooksJsonStrings.add(json.encode(element.toJson()));
+      });
+      return await prefs.setStringList(
+        'PostponeBooks',
+        postponesBooksJsonStrings,
+      );
+    } catch (e) {
+      return await prefs.setStringList('PostponeBooks', List<String>());
+    }
+  }
+
+  Future<bool> isPostponeBook(int bookId) async {
+    var prefs = await _prefs;
+    try {
+      var postponeBookIds = prefs.getStringList('PostponeBooks');
+      if (postponeBookIds?.isNotEmpty != true) {
+        return false;
+      }
+
+      return postponeBookIds.any((element) {
+        return BookCard.fromJson(json.decode(element)).id == bookId;
+      });
+    } catch (e) {
+      await prefs.setStringList('PostponeBooks', List<String>());
+      return false;
+    }
+  }
+
+  Future<bool> addPostponeBook(BookCard bookCard) async {
+    var postponeBooks = await getPostponeBooks();
+    if (postponeBooks.any((element) => element.id == bookCard.id)) return true;
+
+    postponeBooks.add(bookCard);
+    return await setPostponeBooks(postponeBooks);
+  }
+
+  Future<bool> deletePostponeBook(int bookId) async {
+    var postponeBooks = await getPostponeBooks();
+    if (!postponeBooks.any((element) => element.id == bookId)) return true;
+
+    postponeBooks.removeWhere((element) => element.id == bookId);
+    return await setPostponeBooks(postponeBooks);
+  }
+
+  Future<List<AuthorCard>> getFavoriteAuthors() async {
+    var prefs = await _prefs;
+    try {
+      var result = List<AuthorCard>();
+
+      var favoriteAuthorsJson = prefs.getStringList('FavoriteAuthors');
+      if (favoriteAuthorsJson?.isNotEmpty != true) {
+        return result;
+      }
+
+      favoriteAuthorsJson.forEach((element) {
+        result.add(AuthorCard.fromJson(json.decode(element)));
+      });
+      return result;
+    } catch (e) {
+      await prefs.setStringList('FavoriteAuthors', List<String>());
+      return List<AuthorCard>();
+    }
+  }
+
+  Future<bool> setFavoriteAuthors(List<AuthorCard> authorCards) async {
+    if (authorCards == null) return true;
+
+    var prefs = await _prefs;
+    try {
+      var favoritesAuthorsJsonStrings = List<String>();
+      authorCards.forEach((element) {
+        favoritesAuthorsJsonStrings.add(json.encode(element.toJson()));
+      });
+      return await prefs.setStringList(
+        'FavoriteAuthors',
+        favoritesAuthorsJsonStrings,
+      );
+    } catch (e) {
+      return await prefs.setStringList('FavoriteAuthors', List<String>());
+    }
+  }
+
+  Future<bool> isFavoriteAuthor(int authorId) async {
+    var prefs = await _prefs;
+    try {
+      var favoriteAuthorIds = prefs.getStringList('FavoriteAuthors');
+      if (favoriteAuthorIds?.isNotEmpty != true) {
+        return false;
+      }
+
+      return favoriteAuthorIds.any((element) {
+        return AuthorCard.fromJson(json.decode(element)).id == authorId;
+      });
+    } catch (e) {
+      await prefs.setStringList('FavoriteAuthors', List<String>());
+      return false;
+    }
+  }
+
+  Future<bool> addFavoriteAuthor(AuthorCard authorCard) async {
+    var favoriteAuthors = await getFavoriteAuthors();
+    if (favoriteAuthors.any((element) => element.id == authorCard.id)) return true;
+
+    favoriteAuthors.add(authorCard);
+    return await setFavoriteAuthors(favoriteAuthors);
+  }
+
+  Future<bool> deleteFavoriteAuthor(int authorId) async {
+    var favoriteAuthors = await getFavoriteAuthors();
+    if (!favoriteAuthors.any((element) => element.id == authorId)) return true;
+
+    favoriteAuthors.removeWhere((element) => element.id == authorId);
+    return await setFavoriteAuthors(favoriteAuthors);
+  }
+
+  Future<List<SequenceCard>> getFavoriteSequences() async {
+    var prefs = await _prefs;
+    try {
+      var result = List<SequenceCard>();
+
+      var favoriteSequencesJson = prefs.getStringList('FavoriteSequences');
+      if (favoriteSequencesJson?.isNotEmpty != true) {
+        return result;
+      }
+
+      favoriteSequencesJson.forEach((element) {
+        result.add(SequenceCard.fromJson(json.decode(element)));
+      });
+      return result;
+    } catch (e) {
+      await prefs.setStringList('FavoriteSequences', List<String>());
+      return List<SequenceCard>();
+    }
+  }
+
+  Future<bool> setFavoriteSequences(List<SequenceCard> sequenceCards) async {
+    if (sequenceCards == null) return true;
+
+    var prefs = await _prefs;
+    try {
+      var favoritesSequencesJsonStrings = List<String>();
+      sequenceCards.forEach((element) {
+        favoritesSequencesJsonStrings.add(json.encode(element.toJson()));
+      });
+      return await prefs.setStringList(
+        'FavoriteSequences',
+        favoritesSequencesJsonStrings,
+      );
+    } catch (e) {
+      return await prefs.setStringList('FavoriteSequences', List<String>());
+    }
+  }
+
+  Future<bool> isFavoriteSequence(int sequenceId) async {
+    var prefs = await _prefs;
+    try {
+      var favoriteSequenceIds = prefs.getStringList('FavoriteSequences');
+      if (favoriteSequenceIds?.isNotEmpty != true) {
+        return false;
+      }
+
+      return favoriteSequenceIds.any((element) {
+        return SequenceCard.fromJson(json.decode(element)).id == sequenceId;
+      });
+    } catch (e) {
+      await prefs.setStringList('FavoriteSequences', List<String>());
+      return false;
+    }
+  }
+
+  Future<bool> addFavoriteSequence(SequenceCard sequenceCard) async {
+    var favoriteSequences = await getFavoriteSequences();
+    if (favoriteSequences.any((element) => element.id == sequenceCard.id)) return true;
+
+    favoriteSequences.add(sequenceCard);
+    return await setFavoriteSequences(favoriteSequences);
+  }
+
+  Future<bool> deleteFavoriteSequence(int sequenceId) async {
+    var favoriteSequences = await getFavoriteSequences();
+    if (!favoriteSequences.any((element) => element.id == sequenceId)) return true;
+
+    favoriteSequences.removeWhere((element) => element.id == sequenceId);
+    return await setFavoriteSequences(favoriteSequences);
+  }
+
   Future<List<BookCard>> getDownloadedBooks() async {
     var prefs = await _prefs;
     try {
@@ -345,12 +630,7 @@ class LocalStorage {
     var prefs = await _prefs;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     if (prefs.getString('VersionCode') != packageInfo.buildNumber) {
-      // _clearPrefs(prefs);
       await prefs.setString('VersionCode', packageInfo.buildNumber);
     }
   }
-
-  // Future<bool> _clearPrefs(SharedPreferences prefs) async {
-  //   return prefs.clear();
-  // }
 }

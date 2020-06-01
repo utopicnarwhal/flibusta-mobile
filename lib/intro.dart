@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:flibusta/components/directory_picker/directory_picker.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
-import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
@@ -21,19 +23,19 @@ class IntroPage extends StatelessWidget {
       Slide(
         title: 'Добро пожаловать!',
         maxLineTitle: 3,
-        styleTitle: Theme.of(context).textTheme.display1,
+        styleTitle: Theme.of(context).textTheme.headline4,
         centerWidget: Center(
           child: FlibustaLogo(
             sideHeight: MediaQuery.of(context).size.width / 2,
           ),
         ),
-        styleDescription: Theme.of(context).textTheme.body1,
+        styleDescription: Theme.of(context).textTheme.bodyText2,
         backgroundColor: Colors.transparent,
       ),
       Slide(
         title: 'Отказ от ответственности',
         maxLineTitle: 3,
-        styleTitle: Theme.of(context).textTheme.display1,
+        styleTitle: Theme.of(context).textTheme.headline4,
         widgetDescription: Text(
           'ПРОДОЛЖАЯ ПОЛЬЗОВАТЬСЯ ДАННЫМ ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ, ВЫ СОГЛАШАЕТЕСЬ С ТЕМ, '
           'ЧТО ДАННОЕ ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ», БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, '
@@ -59,7 +61,7 @@ class IntroPage extends StatelessWidget {
       ),
       Slide(
         title: 'Поддержка',
-        styleTitle: Theme.of(context).textTheme.display1,
+        styleTitle: Theme.of(context).textTheme.headline4,
         centerWidget: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 150),
           child: AspectRatio(
@@ -76,12 +78,12 @@ class IntroPage extends StatelessWidget {
 
 Приятного пользования приложением!
               """,
-        styleDescription: Theme.of(context).textTheme.body1,
+        styleDescription: Theme.of(context).textTheme.bodyText2,
         backgroundColor: Colors.transparent,
       ),
       Slide(
         title: 'Укажите адрес сайта, к которому хотите подключиться',
-        styleTitle: Theme.of(context).textTheme.headline,
+        styleTitle: Theme.of(context).textTheme.headline5,
         maxLineTitle: 4,
         centerWidget: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 200),
@@ -185,22 +187,76 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
       ProxyHttpClient().setHostAddress(value);
       LocalStorage().setHostAddress(value);
       LocalStorage().setIntroCompleted();
+
       var turnProxyOn = await DialogUtils.confirmationDialog(
         context,
         'Включить прокси создателя приложения?',
         builder: (context) {
           return Text(
-              'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране');
+            'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране. Но оно не работает на мобильном интернете Yota. Если вы знаете, как сделать так, чтобы оно работало, напишите мне на почту gigok@bk.ru',
+          );
         },
         builderPadding: true,
         barrierDismissible: false,
       );
+
       if (turnProxyOn == true) {
         LocalStorage()
             .setActualProxy('flibustauser:ilovebooks@35.217.29.210:1194');
         ProxyHttpClient()
             .setProxy('flibustauser:ilovebooks@35.217.29.210:1194');
       }
+
+      var downloadPath = await LocalStorage().getBooksDirectory();
+
+      var chooseDownloadPath = await DialogUtils.confirmationDialog(
+        context,
+        'Папка для загрузки книг',
+        builder: (context) {
+          return Text(
+            'Сейчас файлы будут загружаться в папку "${downloadPath.path}". Хотите ли указать свой путь? Вы всегда можете изменить этот путь в настройках.',
+          );
+        },
+        builderPadding: true,
+        barrierDismissible: false,
+      );
+
+      if (chooseDownloadPath == true) {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return SimpleDialog(
+              title: Text('Учтите'),
+              contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 16),
+              children: <Widget>[
+                Text(
+                  'В следующем окне с выбором папки будут отображаться ТОЛЬКО папки (без каких-либо файлов). \nА также, если у Вас Android 4.4 или ниже, то не стоит менять этот параметр.',
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: FlatButton(
+                    child: Text('Понятно'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        Directory newDirectory = await DirectoryPicker.pick(
+          allowFolderCreation: true,
+          context: context,
+          rootDirectory: downloadPath,
+        );
+
+        if (newDirectory != null) {
+          await LocalStorage().setBooksDirectory(newDirectory);
+        }
+      }
+
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
       return;
     }

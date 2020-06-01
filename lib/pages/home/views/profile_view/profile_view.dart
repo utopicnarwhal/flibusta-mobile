@@ -1,17 +1,24 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flibusta/blocs/user_contact_data/user_contact_data_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
+import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
+import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
+import 'package:flibusta/pages/login_page/login_page.dart';
+import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:share/share.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final BehaviorSubject<int> selectedNavItemController;
 
@@ -22,16 +29,21 @@ class ProfileView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
+      key: widget.scaffoldKey,
       body: SafeArea(
         child: Scrollbar(
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
                 physics: kBouncingAlwaysScrollableScrollPhysics,
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 42),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Container(
                   constraints: BoxConstraints(
                     minHeight: constraints.maxHeight,
@@ -44,48 +56,57 @@ class ProfileView extends StatelessWidget {
                     children: <Widget>[
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
+                        children: [
+                          SizedBox(height: 16),
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 12.0),
                             child: Text(
                               'Профиль',
                               style: Theme.of(context)
                                   .textTheme
-                                  .display1
+                                  .headline4
                                   .copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color:
-                                        Theme.of(context).textTheme.body1.color,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        .color,
                                   ),
                             ),
                           ),
                           SizedBox(height: 16),
                           ProfileScreen(),
-                          SizedBox(height: 16),
                         ],
                       ),
-                      // ListFadeInSlideStagger(
-                      //   index: 2,
-                      //   child: Card(
-                      //     margin: EdgeInsets.zero,
-                      //     child: ListTile(
-                      //       title: Text(
-                      //         'Выйти',
-                      //         textAlign: TextAlign.center,
-                      //       ),
-                      //       onTap: () async {
-                      //         var signOutConfirm =
-                      //             await DialogUtils.confirmationDialog(
-                      //           context,
-                      //           'Выйти из аккаунта?',
-                      //         );
-                      //         if (signOutConfirm == true) {
-                      //           AuthenticationBloc().signOut();
-                      //         }
-                      //       },
-                      //     ),
-                      //   ),
-                      // ),
+                      if (ProxyHttpClient().isAuthorized())
+                        ListFadeInSlideStagger(
+                          index: 2,
+                          child: Card(
+                            margin: EdgeInsets.only(bottom: 16),
+                            child: ListTile(
+                              title: Text(
+                                'Выйти',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .button
+                                    .copyWith(fontSize: 16),
+                              ),
+                              onTap: () async {
+                                var signOutConfirm =
+                                    await DialogUtils.confirmationDialog(
+                                  context,
+                                  'Выйти из аккаунта?',
+                                );
+                                if (signOutConfirm == true) {
+                                  setState(() {
+                                    ProxyHttpClient().signOut();
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -97,7 +118,7 @@ class ProfileView extends StatelessWidget {
       bottomNavigationBar: HomeBottomNavBar(
         key: Key('HomeBottomNavBar'),
         index: 3,
-        selectedNavItemController: selectedNavItemController,
+        selectedNavItemController: widget.selectedNavItemController,
       ),
     );
   }
@@ -108,98 +129,118 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListFadeInSlideStagger(
-          index: 0,
-          child: Card(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(kCardBorderRadius),
-              child: Material(
-                type: MaterialType.card,
+        if (!ProxyHttpClient().isAuthorized()) ...[
+          ListFadeInSlideStagger(
+            index: 0,
+            child: Card(
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(kCardBorderRadius),
-                child: Banner(
-                  location: BannerLocation.topStart,
-                  message: 'В работе',
+                child: Material(
+                  type: MaterialType.card,
+                  borderRadius: BorderRadius.circular(kCardBorderRadius),
                   child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 18,
-                    ),
-                    trailing: CircleAvatar(
-                      radius: 30,
-                      child: Icon(
-                        EvaIcons.personOutline,
-                        size: 34,
-                      ),
-                    ),
-                    title: Text(
-                      'Имя пользователя',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
+                    leading: Icon(FontAwesomeIcons.signInAlt),
+                    title: Text('Авторизоваться'),
                     onTap: () {
-                      // Navigator.of(context).pushNamed(ProfilePage.routeName);
+                      Navigator.of(context).pushNamed(LoginPage.routeName);
                     },
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        // BlocBuilder(
-        //   bloc: ProfileDataBloc(),
-        //   builder: (context, profileDataState) {
-        //     Widget child = profileDataState is InProfileDataState
-        //         ? Card(
-        //             child: ListTile(
-        //               contentPadding: EdgeInsets.symmetric(
-        //                 vertical: 10,
-        //                 horizontal: 18,
-        //               ),
-        //               trailing: CircleAvatar(
-        //                 radius: 30,
-        //                 child: Text(
-        //                   StringUtils.getInitials(
-        //                       firstname:
-        //                           profileDataState.profileData?.firstName,
-        //                       lastname: profileDataState.profileData?.lastName),
-        //                   style: TextStyle(
-        //                     fontSize: 24,
-        //                     fontWeight: FontWeight.w400,
-        //                   ),
-        //                 ),
-        //               ),
-        //               title: Text(
-        //                 StringUtils.getShortName(
-        //                     firstname: profileDataState.profileData?.firstName,
-        //                     lastname: profileDataState.profileData?.lastName),
-        //                 style: TextStyle(
-        //                   fontSize: 16,
-        //                   fontWeight: FontWeight.w800,
-        //                 ),
-        //               ),
-        //               subtitle: Padding(
-        //                 padding: const EdgeInsets.only(top: 8.0),
-        //                 child: Text(
-        //                   UserUtils.getUserCustomerType(
-        //                       customerTypeCode: profileDataState
-        //                           .profileData?.customerTypeCode),
-        //                 ),
-        //               ),
-        //               onTap: () {
-        //                 Navigator.of(context).pushNamed(ProfilePage.routeName);
-        //               },
-        //             ),
-        //           )
-        //         : Container();
+          SizedBox(height: 4),
+          ListFadeInSlideStagger(
+            index: 0,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: FlatButton(
+                child: Text('Что позволяет авторизация?'),
+                onPressed: () {
+                  DialogUtils.simpleAlert(
+                    context,
+                    'Что позволяет авторизация?',
+                    content: Text(
+                        'Вроде бы, вам становится доступна иностранная литература.'),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+        if (ProxyHttpClient().isAuthorized())
+          ListFadeInSlideStagger(
+            index: 0,
+            child: Card(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(kCardBorderRadius),
+                child: Material(
+                  type: MaterialType.card,
+                  borderRadius: BorderRadius.circular(kCardBorderRadius),
+                  child: BlocBuilder(
+                    bloc: UserContactDataBloc(),
+                    builder:
+                        (context, UserContactDataState userContactDataState) {
+                      if (userContactDataState is InUserContactDataState) {
+                        return ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 18,
+                          ),
+                          trailing: CircleAvatar(
+                            radius: 30,
+                            child: userContactDataState
+                                        .userContactData.profileImgSrc ==
+                                    null
+                                ? Icon(
+                                    EvaIcons.personOutline,
+                                    size: 34,
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Image.memory(
+                                      userContactDataState
+                                          .userContactData.profileImg,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                          ),
+                          title: Text(
+                            userContactDataState.userContactData.nickname,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          subtitle: Text(
+                            userContactDataState.userContactData.email,
+                          ),
+                        );
+                      }
+                      if (userContactDataState is ErrorUserContactDataState) {
+                        return ErrorScreen(
+                          errorMessage: userContactDataState.error.userMessage,
+                          showTextToCheckInternet: false,
+                          showIcon: false,
+                          onTryAgain: () {
+                            UserContactDataBloc().refreshUserContactData();
+                          },
+                        );
+                      }
 
-        //     return ListFadeInSlideStagger(
-        //       index: 1,
-        //       child: child,
-        //     );
-        //   },
-        // ),
+                      return Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                        child: Center(
+                          child: DsCircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
         SizedBox(height: 16),
         ListFadeInSlideStagger(
           index: 1,

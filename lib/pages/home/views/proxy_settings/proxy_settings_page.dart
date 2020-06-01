@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
+import 'package:flibusta/ds_controls/ui/buttons/raised_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/get_new_proxy_tile.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/proxy_radio_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flibusta/pages/home/views/proxy_settings/components/server_status_checker.dart';
 
 class ProxySettingsPage extends StatefulWidget {
   static const routeName = '/ProxySettings';
@@ -53,9 +55,9 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                   children: <Widget>[
                     Text(
                       'Прокси',
-                      style: Theme.of(context).textTheme.display1.copyWith(
+                      style: Theme.of(context).textTheme.headline4.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).textTheme.body1.color,
+                            color: Theme.of(context).textTheme.bodyText2.color,
                           ),
                     ),
                     IconButton(
@@ -68,17 +70,18 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 8),
+              ServerStatusChecker(),
+              SizedBox(height: 16),
               Text(
                 'Использование прокси-сервера может помочь, если Флибуста заблокирована Вашим интернет-провайдером.',
-                style: Theme.of(context).textTheme.body1,
+                style: Theme.of(context).textTheme.bodyText2,
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               Text(
                 'Соединения:',
                 style: Theme.of(context)
                     .textTheme
-                    .subhead
+                    .subtitle1
                     .copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
@@ -111,8 +114,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                               ),
                               Divider(),
                               ProxyRadioListTile(
-                                title:
-                                    'Прокси создателя приложения (проверка работы на Yota)',
+                                title: 'Прокси создателя приложения 1',
                                 value:
                                     'flibustauser:ilovebooks@35.217.29.210:1194',
                                 groupValue: actualProxySnapshot.data,
@@ -121,8 +123,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                               ),
                               Divider(),
                               ProxyRadioListTile(
-                                title:
-                                    'Прокси создателя приложения (не работает на мобильном интернете Yota)',
+                                title: 'Прокси создателя приложения 2',
                                 value:
                                     'flibustauser:ilovebooks@35.228.73.110:3128',
                                 groupValue: actualProxySnapshot.data,
@@ -151,8 +152,16 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                                 actualProxySnapshot.data,
                                             onChanged:
                                                 _proxyListBloc.setActualProxy,
-                                            onDelete: _proxyListBloc
-                                                .removeFromProxyList,
+                                            onDelete: (proxyHost) {
+                                              _proxyListBloc
+                                                  .removeFromProxyList(
+                                                      proxyHost);
+                                              if (actualProxySnapshot.data ==
+                                                  proxyHost) {
+                                                _proxyListBloc
+                                                    .setActualProxy('');
+                                              }
+                                            },
                                             cancelToken:
                                                 _proxyListBloc.cancelToken,
                                           ),
@@ -185,17 +194,36 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                           TextEditingController();
                                       return SimpleDialog(
                                         title: Text('Добавить свой прокси'),
-                                        children: <Widget>[
-                                          TextField(
-                                            controller: proxyHostController,
-                                            autofocus: true,
-                                            onEditingComplete: () {
-                                              Navigator.pop(
-                                                context,
-                                                proxyHostController.text,
-                                              );
-                                            },
-                                          )
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.all(16),
+                                            child: TextField(
+                                              controller: proxyHostController,
+                                              autofocus: true,
+                                              onEditingComplete: () {
+                                                Navigator.pop(
+                                                  context,
+                                                  proxyHostController.text,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              child: DsRaisedButton(
+                                                child: Text('Добавить'),
+                                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                                onPressed: () {
+                                                  Navigator.pop(
+                                                    context,
+                                                    proxyHostController.text,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       );
                                     },

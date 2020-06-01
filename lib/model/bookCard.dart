@@ -13,7 +13,10 @@ class BookCard extends GridData {
   String sequenceTitle;
   String title;
   String size;
+
+  @JsonKey(ignore: true)
   int fileScore;
+
   DownloadFormats downloadFormats;
   Authors authors;
   Translators translators;
@@ -132,9 +135,9 @@ class Authors {
   @override
   String toString() {
     if (list == null || list.isEmpty) {
-      return "Пустой массив";
+      return '';
     }
-    var result = "";
+    var result = '';
     list.forEach((f) {
       result += f.values.first;
       if (f != list.last) {
@@ -166,7 +169,7 @@ class Translators {
   @override
   String toString() {
     if (list == null || list.isEmpty) {
-      return "Пустой массив";
+      return '';
     }
     var result = "";
     list.forEach((f) {
@@ -200,7 +203,7 @@ class Genres {
   @override
   String toString() {
     if (list == null || list.isEmpty) {
-      return "Пустой массив";
+      return '';
     }
     var result = "";
     list.forEach((f) {

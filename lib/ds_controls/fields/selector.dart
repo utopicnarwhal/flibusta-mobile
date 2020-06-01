@@ -288,7 +288,7 @@ class DsDropdownButtonFormField<T> extends FormField<T> {
                             maxLines: 1,
                             style: Theme.of(state.context)
                                 .textTheme
-                                .subhead
+                                .subtitle1
                                 .copyWith(color: style?.color),
                           ),
                         ),

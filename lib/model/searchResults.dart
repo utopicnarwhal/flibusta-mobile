@@ -1,6 +1,9 @@
 import 'package:flibusta/model/bookCard.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'grid_data/grid_data.dart';
+
+part 'searchResults.g.dart';
 
 class SearchResults {
   List<BookCard> books;
@@ -10,6 +13,7 @@ class SearchResults {
   SearchResults({this.books, this.authors, this.sequences});
 }
 
+@JsonSerializable()
 class AuthorCard extends GridData {
   int id;
   String name;
@@ -18,12 +22,17 @@ class AuthorCard extends GridData {
   AuthorCard({this.id, this.name, this.booksCount}) : assert(id != null);
 
   @override
-  String get tileSubtitle => '$booksCount';
+  String get tileSubtitle => booksCount ?? '';
 
   @override
   String get tileTitle => name;
+
+  factory AuthorCard.fromJson(Map<String, dynamic> json) =>
+      _$AuthorCardFromJson(json);
+  Map<String, dynamic> toJson() => _$AuthorCardToJson(this);
 }
 
+@JsonSerializable()
 class SequenceCard extends GridData {
   int id;
   String title;
@@ -32,8 +41,12 @@ class SequenceCard extends GridData {
   SequenceCard({this.id, this.title, this.booksCount}) : assert(id != null);
 
   @override
-  String get tileSubtitle => '$booksCount книг';
+  String get tileSubtitle => booksCount != null ? '$booksCount книг' : '';
 
   @override
   String get tileTitle => title;
+
+  factory SequenceCard.fromJson(Map<String, dynamic> json) =>
+      _$SequenceCardFromJson(json);
+  Map<String, dynamic> toJson() => _$SequenceCardToJson(this);
 }

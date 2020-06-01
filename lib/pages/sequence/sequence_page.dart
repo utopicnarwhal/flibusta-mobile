@@ -2,6 +2,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
+import 'package:flibusta/model/searchResults.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -14,6 +15,7 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SequencePage extends StatefulWidget {
   static const routeName = "/SequencePage";
@@ -63,7 +65,7 @@ class _SequencePageState extends State<SequencePage> {
                   alignment: Alignment.topCenter,
                   fit: BoxFit.contain,
                   animation: 'idle',
-                  color: Theme.of(context).textTheme.body1.color,
+                  color: Theme.of(context).textTheme.bodyText2.color,
                 ),
               ),
               Padding(
@@ -198,6 +200,40 @@ class _SequencePageState extends State<SequencePage> {
               gridDataState.sequenceTitle ?? 'Загрузка...',
               overflow: TextOverflow.fade,
             ),
+            actions: [
+              FutureBuilder<bool>(
+                future: LocalStorage().isFavoriteSequence(widget.sequenceId),
+                builder: (context, isFavoriteSequenceSnapshot) {
+                  return IconButton(
+                    tooltip: isFavoriteSequenceSnapshot.data == true
+                        ? 'Убрать из избранного'
+                        : 'Добавить в избранное',
+                    icon: Icon(
+                      isFavoriteSequenceSnapshot.data == true
+                          ? FontAwesomeIcons.solidHeart
+                          : FontAwesomeIcons.heart,
+                      color: isFavoriteSequenceSnapshot.data == true
+                          ? Colors.red
+                          : null,
+                    ),
+                    onPressed: () async {
+                      if (isFavoriteSequenceSnapshot.data == true) {
+                        await LocalStorage()
+                            .deleteFavoriteSequence(widget.sequenceId);
+                      } else {
+                        await LocalStorage().addFavoriteSequence(
+                          SequenceCard(
+                            id: widget.sequenceId,
+                            title: gridDataState.sequenceTitle,
+                          ),
+                        );
+                      }
+                      setState(() {});
+                    },
+                  );
+                },
+              ),
+            ],
           ),
           body: body,
         );

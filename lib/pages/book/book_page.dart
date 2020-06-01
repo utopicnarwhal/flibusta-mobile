@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/show_modal_bottom_sheet.dart';
@@ -19,7 +20,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BookPage extends StatefulWidget {
-  static const routeName = "/BookPage";
+  static const routeName = '/BookPage';
 
   final int bookId;
 
@@ -98,7 +99,7 @@ class BookPageState extends State<BookPage> {
         body: Center(
           child: Text(
             _getBookInfoError.toString(),
-            style: Theme.of(context).textTheme.headline,
+            style: Theme.of(context).textTheme.headline5,
             textAlign: TextAlign.center,
           ),
         ),
@@ -120,7 +121,7 @@ class BookPageState extends State<BookPage> {
             appBarBackground = Center(
               child: Text(
                 _getBookCoverImageError.toString(),
-                style: Theme.of(context).textTheme.headline,
+                style: Theme.of(context).textTheme.headline5,
                 textAlign: TextAlign.center,
               ),
             );
@@ -171,6 +172,67 @@ class BookPageState extends State<BookPage> {
                   ListTile(
                     title: Text(_bookInfo.title ?? ''),
                     subtitle: Text('Название произведения'),
+                    trailing: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FutureBuilder<bool>(
+                          future: LocalStorage().isFavoriteBook(_bookInfo.id),
+                          builder: (context, isFavoriteBookSnapshot) {
+                            return IconButton(
+                              tooltip: isFavoriteBookSnapshot.data == true
+                                  ? 'Убрать из избранного'
+                                  : 'Добавить в избранное',
+                              icon: Icon(
+                                isFavoriteBookSnapshot.data == true
+                                    ? FontAwesomeIcons.solidHeart
+                                    : FontAwesomeIcons.heart,
+                                color: isFavoriteBookSnapshot.data == true
+                                    ? Colors.red
+                                    : null,
+                              ),
+                              onPressed: () async {
+                                if (isFavoriteBookSnapshot.data == true) {
+                                  await LocalStorage()
+                                      .deleteFavoriteBook(_bookInfo.id);
+                                } else {
+                                  await LocalStorage()
+                                      .addFavoriteBook(_bookInfo);
+                                }
+                                setState(() {});
+                              },
+                            );
+                          },
+                        ),
+                        FutureBuilder<bool>(
+                          future: LocalStorage().isPostponeBook(_bookInfo.id),
+                          builder: (context, isPostponeSnapshot) {
+                            return IconButton(
+                              tooltip: isPostponeSnapshot.data == true
+                                  ? 'Убрать из отложенного'
+                                  : 'Отложить на потом',
+                              icon: Icon(
+                                FontAwesomeIcons.clock,
+                                color: isPostponeSnapshot.data == true
+                                    ? kSecondaryColor(context)
+                                    : null,
+                              ),
+                              onPressed: () async {
+                                if (isPostponeSnapshot.data == true) {
+                                  await LocalStorage()
+                                      .deletePostponeBook(_bookInfo.id);
+                                } else {
+                                  await LocalStorage()
+                                      .addPostponeBook(_bookInfo);
+                                }
+                                setState(() {});
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   Divider(indent: 16),
                   ListTile(
@@ -275,7 +337,7 @@ class BookPageState extends State<BookPage> {
                       ),
                       child: Text(
                         'Аннотация:',
-                        style: Theme.of(context).textTheme.headline,
+                        style: Theme.of(context).textTheme.headline5,
                       ),
                     ),
                     Padding(
