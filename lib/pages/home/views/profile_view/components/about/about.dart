@@ -1,7 +1,6 @@
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
-import 'package:flibusta/pages/home/views/profile_view/components/about/donate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -125,7 +124,11 @@ class AboutPage extends StatelessWidget {
                       title: Text('Поддержать разработчика'),
                       trailing: kIconArrowForward,
                       onTap: () {
-                        Navigator.of(context).pushNamed(DonatePage.routeName);
+                        launch(
+                          'https://gist.github.com/utopicnarwhal/1acebc04aafc1de5c3dc404480e999ff',
+                          forceSafariVC: false,
+                          forceWebView: false,
+                        );
                       },
                     ),
                     Divider(indent: 70),
