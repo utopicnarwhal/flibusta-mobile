@@ -1,10 +1,9 @@
-# Мобильное приложение Флибуста (Android)
+# Мобильное приложение Флибуста Browser (Android). ЗАВЕРШЕНО
 
 <a href='https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser&hl=ru&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Доступно в Google Play'  width="30%" src='https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png'/></a>
 
 Данное приложение позволит вам находить по названию и скачивать книги с сайта "flibusta.is".  
 Если данный сайт заблокирован в вашей стране, приложение может найти бесплатный прокси сервер, через который вы сможете получить доступ к сайту. Также есть прокси-сервер разработчика приложения.
-Программа находится в стадии бета-тестирования.  
 Для просмотра этого файла в удобной форме в VS Code, нажмите сочетание клавиш `Ctrl + Shift + V`.  
 
 ## Для запуска приложения в Windows необходимо:
@@ -52,8 +51,7 @@ Bundle: `flutter build appbundle`
 
 1. Используйте тему иконок для VSCode [Material Icon Theme](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
 2. Используйте расширение для VSCode [bloc](https://marketplace.visualstudio.com/items?itemName=FelixAngelov.bloc) для создания новых BLoC.
-3. Используйте расширение для VSCode [Pubspec Assist](https://marketplace.visualstudio.com/items?itemName=jeroen-meijer.pubspec-assist), чтобы быстро добавлять пакеты.
-4. Используйте [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments), для наглядности комментариев.
-5. Зайдите в настройки расширения `Dart` и включите опцию `Dart: Preview Flutter Ui Guides`.
-6. Желательно всегда форматировать файл перед сохранением комбинацией клавиш `Alt + Shift + F`. Если выглядит некрасиво, то можно пробывать добавлять/удалять запятые, чтобы красиво переносилось на следующую строчку.
-7. Для редактирования этого файла используйте расширение [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one), будет легче работать со списками.
+3. Используйте [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments), для наглядности комментариев.
+4. Зайдите в настройки расширения `Dart` и включите опцию `Dart: Preview Flutter Ui Guides`.
+5. Желательно всегда форматировать файл перед сохранением комбинацией клавиш `Alt + Shift + F`. Если выглядит некрасиво, то можно пробывать добавлять/удалять запятые, чтобы красиво переносилось на следующую строчку.
+6. Для редактирования этого файла используйте расширение [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one), будет легче работать со списками.
