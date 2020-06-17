@@ -126,8 +126,7 @@ class BookService {
             try {
               var fileName = contentDisposition[0]
                   .split('filename=')[1]
-                  .replaceAll('\"', '')
-                  .replaceAll('.fb2.zip', '.fb2');
+                  .replaceAll('\"', '');
 
               fileUri = saveDocDir.path + '/' + fileName;
             } catch (e) {
@@ -170,6 +169,10 @@ class BookService {
           },
         )
         .catchError((error) {
+      if (cancelToken.isCancelled) {
+        ToastManager().showToast(cancelToken.cancelError.message);
+        return;
+      }
       ToastManager().hideToast(prepareToDownloadToastFuture);
       if (error is DsError) {
         _alertsCallback(

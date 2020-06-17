@@ -27,11 +27,11 @@
 ## Сборка
 ### Комманды сборки APK
 
-Prod: `flutter build apk`  
+Prod: `flutter build apk --no-shrink`  
 
 ### Команды сборки AppBundle
 
-Bundle: `flutter build appbundle`  
+Bundle: `flutter build appbundle --no-shrink`  
 
 
 ## Проверка обновлений пакетов
@@ -41,7 +41,7 @@ Bundle: `flutter build appbundle`
 ## Версия приложения
 
 Версия приложения меняется в файле `pubspec.yaml`.  
-Версия состоит из двух частей. Пример: `0.2.4+55`, где `0.2.4` это название версии, а `55` это номер версии.  
+Версия состоит из двух частей. Пример: `0.2.4+55`, где `0.2.4` это название версии, а `55` это номер версии(сборки).  
 При билде Flutter автоматически обновляет версии в файлах определённой платформы.  
 Для Android в файле `android/local.properties`.  
 Для iOS в файле `ios/Runner/Info.plist`, вроде бы.  
