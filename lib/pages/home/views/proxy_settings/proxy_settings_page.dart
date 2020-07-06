@@ -78,6 +78,14 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
               ),
               SizedBox(height: 16),
               Text(
+                'Прокси-сервера создателя приложения будут отключены 21 сентября 2020 года.',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText2
+                    .copyWith(color: Colors.red),
+              ),
+              SizedBox(height: 16),
+              Text(
                 'Соединения:',
                 style: Theme.of(context)
                     .textTheme
@@ -211,10 +219,13 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                           Align(
                                             alignment: Alignment.centerRight,
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16),
                                               child: DsRaisedButton(
                                                 child: Text('Добавить'),
-                                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16),
                                                 onPressed: () {
                                                   Navigator.pop(
                                                     context,

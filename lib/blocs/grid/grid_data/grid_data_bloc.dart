@@ -8,18 +8,16 @@ class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
   final GridViewType gridViewType;
   final int sequenceId;
 
-  GridDataBloc(this.gridViewType, [this.sequenceId]);
-
-  @override
-  GridDataState get initialState => GridDataState(
-        searchString: null,
-        page: 1,
-        hasReachedMax: false,
-        gridData: null,
-        uploadingMore: false,
-        message: null,
-        stateCode: GridDataStateCode.Empty,
-      );
+  GridDataBloc(this.gridViewType, [this.sequenceId])
+      : super(GridDataState(
+          searchString: null,
+          page: 1,
+          hasReachedMax: false,
+          gridData: null,
+          uploadingMore: false,
+          message: null,
+          stateCode: GridDataStateCode.Empty,
+        ));
 
   void fetchGridData([AdvancedSearchParams advancedSearchParams]) {
     this.add(LoadGridDataEvent(

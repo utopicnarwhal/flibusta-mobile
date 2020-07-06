@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +16,17 @@ class ServerStatusChecker extends StatefulWidget {
 }
 
 class ServerStatusCheckerState extends State<ServerStatusChecker> {
-  Error _error;
+  DioError _error;
   Map<String, dynamic> _serverStatus;
+  Dio _dioForCheck;
 
   @override
   void initState() {
     super.initState();
+
+    _dioForCheck = Dio();
+    _dioForCheck.interceptors.add(CookieManager(CookieJar()));
+
     _check();
   }
 
@@ -29,21 +36,22 @@ class ServerStatusCheckerState extends State<ServerStatusChecker> {
       _serverStatus = null;
     });
 
-    Dio dioForCheck = Dio();
-    Uri uri = Uri.https(
-      'api.downfor.cloud',
-      '/httpcheck/${ProxyHttpClient().getHostAddress()}',
-    );
     try {
-      var response = await dioForCheck.getUri(
-        uri,
-        options: Options(responseType: ResponseType.json),
+      var response = await _dioForCheck.get(
+        'https://api.downfor.cloud/httpcheck/${ProxyHttpClient().getHostAddress()}',
+        options: Options(
+          headers: {
+            'user-agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+            'accept-language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+          },
+        ),
       );
       if (response.data != null && response.data is Map<String, dynamic>) {
         _serverStatus = response.data;
       }
-    } catch (e) {
-      _error = e;
+    } on DioError catch (dioError) {
+      _error = dioError;
     }
     if (mounted) {
       setState(() {});

@@ -12,13 +12,8 @@ import 'package:flutter/services.dart';
 
 const _filesToWarmup = [
   'assets/animations/empty_state.flr',
-  'assets/animations/floating_document.flr',
-  'assets/animations/questions.flr',
-  'assets/animations/like.flr',
-  'assets/animations/roskomnadzor.flr',
   'assets/animations/books_placeholder.flr',
   'assets/animations/long_tap.flr',
-  'assets/animations/cloud.flr',
 ];
 
 class SplashScreen extends StatefulWidget {
@@ -39,12 +34,7 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.wait(futures);
     futures.clear();
 
-    // futures.add(
-    //   ApiHttpClient.isUserAlreadyAuthorized().then(
-    //     (isUserAlreadyAuthorized) async {
     if (!mounted) return;
-
-    // if (isUserAlreadyAuthorized == true) {
 
     if (!await LocalStorage().getIntroCompleted()) {
       Navigator.of(context).pushReplacement(

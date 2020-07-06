@@ -77,17 +77,6 @@ class _DsTextFieldState extends State<DsTextField>
 
   @override
   bool checkFieldMask() {
-    if (_maskFormatter?.lastResValue != null &&
-        _maskFormatter.lastResValue?.text != _textController.value?.text) {
-      var maskedValue = _maskFormatter?.formatEditUpdate(
-        _maskFormatter.lastResValue,
-        _textController.value,
-      );
-      if (maskedValue?.text != _textController?.value?.text) {
-        _textController.value = maskedValue;
-        return false;
-      }
-    }
     return true;
   }
 

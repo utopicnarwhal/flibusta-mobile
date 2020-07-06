@@ -20,10 +20,7 @@ class UserContactDataBloc
   factory UserContactDataBloc() {
     return _userContactDataBlocSingleton;
   }
-  UserContactDataBloc._internal();
-
-  @override
-  UserContactDataState get initialState => UnUserContactDataState();
+  UserContactDataBloc._internal() : super(UnUserContactDataState());
 
   Future<void> fetchUserContactData() async {
     if (state is LoadingUserContactDataState ||

@@ -1,5 +1,6 @@
 import 'package:flibusta/blocs/genres_list/genres_list_bloc.dart';
 import 'package:flibusta/constants.dart';
+import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
@@ -123,6 +124,16 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                                 : Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: DsCircularProgressIndicator()),
+                          ),
+                        ),
+                        getImmediateSuggestions: true,
+                        hideOnEmpty: true,
+                        hideOnError: true,
+                        hideOnLoading: true,
+                        hideSuggestionsOnKeyboardHide: true,
+                        suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            kCardBorderRadius,
                           ),
                         ),
                         itemBuilder: (context, suggestion) {
