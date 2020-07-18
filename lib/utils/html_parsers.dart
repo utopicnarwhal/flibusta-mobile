@@ -748,7 +748,10 @@ UserContactData parseHtmlFromUserMeEdit(String htmlString) {
       .firstWhere((element) => element.className == 'title', orElse: null)
       .innerHtml;
 
-  result.email = document.getElementById('edit-mail').attributes['value'];
+  var editMailElement = document.getElementById('edit-mail');
+  if (editMailElement != null) {
+    result.email = editMailElement.attributes['value'];
+  }
 
   var elementsClassPicture = document
       ?.getElementById('user-profile-form')

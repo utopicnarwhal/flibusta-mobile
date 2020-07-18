@@ -5,6 +5,7 @@ import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
+import 'package:flibusta/services/curl_http_client_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:path_provider/path_provider.dart';
@@ -93,7 +94,8 @@ class ProxyHttpClient {
       return;
     }
     _proxyHostPort = hostPort;
-    var newDio = Dio(defaultDioOptions);
+    var newDio = Dio(defaultDioOptions)
+      ..httpClientAdapter = CurlHttpClientAdapter();
 
     newDio.interceptors.add(
       InterceptorsWrapper(
@@ -119,21 +121,26 @@ class ProxyHttpClient {
       ),
     );
 
-    (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (HttpClient client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) =>
-              host == 'flibusta.is';
+    if (newDio.httpClientAdapter is CurlHttpClientAdapter) {
+      (newDio.httpClientAdapter as CurlHttpClientAdapter)
+          .httpProxyCredHostPort = hostPort;
+    } else if (newDio.httpClientAdapter is DefaultHttpClientAdapter) {
+      (newDio.httpClientAdapter as DefaultHttpClientAdapter)
+          .onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) =>
+                host == 'flibusta.is';
 
-      if (hostPort == '') {
-        client.findProxy = null;
+        if (hostPort == '') {
+          client.findProxy = null;
+          return client;
+        }
+        client.findProxy = (url) {
+          return 'PROXY $hostPort';
+        };
         return client;
-      }
-      client.findProxy = (url) {
-        return 'PROXY $hostPort';
       };
-      return client;
-    };
+    }
     _dio.clear();
     _dio.close();
     _dio = newDio;

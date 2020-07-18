@@ -1,15 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/buttons/raised_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
+import 'package:flibusta/ds_controls/ui/svg_icon.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/get_new_proxy_tile.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/proxy_radio_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/server_status_checker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ProxySettingsPage extends StatefulWidget {
   static const routeName = '/ProxySettings';
@@ -77,6 +81,40 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                 style: Theme.of(context).textTheme.bodyText2,
               ),
               SizedBox(height: 16),
+              ListFadeInSlideStagger(
+                index: 1,
+                child: Card(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(kCardBorderRadius),
+                    child: Material(
+                      type: MaterialType.card,
+                      borderRadius: BorderRadius.circular(kCardBorderRadius),
+                      child: ListTile(
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgIcon(
+                              assetPath: 'assets/img/tor_logo.svg',
+                              size: 40,
+                            ),
+                          ],
+                        ),
+                        title: Text('Запустить Tor Onion Proxy'),
+                        onTap: () async {
+                          var workingDirectory = await getTemporaryDirectory();
+                          print(
+                            (await Process.run('pwd', [],
+                                    stdoutEncoding: utf8,
+                                    workingDirectory: workingDirectory.path))
+                                .stdout,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
               Text(
                 'Прокси-сервера создателя приложения будут отключены 21 сентября 2020 года.',
                 style: Theme.of(context)
@@ -94,7 +132,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
               ),
               SizedBox(height: 8),
               ListFadeInSlideStagger(
-                index: 1,
+                index: 2,
                 child: Card(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(kCardBorderRadius),

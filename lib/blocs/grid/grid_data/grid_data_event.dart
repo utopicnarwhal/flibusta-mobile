@@ -56,7 +56,11 @@ class LoadGridDataEvent extends GridDataEvent {
               1,
             );
             hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
-            if (_gridData.isEmpty == true) throw new DsError(userMessage: 'На что-то сломалось. Попробуйте зайти позже.');
+            if (_gridData.isEmpty == true)
+              throw new DsError(
+                userMessage:
+                    'На сайте что-то сломалось. Попробуйте зайти позже.',
+              );
           }
           break;
         case GridViewType.authors:

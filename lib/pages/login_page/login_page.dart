@@ -243,21 +243,20 @@ class LoginPageState extends State<LoginPage> {
     try {
       var response = await ProxyHttpClient().getDio().postUri(
             url,
-            data: FormData.fromMap(
-              {
-                'name': userCredentials.login,
-                'pass': userCredentials.password,
-                'persistent_login': 1,
-                'op': 'Вход+в+систему',
-                'form_id': 'user_login_block',
-                'openid_identifier': '',
-                'form_build_id': _formBuildId,
-                'openid.return_to':
-                    'https://${ProxyHttpClient().getHostAddress()}/openid/authenticate?destination=node',
-              },
-            ),
+            data: {
+              'name': userCredentials.login,
+              'pass': userCredentials.password,
+              'persistent_login': 1,
+              'op': 'Вход+в+систему',
+              'form_id': 'user_login_block',
+              'openid_identifier': '',
+              'form_build_id': _formBuildId,
+              'openid.return_to':
+                  'https://${ProxyHttpClient().getHostAddress()}/openid/authenticate?destination=node',
+            },
             options: Options(
               followRedirects: true,
+              contentType: Headers.formUrlEncodedContentType,
               validateStatus: (status) => status == 200 || status == 302,
             ),
           );

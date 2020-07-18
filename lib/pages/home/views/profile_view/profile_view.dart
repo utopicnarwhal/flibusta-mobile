@@ -206,14 +206,14 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                           ),
                           title: Text(
-                            userContactDataState.userContactData.nickname,
+                            userContactDataState.userContactData.nickname ?? '',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
                           subtitle: Text(
-                            userContactDataState.userContactData.email,
+                            userContactDataState.userContactData.email ?? '',
                           ),
                         );
                       }

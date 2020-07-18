@@ -14,23 +14,26 @@ dependencies:
   dio_cookie_manager: ^1.0.0
   cookie_jar: ^1.0.1
 
+  utopic_tor_onion_proxy: ^0.1.0
+
   flutter_typeahead: ^1.8.5
   mask_text_input_formatter: ^1.0.7
 
   flutter_secure_storage: ^3.3.3
-  shared_preferences: ^0.5.7+3
-  flutter_local_notifications: ^1.4.4+1
+  shared_preferences: ^0.5.8
+  flutter_local_notifications: ^1.4.4+2
 
-  url_launcher: ^5.4.11
+  url_launcher: ^5.5.0
 
   font_awesome_flutter: ^8.8.1
   eva_icons_flutter: ^2.0.0
 
-  flutter_bloc: ^5.0.0
-  bloc: ^5.0.0
+  flutter_bloc: ^5.0.1
+  bloc: ^5.0.1
   rxdart: ^0.24.1
-  equatable: ^1.1.1
-  provider: ^4.1.3+1
+  async: ^2.4.1
+  equatable: ^1.2.2
+  provider: ^4.3.1
 
   path_provider: ^1.6.11
   utopic_open_file: ^1.0.0
@@ -73,6 +76,7 @@ flutter:
     - assets/img/bg-header.png
     - assets/img/utopic_narwhal.png
     - assets/img/4pda_logo.svg
+    - assets/img/tor_logo.svg
     - assets/animations/empty_state.flr
     - assets/animations/books_placeholder.flr
     - assets/animations/long_tap.flr
