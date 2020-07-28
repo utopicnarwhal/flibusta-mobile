@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/selected_view_type/selected_view_type_bloc.dart';
 import 'package:flibusta/blocs/user_contact_data/user_contact_data_bloc.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';

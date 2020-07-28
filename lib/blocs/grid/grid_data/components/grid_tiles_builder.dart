@@ -5,7 +5,6 @@ import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';

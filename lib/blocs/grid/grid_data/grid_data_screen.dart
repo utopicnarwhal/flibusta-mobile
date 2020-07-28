@@ -1,10 +1,4 @@
-import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
-import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:utopic_toast/utopic_toast.dart';
-import 'package:flutter/material.dart' hide NestedScrollView;
-import 'package:flutter_bloc/flutter_bloc.dart';
+part of 'grid_data_bloc.dart';
 
 class GridDataScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -24,9 +18,9 @@ class GridDataScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<GridDataBloc>.value(
       value: gridDataBloc,
-      child: BlocListener(
-        bloc: gridDataBloc,
-        listener: (BuildContext context, GridDataState gridDataState) {
+      child: BlocListener<Cubit<GridDataState>, GridDataState>(
+        cubit: gridDataBloc,
+        listener: (context, gridDataState) {
           if (gridDataState?.message?.isEmpty != false) {
             return;
           }
@@ -41,9 +35,9 @@ class GridDataScreen extends StatelessWidget {
             type: toastType,
           );
         },
-        child: BlocBuilder(
-          bloc: gridDataBloc,
-          builder: (BuildContext context, GridDataState gridDataState) {
+        child: BlocBuilder<GridDataBloc, GridDataState>(
+          cubit: gridDataBloc,
+          builder: (context, gridDataState) {
             return GridTilesBuilder(
               gridViewType: gridDataBloc.gridViewType,
               gridDataState: gridDataState,

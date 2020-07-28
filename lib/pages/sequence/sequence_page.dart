@@ -1,11 +1,12 @@
+import 'dart:ui';
+
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/constants.dart';
@@ -42,9 +43,9 @@ class _SequencePageState extends State<SequencePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
-      bloc: _gridDataBloc,
-      builder: (context, GridDataState gridDataState) {
+    return BlocBuilder<GridDataBloc, GridDataState>(
+      cubit: _gridDataBloc,
+      builder: (context, gridDataState) {
         Widget body;
 
         int shimmerListCount =

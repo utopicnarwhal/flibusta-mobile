@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
-import 'package:flibusta/intro.dart';
+import 'package:flibusta/pages/intro.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flare_flutter/flare_cache.dart';
 import 'package:flare_flutter/provider/asset_flare.dart';

@@ -1,19 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/buttons/raised_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
-import 'package:flibusta/ds_controls/ui/svg_icon.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/get_new_proxy_tile.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/proxy_radio_list_tile.dart';
+import 'package:flibusta/pages/home/views/proxy_settings/components/tor_onion_proxy_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/server_status_checker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ProxySettingsPage extends StatefulWidget {
   static const routeName = '/ProxySettings';
@@ -50,7 +47,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
             physics: kBouncingAlwaysScrollableScrollPhysics,
             addSemanticIndexes: false,
             padding: EdgeInsets.fromLTRB(16, 16, 16, 42),
-            children: <Widget>[
+            children: [
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.0),
                 child: Row(
@@ -74,45 +71,26 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                   ],
                 ),
               ),
-              ServerStatusChecker(),
+              Table(
+                children: [
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ServerStatusChecker(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: TorOnionProxyCard(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
               SizedBox(height: 16),
               Text(
                 'Использование прокси-сервера может помочь, если Флибуста заблокирована Вашим интернет-провайдером.',
                 style: Theme.of(context).textTheme.bodyText2,
-              ),
-              SizedBox(height: 16),
-              ListFadeInSlideStagger(
-                index: 1,
-                child: Card(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(kCardBorderRadius),
-                    child: Material(
-                      type: MaterialType.card,
-                      borderRadius: BorderRadius.circular(kCardBorderRadius),
-                      child: ListTile(
-                        leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgIcon(
-                              assetPath: 'assets/img/tor_logo.svg',
-                              size: 40,
-                            ),
-                          ],
-                        ),
-                        title: Text('Запустить Tor Onion Proxy'),
-                        onTap: () async {
-                          var workingDirectory = await getTemporaryDirectory();
-                          print(
-                            (await Process.run('pwd', [],
-                                    stdoutEncoding: utf8,
-                                    workingDirectory: workingDirectory.path))
-                                .stdout,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
               ),
               SizedBox(height: 16),
               Text(

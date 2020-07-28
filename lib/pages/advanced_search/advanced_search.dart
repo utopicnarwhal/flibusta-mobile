@@ -1,11 +1,12 @@
 import 'dart:ui';
 
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
+import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
@@ -53,9 +54,9 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
-      bloc: _gridDataBloc,
-      builder: (context, GridDataState gridDataState) {
+    return BlocBuilder<GridDataBloc, GridDataState>(
+      cubit: _gridDataBloc,
+      builder: (context, gridDataState) {
         Widget body;
 
         int shimmerListCount =
@@ -63,13 +64,25 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
 
         if (gridDataState.stateCode == GridDataStateCode.Empty) {
           body = Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 300, maxHeight: 300),
-              child: FlareActor(
-                'assets/animations/books_placeholder.flr',
-                fit: BoxFit.contain,
-                animation: 'Animations',
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 300, maxHeight: 300),
+                  child: FlareActor(
+                    'assets/animations/books_placeholder.flr',
+                    fit: BoxFit.contain,
+                    animation: 'Animations',
+                  ),
+                ),
+                DsOutlineButton(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text('Открыть параметры поиска'),
+                  onPressed: () {
+                    _scaffoldKey.currentState.openEndDrawer();
+                  },
+                ),
+              ],
             ),
           );
         } else if ((gridDataState.stateCode == GridDataStateCode.Normal ||

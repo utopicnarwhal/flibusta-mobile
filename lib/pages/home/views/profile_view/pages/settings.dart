@@ -234,7 +234,7 @@ class _SettingsPageState extends State<SettingsPage> {
           return ListTile(
             leading: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
+              children: [
                 Icon(FontAwesomeIcons.fileDownload, size: 26.0),
               ],
             ),

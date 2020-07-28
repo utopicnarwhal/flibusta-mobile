@@ -1,8 +1,22 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
+import 'package:flibusta/constants.dart';
+import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
+import 'package:flibusta/model/grid_data/grid_data.dart';
+import 'package:meta/meta.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:utopic_toast/utopic_toast.dart';
+import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+part 'grid_data_event.dart';
+part 'grid_data_screen.dart';
+part 'grid_data_state.dart';
 
 class GridDataBloc extends Bloc<GridDataEvent, GridDataState> {
   final GridViewType gridViewType;

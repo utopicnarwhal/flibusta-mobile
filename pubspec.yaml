@@ -14,9 +14,9 @@ dependencies:
   dio_cookie_manager: ^1.0.0
   cookie_jar: ^1.0.1
 
-  utopic_tor_onion_proxy: ^0.1.0
+  utopic_tor_onion_proxy: ^0.1.1
 
-  flutter_typeahead: ^1.8.5
+  flutter_typeahead: ^1.8.6
   mask_text_input_formatter: ^1.0.7
 
   flutter_secure_storage: ^3.3.3
@@ -26,13 +26,13 @@ dependencies:
   url_launcher: ^5.5.0
 
   font_awesome_flutter: ^8.8.1
-  eva_icons_flutter: ^2.0.0
+  eva_icons_flutter: ^2.0.1
 
-  flutter_bloc: ^5.0.1
-  bloc: ^5.0.1
+  flutter_bloc: ^6.0.1
+  bloc: ^6.0.1
   rxdart: ^0.24.1
   async: ^2.4.1
-  equatable: ^1.2.2
+  equatable: ^1.2.3
   provider: ^4.3.1
 
   path_provider: ^1.6.11
@@ -41,7 +41,7 @@ dependencies:
   html: ^0.14.0+3
   permission_handler: ^5.0.1+1
   
-  flutter_slidable: ^0.5.4
+  flutter_slidable: ^0.5.5
   shimmer: ^1.1.1
   avatar_glow: ^1.2.0
   flutter_staggered_animations: ^0.1.2

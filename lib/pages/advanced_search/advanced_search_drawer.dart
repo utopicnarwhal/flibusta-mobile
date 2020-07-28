@@ -1,7 +1,7 @@
 import 'package:flibusta/blocs/genres_list/genres_list_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
-import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
+import 'package:flibusta/ds_controls/ui/buttons/raised_button.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/genre.dart';
@@ -172,7 +172,8 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                             [],
                       ),
                       SizedBox(height: 14),
-                      DsOutlineButton(
+                      DsRaisedButton(
+                        elevation: 4,
                         padding: EdgeInsets.symmetric(vertical: 10.0),
                         child: Text(
                           'Искать!',
