@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -37,8 +39,13 @@ class ServerStatusCheckerState extends State<ServerStatusChecker> {
     });
 
     try {
+      var urlToCheck = ProxyHttpClient().getHostAddress();
+      if (urlToCheck == kFlibustaOnionUrl) {
+        urlToCheck = await LocalStorage().getHostAddress();
+      }
+
       var response = await _dioForCheck.get(
-        'https://api.downfor.cloud/httpcheck/${ProxyHttpClient().getHostAddress()}',
+        'https://api.downfor.cloud/httpcheck/$urlToCheck',
         options: Options(
           headers: {
             'user-agent':

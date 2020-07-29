@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:async/async.dart';
 import 'package:dio/dio.dart';
+import 'package:flibusta/constants.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CurlHttpClientAdapter extends HttpClientAdapter {
@@ -126,7 +127,10 @@ class CurlHttpClientAdapter extends HttpClientAdapter {
 
     // if (kReleaseMode == false) {
     //   process.stderr.listen((event) {
-    //     print(String.fromCharCodes(event));
+    //     var message = String.fromCharCodes(event);
+    //     if (message.trim().isNotEmpty) {
+    //       print(message);
+    //     }
     //   });
     // } else {
     process.stderr.drain();
@@ -236,7 +240,11 @@ class CurlHttpClientAdapter extends HttpClientAdapter {
       args.addAll(['-D', headersFilePath]);
     }
 
-    args.addAll(['--url', options.uri.toString()]);
+    var urlString = options.uri.toString();
+    if (options.uri.host == kFlibustaOnionUrl) {
+      urlString = urlString.replaceAll('https://', 'http://');
+    }
+    args.addAll(['--url', urlString]);
 
     args.addAll(['--output', '-']);
 

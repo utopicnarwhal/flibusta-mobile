@@ -46,22 +46,32 @@ class _TorOnionProxyCardState extends State<TorOnionProxyCard> {
                     BlocBuilder<TorProxyBloc, TorProxyState>(
                       cubit: TorProxyBloc(),
                       builder: (context, torProxyState) {
-                        var stateString = 'Неизвестно';
+                        Widget stateWidget = Text('Неизвестно');
 
                         if (torProxyState is UnTorProxyState) {
-                          stateString = 'Выключен';
+                          stateWidget = Text('Выключен');
                         } else if (torProxyState is InTorProxyState) {
-                          stateString = 'Включен';
+                          stateWidget = Text(
+                            'Включен',
+                            style: TextStyle(
+                              color: Colors.green,
+                            ),
+                          );
                         } else if (torProxyState is StartingTorProxyState) {
-                          stateString = 'Запускается';
+                          stateWidget = Text('Запускается');
                         } else if (torProxyState is ErrorTorProxyState) {
-                          stateString = 'Ошибка';
+                          stateWidget = Text(
+                            'Ошибка',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          );
                         }
 
                         return ListTile(
                           trailing: kIconArrowForward,
                           title: Text('Состояние:'),
-                          subtitle: Text(stateString),
+                          subtitle: stateWidget,
                         );
                       },
                     ),

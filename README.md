@@ -1,24 +1,10 @@
 # Мобильное приложение Флибуста Browser (Android). ЗАВЕРШЕНО
 
-<a href='https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser&hl=ru&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Доступно в Google Play'  width="30%" src='https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png'/></a>
+<a href='https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser&hl=ru&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Доступно в Google Play' width="30%" src='https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png'/></a>
 
-Данное приложение позволит вам находить по названию и скачивать книги с сайта "flibusta.is".  
-Если данный сайт заблокирован в вашей стране, приложение может найти бесплатный прокси сервер, через который вы сможете получить доступ к сайту. Также есть прокси-сервер разработчика приложения.
+Данное приложение позволит вам находить по названию и скачивать книги с сайта "flibusta.is" или его зеркал.  
+Если данный сайт заблокирован в вашей стране, в приложении есть встроенные прокси создателя приложения, через которые вы сможете получить доступ к сайту. Также есть возможность включить Tor Onion Proxy.
 Для просмотра этого файла в удобной форме в VS Code, нажмите сочетание клавиш `Ctrl + Shift + V`.  
-
-## Для запуска приложения в Windows необходимо:
-
-1. Скачать c сайта [Flutter. Windows install](https://flutter.dev/docs/get-started/install/windows) архив с Flutter SDK
-2. Разархивировать папку `flutter`, куда удобнее. Чтобы не было проблем, можно в `C:/flutter`
-3. Запустить из папки `flutter_console.bat`
-4. Добавить в environment variables в переменную `PATH` путь к вашему `flutter\bin`, например `C:\flutter\bin`
-После этого перезагрузить камплюктер.
-5. Установить [Android Studio](`https://developer.android.com/studio`).
-6. Установить в VS Code и в Android Studio плагины Dart и Flutter
-7. Открыть проект в Android Studio  
-8. Установить пакеты, указанные в `pubspec.yaml`, с помощью команды `flutter pub get`  
-9. Ввести в коммандной строке `flutter doctor` и решить указанные проблемы, если они есть. Принять лицензии Android `flutter doctor --android-licenses`  
-10. Попробовать запустить приложение на подключенном устройстве или эмуляторе `F5`.  
 
 ## Генерация сериализации моделей
 

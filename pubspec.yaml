@@ -1,7 +1,7 @@
 name: flibusta
 description: Mobile application
 
-version: 0.5.3+31
+version: 0.5.4+32
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -14,7 +14,7 @@ dependencies:
   dio_cookie_manager: ^1.0.0
   cookie_jar: ^1.0.1
 
-  utopic_tor_onion_proxy: ^0.1.1
+  utopic_tor_onion_proxy: ^0.1.2
 
   flutter_typeahead: ^1.8.6
   mask_text_input_formatter: ^1.0.7

@@ -23,6 +23,14 @@ class StartTorProxyEvent extends TorProxyEvent {
     try {
       var port = await UtopicTorOnionProxy.startTor();
 
+      await ProxyHttpClient().setProxy(
+        '${InternetAddress.loopbackIPv4.host}:$port',
+        isSocks4aProxy: true,
+      );
+      if (await LocalStorage().getUseOnionSiteWithTor()) {
+        ProxyHttpClient().setHostAddress(kFlibustaOnionUrl);
+      }
+
       return InTorProxyState(
         port: port,
       );
@@ -69,6 +77,13 @@ class StopTorProxyEvent extends TorProxyEvent {
       {TorProxyState currentState, TorProxyBloc bloc}) async {
     try {
       if (await UtopicTorOnionProxy.stopTor()) {
+        ProxyHttpClient().setProxy(
+          await LocalStorage().getActualProxy(),
+          isSocks4aProxy: false,
+        );
+
+        ProxyHttpClient().setHostAddress(await LocalStorage().getHostAddress());
+
         return UnTorProxyState();
       }
       return ErrorTorProxyState(

@@ -89,13 +89,16 @@ class ProxyHttpClient {
     ]);
   }
 
-  Future<void> setProxy(String hostPort) async {
+  Future<void> setProxy(String hostPort, {bool isSocks4aProxy = false}) async {
     if (_proxyHostPort == hostPort) {
       return;
     }
     _proxyHostPort = hostPort;
-    var newDio = Dio(defaultDioOptions)
-      ..httpClientAdapter = CurlHttpClientAdapter();
+
+    var newDio = Dio(defaultDioOptions);
+    if (isSocks4aProxy) {
+      newDio.httpClientAdapter = CurlHttpClientAdapter();
+    }
 
     newDio.interceptors.add(
       InterceptorsWrapper(
@@ -122,8 +125,13 @@ class ProxyHttpClient {
     );
 
     if (newDio.httpClientAdapter is CurlHttpClientAdapter) {
-      (newDio.httpClientAdapter as CurlHttpClientAdapter)
-          .httpProxyCredHostPort = hostPort;
+      if (isSocks4aProxy) {
+        (newDio.httpClientAdapter as CurlHttpClientAdapter).socks4aHostPort =
+            hostPort;
+      } else {
+        (newDio.httpClientAdapter as CurlHttpClientAdapter)
+            .httpProxyCredHostPort = hostPort;
+      }
     } else if (newDio.httpClientAdapter is DefaultHttpClientAdapter) {
       (newDio.httpClientAdapter as DefaultHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {

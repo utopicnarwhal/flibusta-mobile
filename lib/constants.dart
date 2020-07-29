@@ -1,7 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
-const kFlibustaOnionUrl = "http://flibustahezeous3.onion";
+const kFlibustaOnionUrl = "flibustahezeous3.onion";
 
 const kBouncingAlwaysScrollableScrollPhysics = BouncingScrollPhysics(
   parent: AlwaysScrollableScrollPhysics(),

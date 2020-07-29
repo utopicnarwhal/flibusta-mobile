@@ -3,28 +3,27 @@ import 'package:flibusta/services/http_client.dart';
 import 'package:flutter/material.dart';
 
 class GetNewProxyTile extends StatefulWidget {
-  final void Function(String) _callback;
+  final void Function(String) callback;
+  final bool enabled;
 
   GetNewProxyTile({
     Key key,
-    void Function(String) callback,
-  })  : this._callback = callback,
-        super(key: key);
+    this.callback,
+    this.enabled = true,
+  }) : super(key: key);
 
-  _GetNewProxyTileState createState() => _GetNewProxyTileState(_callback);
+  _GetNewProxyTileState createState() => _GetNewProxyTileState();
 }
 
 class _GetNewProxyTileState extends State<GetNewProxyTile> {
-  final void Function(String) _callback;
-
-  _GetNewProxyTileState(this._callback);
+  _GetNewProxyTileState();
 
   var requestingProxies = false;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      enabled: !requestingProxies,
+      enabled: !requestingProxies && widget.enabled,
       leading: Padding(
         padding: EdgeInsets.only(left: 8.0),
         child: requestingProxies
@@ -44,7 +43,7 @@ class _GetNewProxyTileState extends State<GetNewProxyTile> {
           requestingProxies = true;
         });
         var newProxies = await ProxyHttpClient().getNewProxies();
-        newProxies.forEach(_callback);
+        newProxies.forEach(widget.callback);
         if (mounted) {
           setState(() {
             requestingProxies = false;
