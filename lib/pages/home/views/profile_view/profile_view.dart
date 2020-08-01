@@ -6,8 +6,8 @@ import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
-import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
-import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
+import 'package:flibusta/pages/home/views/profile_view/pages/about.dart';
+import 'package:flibusta/pages/home/views/profile_view/pages/settings.dart';
 import 'package:flibusta/pages/login_page/login_page.dart';
 import 'package:flibusta/services/http_client.dart';
 import 'package:flibusta/utils/dialog_utils.dart';
@@ -177,10 +177,9 @@ class ProfileScreen extends StatelessWidget {
                 child: Material(
                   type: MaterialType.card,
                   borderRadius: BorderRadius.circular(kCardBorderRadius),
-                  child: BlocBuilder(
-                    bloc: UserContactDataBloc(),
-                    builder:
-                        (context, UserContactDataState userContactDataState) {
+                  child: BlocBuilder<UserContactDataBloc, UserContactDataState>(
+                    cubit: UserContactDataBloc(),
+                    builder: (context, userContactDataState) {
                       if (userContactDataState is InUserContactDataState) {
                         return ListTile(
                           contentPadding: EdgeInsets.symmetric(
@@ -206,14 +205,14 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                           ),
                           title: Text(
-                            userContactDataState.userContactData.nickname,
+                            userContactDataState.userContactData.nickname ?? '',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
                           subtitle: Text(
-                            userContactDataState.userContactData.email,
+                            userContactDataState.userContactData.email ?? '',
                           ),
                         );
                       }

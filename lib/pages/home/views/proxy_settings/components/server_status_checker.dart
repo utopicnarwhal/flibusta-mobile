@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
 import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -37,8 +39,13 @@ class ServerStatusCheckerState extends State<ServerStatusChecker> {
     });
 
     try {
+      var urlToCheck = ProxyHttpClient().getHostAddress();
+      if (urlToCheck == kFlibustaOnionUrl) {
+        urlToCheck = await LocalStorage().getHostAddress();
+      }
+
       var response = await _dioForCheck.get(
-        'https://api.downfor.cloud/httpcheck/${ProxyHttpClient().getHostAddress()}',
+        'https://api.downfor.cloud/httpcheck/$urlToCheck',
         options: Options(
           headers: {
             'user-agent':
@@ -60,63 +67,61 @@ class ServerStatusCheckerState extends State<ServerStatusChecker> {
 
   @override
   Widget build(BuildContext context) {
+    Widget siteStatusIcon = SizedBox();
+    if (_serverStatus == null && _error == null) {
+      siteStatusIcon = SizedBox(
+        height: 28,
+        width: 28,
+        child: DsCircularProgressIndicator(),
+      );
+    } else if (_serverStatus != null && _serverStatus['isDown'] == false) {
+      siteStatusIcon = Icon(
+        FontAwesomeIcons.check,
+        color: Colors.green,
+        size: 28,
+      );
+    } else if (_serverStatus != null && _serverStatus['isDown'] == true) {
+      siteStatusIcon = Icon(
+        FontAwesomeIcons.ban,
+        color: Colors.red,
+        size: 30,
+      );
+    } else if (_error != null) {
+      siteStatusIcon = Icon(
+        FontAwesomeIcons.question,
+        color: Theme.of(context).disabledColor,
+        size: 30,
+      );
+    }
+
     return Card(
-      child: ListTile(
-        leading: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_serverStatus == null && _error == null)
-              Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: SizedBox(
-                  height: 28,
-                  width: 28,
-                  child: DsCircularProgressIndicator(),
-                ),
-              ),
-            if (_serverStatus != null && _serverStatus['isDown'] == false)
-              Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Icon(
-                  FontAwesomeIcons.check,
-                  color: Colors.green,
-                  size: 28,
-                ),
-              ),
-            if (_serverStatus != null && _serverStatus['isDown'] == true)
-              Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Icon(
-                  FontAwesomeIcons.ban,
-                  color: Colors.red,
-                  size: 30,
-                ),
-              ),
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Icon(
-                  FontAwesomeIcons.question,
-                  color: Theme.of(context).disabledColor,
-                  size: 30,
-                ),
-              ),
-          ],
-        ),
-        title: Text('Состояние сайта:'),
-        subtitle: Text(
-          _serverStatus != null
-              ? _serverStatus['statusText']
-              : (_error != null ? 'Неизвестно' : 'Проверка...'),
-        ),
-        trailing: IconButton(
-          icon: Icon(
-            FontAwesomeIcons.redoAlt,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          ListTile(
+            title: Text('Состояние сайта:'),
+            subtitle: Text(
+              _serverStatus != null
+                  ? _serverStatus['statusText']
+                  : (_error != null ? 'Неизвестно' : 'Проверка...'),
+            ),
           ),
-          tooltip: 'Обновить информацию',
-          color: Theme.of(context).iconTheme.color,
-          onPressed: _serverStatus != null || _error != null ? _check : null,
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: siteStatusIcon,
+          ),
+          IconButton(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+            icon: Icon(
+              FontAwesomeIcons.redoAlt,
+            ),
+            tooltip: 'Обновить информацию',
+            color: Theme.of(context).iconTheme.color,
+            onPressed: _serverStatus != null || _error != null ? _check : null,
+          ),
+        ],
       ),
     );
   }

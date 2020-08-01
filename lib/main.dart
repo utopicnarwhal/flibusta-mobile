@@ -40,20 +40,25 @@ Future<void> initialization() async {
   }
   var preparationFutures = List<Future>();
   preparationFutures.add(LocalStorage().checkVersion());
+
   preparationFutures.add(LocalStorage()
       .getActualProxy()
       .then((actualProxy) => ProxyHttpClient().setProxy(actualProxy)));
+
   preparationFutures.add(LocalStorage()
       .getHostAddress()
       .then((url) => ProxyHttpClient().setHostAddress(url)));
+
   preparationFutures.add(LocalStorage().getBooksDirectory().then((dir) async {
     var externalStorageDownloadDirectories = await FileUtils.getStorageDir();
     await LocalStorage().setBooksDirectory(externalStorageDownloadDirectories);
   }));
+
   preparationFutures.add(PermissionsUtils.requestAccess(
     null,
     Permission.storage,
   ));
+
   preparationFutures.add(ProxyHttpClient().initCookieJar());
 
   NotificationService().init();

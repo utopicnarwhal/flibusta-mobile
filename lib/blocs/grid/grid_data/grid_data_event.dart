@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/grid_data_repository.dart';
-import 'package:flibusta/constants.dart';
-import 'package:flibusta/model/advancedSearchParams.dart';
-import 'package:flibusta/model/enums/gridViewType.dart';
-import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
-import 'package:flibusta/model/grid_data/grid_data.dart';
-import 'package:meta/meta.dart';
+part of 'grid_data_bloc.dart';
 
 @immutable
 abstract class GridDataEvent {
@@ -56,7 +48,11 @@ class LoadGridDataEvent extends GridDataEvent {
               1,
             );
             hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
-            if (_gridData.isEmpty == true) throw new DsError(userMessage: 'На что-то сломалось. Попробуйте зайти позже.');
+            if (_gridData.isEmpty == true)
+              throw new DsError(
+                userMessage:
+                    'На сайте что-то сломалось. Попробуйте зайти позже.',
+              );
           }
           break;
         case GridViewType.authors:

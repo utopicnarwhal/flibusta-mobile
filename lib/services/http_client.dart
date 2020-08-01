@@ -5,6 +5,7 @@ import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
+import 'package:flibusta/services/curl_http_client_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:path_provider/path_provider.dart';
@@ -88,12 +89,16 @@ class ProxyHttpClient {
     ]);
   }
 
-  Future<void> setProxy(String hostPort) async {
+  Future<void> setProxy(String hostPort, {bool isSocks4aProxy = false}) async {
     if (_proxyHostPort == hostPort) {
       return;
     }
     _proxyHostPort = hostPort;
+
     var newDio = Dio(defaultDioOptions);
+    if (isSocks4aProxy) {
+      newDio.httpClientAdapter = CurlHttpClientAdapter();
+    }
 
     newDio.interceptors.add(
       InterceptorsWrapper(
@@ -119,21 +124,31 @@ class ProxyHttpClient {
       ),
     );
 
-    (newDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (HttpClient client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) =>
-              host == 'flibusta.is';
-
-      if (hostPort == '') {
-        client.findProxy = null;
-        return client;
+    if (newDio.httpClientAdapter is CurlHttpClientAdapter) {
+      if (isSocks4aProxy) {
+        (newDio.httpClientAdapter as CurlHttpClientAdapter).socks4aHostPort =
+            hostPort;
+      } else {
+        (newDio.httpClientAdapter as CurlHttpClientAdapter)
+            .httpProxyCredHostPort = hostPort;
       }
-      client.findProxy = (url) {
-        return 'PROXY $hostPort';
+    } else if (newDio.httpClientAdapter is DefaultHttpClientAdapter) {
+      (newDio.httpClientAdapter as DefaultHttpClientAdapter)
+          .onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) =>
+                host == 'flibusta.is';
+
+        if (hostPort == '') {
+          client.findProxy = null;
+          return client;
+        }
+        client.findProxy = (url) {
+          return 'PROXY $hostPort';
+        };
+        return client;
       };
-      return client;
-    };
+    }
     _dio.clear();
     _dio.close();
     _dio = newDio;

@@ -5,7 +5,6 @@ import 'package:flibusta/blocs/grid/grid_data/components/first_grid_tile.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/full_info_card.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_data_tile.dart';
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/grid_data_state.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
@@ -256,60 +255,63 @@ class GridTilesBuilder extends StatelessWidget {
         children: [
           gridListView,
           if (gridData[0] is BookCard)
-            FutureBuilder<bool>(
-              future: LocalStorage().getLongTapTutorialCompleted(),
-              builder: (context, longTapTutorialCompletedSnapshot) {
-                if (longTapTutorialCompletedSnapshot?.data == false) {
-                  return Padding(
-                    padding: EdgeInsets.only(top: 40),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                spreadRadius: -2,
-                                blurRadius: 6,
+            IgnorePointer(
+              child: FutureBuilder<bool>(
+                future: LocalStorage().getLongTapTutorialCompleted(),
+                builder: (context, longTapTutorialCompletedSnapshot) {
+                  if (longTapTutorialCompletedSnapshot?.data == false) {
+                    return Padding(
+                      padding: EdgeInsets.only(top: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  spreadRadius: -2,
+                                  blurRadius: 6,
+                                  color: Theme.of(context).cardColor,
+                                ),
+                              ],
+                            ),
+                            height: 70,
+                            width: 70,
+                            child: FlareActor(
+                              'assets/animations/long_tap.flr',
+                              animation: 'Animations',
+                              color:
+                                  Theme.of(context).textTheme.bodyText2.color,
+                            ),
+                          ),
+                          Material(
+                            type: MaterialType.card,
+                            borderRadius: BorderRadius.circular(5),
+                            elevation: 2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: Theme.of(context).dividerColor,
+                                ),
                                 color: Theme.of(context).cardColor,
                               ),
-                            ],
-                          ),
-                          height: 70,
-                          width: 70,
-                          child: FlareActor(
-                            'assets/animations/long_tap.flr',
-                            animation: 'Animations',
-                            color: Theme.of(context).textTheme.bodyText2.color,
-                          ),
-                        ),
-                        Material(
-                          type: MaterialType.card,
-                          borderRadius: BorderRadius.circular(5),
-                          elevation: 2,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
+                              padding: EdgeInsets.all(4),
+                              child: Text(
+                                'Зажмите, чтобы\n узнать больше',
+                                style: TextStyle(fontSize: 12),
                               ),
-                              color: Theme.of(context).cardColor,
-                            ),
-                            padding: EdgeInsets.all(4),
-                            child: Text(
-                              'Зажмите, чтобы\n узнать больше',
-                              style: TextStyle(fontSize: 12),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return SizedBox();
-              },
+                        ],
+                      ),
+                    );
+                  }
+                  return SizedBox();
+                },
+              ),
             ),
         ],
       );

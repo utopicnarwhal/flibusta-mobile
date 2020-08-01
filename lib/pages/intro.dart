@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flibusta/components/directory_picker/directory_picker.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
-import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
 import 'package:flibusta/pages/home/home_page.dart';
 import 'package:flibusta/services/http_client.dart';
@@ -20,18 +19,21 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DsAppBar(
-        isTransparent: true,
-        showBottomDivider: false,
-      ),
-      body: Scrollbar(
-        child: SingleChildScrollView(
-          physics: kBouncingAlwaysScrollableScrollPhysics,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 30),
-            child: _OpenSiteBlock(),
-          ),
-        ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Scrollbar(
+            child: SingleChildScrollView(
+              physics: kBouncingAlwaysScrollableScrollPhysics,
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: _OpenSiteBlock(),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -55,14 +57,18 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 100),
         FlibustaLogo(sideHeight: 140),
-        SizedBox(height: 16),
+        SizedBox(height: 20),
+        Text(
+          'Чтобы приложение не заблокировали в Play Market, Вам необходимо самим ввести URL адрес в поле снизу. \n\nНапример: flibusta.is',
+        ),
+        SizedBox(height: 20),
         TypeAheadField(
           textFieldConfiguration: TextFieldConfiguration(
             controller: _urlController,
             decoration: InputDecoration(
-              helperText: 'For example: flibusta.is',
-              hintText: 'Вы знаете, что сюда вписать',
+              hintText: 'Адрес для подключения',
             ),
             onEditingComplete: _onSubmit,
           ),

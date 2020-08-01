@@ -503,7 +503,8 @@ class LocalStorage {
 
   Future<bool> addFavoriteAuthor(AuthorCard authorCard) async {
     var favoriteAuthors = await getFavoriteAuthors();
-    if (favoriteAuthors.any((element) => element.id == authorCard.id)) return true;
+    if (favoriteAuthors.any((element) => element.id == authorCard.id))
+      return true;
 
     favoriteAuthors.add(authorCard);
     return await setFavoriteAuthors(favoriteAuthors);
@@ -574,7 +575,8 @@ class LocalStorage {
 
   Future<bool> addFavoriteSequence(SequenceCard sequenceCard) async {
     var favoriteSequences = await getFavoriteSequences();
-    if (favoriteSequences.any((element) => element.id == sequenceCard.id)) return true;
+    if (favoriteSequences.any((element) => element.id == sequenceCard.id))
+      return true;
 
     favoriteSequences.add(sequenceCard);
     return await setFavoriteSequences(favoriteSequences);
@@ -582,7 +584,8 @@ class LocalStorage {
 
   Future<bool> deleteFavoriteSequence(int sequenceId) async {
     var favoriteSequences = await getFavoriteSequences();
-    if (!favoriteSequences.any((element) => element.id == sequenceId)) return true;
+    if (!favoriteSequences.any((element) => element.id == sequenceId))
+      return true;
 
     favoriteSequences.removeWhere((element) => element.id == sequenceId);
     return await setFavoriteSequences(favoriteSequences);
@@ -624,6 +627,26 @@ class LocalStorage {
       'DownloadedBooks',
       [],
     );
+  }
+
+  Future<bool> getUseOnionSiteWithTor() async {
+    var prefs = await _prefs;
+    try {
+      var useOnionSiteWithTor = prefs.getBool('UseOnionSiteWithTor');
+      if (useOnionSiteWithTor == null) {
+        await prefs.setBool('UseOnionSiteWithTor', false);
+        useOnionSiteWithTor = false;
+      }
+      return useOnionSiteWithTor;
+    } catch (e) {
+      await prefs.setBool('UseOnionSiteWithTor', false);
+      return false;
+    }
+  }
+
+  Future<bool> setUseOnionSiteWithTor(bool value) async {
+    var prefs = await _prefs;
+    return await prefs.setBool('UseOnionSiteWithTor', value);
   }
 
   Future<void> checkVersion() async {

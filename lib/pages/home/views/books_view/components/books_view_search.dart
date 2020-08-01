@@ -1,5 +1,5 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flibusta/blocs/grid/grid_data/bloc.dart';
+import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';

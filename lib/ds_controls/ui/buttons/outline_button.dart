@@ -7,6 +7,7 @@ class DsOutlineButton extends StatelessWidget {
   final FocusNode focusNode;
   final bool autofocus;
   final Widget child;
+  final Color color;
   final EdgeInsetsGeometry margin;
 
   DsOutlineButton({
@@ -16,6 +17,7 @@ class DsOutlineButton extends StatelessWidget {
     this.autofocus = false,
     this.child,
     this.margin,
+    this.color,
   });
 
   @override
@@ -25,6 +27,7 @@ class DsOutlineButton extends StatelessWidget {
       padding: padding ?? EdgeInsets.all(8),
       focusNode: focusNode,
       autofocus: autofocus,
+      color: color,
       splashColor: kSecondaryColor(context).withOpacity(0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),

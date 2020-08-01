@@ -162,7 +162,7 @@ class BookPageState extends State<BookPage> {
                           context,
                           'Права на произведение',
                           content: Text(
-                            'Напишите администратору сайта "flibusta.is" по адресу lib.contact.email@gmail.com',
+                            'Напишите администратору сайта на почту lib.contact.email@gmail.com',
                           ),
                         );
                       },

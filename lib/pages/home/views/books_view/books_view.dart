@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
-import 'package:flibusta/blocs/grid/grid_data/grid_data_screen.dart';
 import 'package:flibusta/blocs/grid/selected_view_type/selected_view_type_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/default_tab_controller.dart';
@@ -72,7 +71,8 @@ class BooksView extends StatelessWidget {
                         scaffoldKey: scaffoldKey,
                         gridDataBloc: gridDataBlocsList[gridViewType.index],
                         searchTextController: searchTextController,
-                        favoriteGenreCodesController: favoriteGenreCodesController,
+                        favoriteGenreCodesController:
+                            favoriteGenreCodesController,
                       ),
                     );
                   }

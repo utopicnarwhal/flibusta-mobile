@@ -3,13 +3,14 @@ import 'package:flibusta/pages/advanced_search/advanced_search.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
 import 'package:flibusta/pages/favorites/favorites_page.dart';
-import 'package:flibusta/pages/home/views/profile_view/components/about/about.dart';
-import 'package:flibusta/pages/home/views/profile_view/components/settings/settings.dart';
+import 'package:flibusta/pages/home/views/profile_view/pages/about.dart';
+import 'package:flibusta/pages/home/views/profile_view/pages/settings.dart';
+import 'package:flibusta/pages/home/views/proxy_settings/pages/tor_onion_proxy_page.dart';
 import 'package:flibusta/pages/login_page/login_page.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
+import 'package:flibusta/pages/home/home_page.dart';
+import 'package:flibusta/pages/intro.dart';
 import 'package:flutter/material.dart';
-import './pages/home/home_page.dart';
-import './intro.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
   return MaterialPageRoute(
@@ -21,14 +22,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           return SplashScreen();
         case HomePage.routeName:
           return HomePage();
+        case TorOnionProxyPage.routeName:
+          return TorOnionProxyPage();
         case LoginPage.routeName:
           return LoginPage();
         case IntroPage.routeName:
           return IntroPage();
         case AboutPage.routeName:
           return AboutPage();
-        // case SupportDeveloperPage.routeName:
-        //   return SupportDeveloperPage();
         case SettingsPage.routeName:
           return SettingsPage();
         case BookPage.routeName:
