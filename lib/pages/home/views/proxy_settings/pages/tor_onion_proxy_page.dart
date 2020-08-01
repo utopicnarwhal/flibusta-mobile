@@ -154,10 +154,13 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                   child: Material(
                     type: MaterialType.card,
                     borderRadius: BorderRadius.zero,
-                    child: ListTile(
+                    child: CheckboxListTile(
                       title: Text('Автозапуск'),
-                      subtitle: Text('Нет'),
-                      trailing: kIconArrowForward,
+                      subtitle: Text(
+                        'Автоматически включать Tor при запуске приложения',
+                      ),
+                      value: false,
+                      onChanged: null,
                     ),
                   ),
                 ),
