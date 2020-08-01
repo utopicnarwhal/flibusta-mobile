@@ -9,12 +9,15 @@
 .history
 .svn/
 
+# VSCode related
+
+.vscode/*
+
 # IntelliJ related
 *.iml
 *.ipr
 *.iws
 .idea/*
-!.idea/workspace.xml
 
 # Flutter/Dart/Pub related
 **/doc/api/
