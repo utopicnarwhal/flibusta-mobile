@@ -1,5 +1,7 @@
 # Флибуста Browser
 
+<img src="https://user-images.githubusercontent.com/8808766/89430168-1c8eec80-d747-11ea-96ff-e1e17d6e8029.jpg" width ="128"/>
+
 #### Language: [English](README_en.md) | [Русский](README.md)
 
 ![GitHub repo release](https://img.shields.io/github/v/release/utopicnarwhal/flibusta-mobile)
