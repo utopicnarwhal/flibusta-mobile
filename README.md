@@ -1,6 +1,6 @@
 # Флибуста Browser
 
-<img src="https://user-images.githubusercontent.com/8808766/89430168-1c8eec80-d747-11ea-96ff-e1e17d6e8029.jpg" width ="128"/>
+<img src="https://user-images.githubusercontent.com/8808766/89461752-16176980-d775-11ea-8920-2aec94c1524c.png" width ="128"/>
 
 #### Language: [English](README_en.md) | [Русский](README.md)
 
