@@ -1,7 +1,7 @@
 name: flibusta
 description: Mobile application
 
-version: 0.5.5+33
+version: 0.5.6+34
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -14,9 +14,9 @@ dependencies:
   dio_cookie_manager: ^1.0.0
   cookie_jar: ^1.0.1
 
-  utopic_tor_onion_proxy: ^0.2.0
+  utopic_tor_onion_proxy: ^0.2.2
 
-  flutter_typeahead: ^1.8.6
+  flutter_typeahead: ^1.8.7
   mask_text_input_formatter: ^1.0.7
 
   flutter_secure_storage: ^3.3.3
@@ -31,7 +31,6 @@ dependencies:
   flutter_bloc: ^6.0.1
   bloc: ^6.0.1
   rxdart: ^0.24.1
-  async: ^2.4.1
   equatable: ^1.2.3
   provider: ^4.3.1
 
@@ -65,7 +64,7 @@ dev_dependencies:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  build_runner: ^1.9.0
+  build_runner: ^1.10.1
   json_serializable: ^3.3.0
 
 flutter:
@@ -73,10 +72,10 @@ flutter:
 
   assets:
     - assets/img/Logo.png
-    - assets/img/bg-header.png
     - assets/img/utopic_narwhal.png
     - assets/img/4pda_logo.svg
     - assets/img/tor_logo.svg
+    - assets/img/onion_services.svg
     - assets/animations/empty_state.flr
     - assets/animations/books_placeholder.flr
     - assets/animations/long_tap.flr

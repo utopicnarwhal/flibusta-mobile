@@ -9,7 +9,7 @@ import 'package:flibusta/pages/home/components/home_bottom_nav_bar.dart';
 import 'package:flibusta/pages/home/views/profile_view/pages/about.dart';
 import 'package:flibusta/pages/home/views/profile_view/pages/settings.dart';
 import 'package:flibusta/pages/login_page/login_page.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

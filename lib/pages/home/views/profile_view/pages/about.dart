@@ -99,10 +99,11 @@ class AboutPage extends StatelessWidget {
                       ),
                       title: Text('Репозиторий Github'),
                       trailing: kIconArrowForward,
-                      subtitle: Text('github.com/utopicnarwhal/FlibustaApp'),
+                      subtitle:
+                          Text('github.com/utopicnarwhal/flibusta-mobile'),
                       onTap: () async {
                         await launch(
-                            'https://github.com/utopicnarwhal/FlibustaApp');
+                            'https://github.com/utopicnarwhal/flibusta-mobile');
                       },
                     ),
                     Divider(indent: 70),

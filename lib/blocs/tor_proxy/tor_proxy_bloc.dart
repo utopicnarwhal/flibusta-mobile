@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

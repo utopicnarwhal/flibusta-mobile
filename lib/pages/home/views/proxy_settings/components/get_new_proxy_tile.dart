@@ -1,5 +1,5 @@
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flutter/material.dart';
 
 class GetNewProxyTile extends StatefulWidget {

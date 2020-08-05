@@ -76,7 +76,7 @@ class StopTorProxyEvent extends TorProxyEvent {
   Future<TorProxyState> applyAsync(
       {TorProxyState currentState, TorProxyBloc bloc}) async {
     try {
-      if (await UtopicTorOnionProxy.stopTor()) {
+      if (await UtopicTorOnionProxy.stopTor().timeout(Duration(seconds: 3))) {
         ProxyHttpClient().setProxy(
           await LocalStorage().getActualProxy(),
           isSocks4aProxy: false,

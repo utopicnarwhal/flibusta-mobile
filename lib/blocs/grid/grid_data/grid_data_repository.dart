@@ -6,7 +6,7 @@ import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 
@@ -20,18 +20,29 @@ class GridDataRepository {
       downloadedBooks = downloadedBooks.where((book) {
         var lowerCaseSearchString = searchString.toLowerCase();
         return book.sequenceTitle
-                .toLowerCase()
-                .contains(lowerCaseSearchString) ||
-            book.title.toLowerCase().contains(lowerCaseSearchString) ||
-            book.authors.list.any((author) => author.values.first
-                .toLowerCase()
-                .contains(lowerCaseSearchString)) ||
-            book.translators.list.any((translator) => translator.values.first
-                .toLowerCase()
-                .contains(lowerCaseSearchString)) ||
-            book.genres.list.any((genre) => genre.values.first
-                .toLowerCase()
-                .contains(lowerCaseSearchString));
+                    ?.toLowerCase()
+                    ?.contains(lowerCaseSearchString) ==
+                true ||
+            book.title?.toLowerCase()?.contains(lowerCaseSearchString) ==
+                true ||
+            book.authors?.list?.any((author) =>
+                    author.values.first
+                        ?.toLowerCase()
+                        ?.contains(lowerCaseSearchString) ==
+                    true) ==
+                true ||
+            book.translators?.list?.any((translator) =>
+                    translator.values?.first
+                        ?.toLowerCase()
+                        ?.contains(lowerCaseSearchString) ==
+                    true) ==
+                true ||
+            book.genres?.list?.any((genre) =>
+                    genre.values?.first
+                        ?.toLowerCase()
+                        ?.contains(lowerCaseSearchString) ==
+                    true) ==
+                true;
       }).toList();
     }
     return _getPageFromList(downloadedBooks, page);

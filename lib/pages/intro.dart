@@ -5,7 +5,7 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/decor/flibusta_logo.dart';
 import 'package:flibusta/pages/home/home_page.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';

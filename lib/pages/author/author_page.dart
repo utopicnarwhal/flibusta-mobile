@@ -11,7 +11,7 @@ import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/sortBooksByEnum.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/pages/book/book_page.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/html_parsers.dart';
 import 'package:flutter/cupertino.dart';

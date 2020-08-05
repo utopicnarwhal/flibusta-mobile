@@ -28,6 +28,7 @@ const MaterialColor kFlibustaLightBlueColor = MaterialColor(0xffa2c0dc, const {
   800: const Color(0xff43598f),
   900: const Color(0xff323d73),
 });
+
 /// 10
 const double kCardBorderRadius = 10;
 

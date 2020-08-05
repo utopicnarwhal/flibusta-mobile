@@ -3,10 +3,12 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/ds_controls/ui/buttons/outline_button.dart';
 import 'package:flibusta/ds_controls/ui/progress_indicator.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TorOnionProxyPage extends StatefulWidget {
   static const routeName = '/TorOnionProxy';
@@ -29,10 +31,17 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
             addSemanticIndexes: false,
             padding: EdgeInsets.fromLTRB(0, 16, 0, 42),
             children: [
+              SvgPicture.asset(
+                'assets/img/onion_services.svg',
+                height: 120,
+                width: 120,
+              ),
+              SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Tor Onion Proxy позволяет использовать Onion версию сайта, с которой сняты ограничения на авторские права.',
+                  'Tor Onion Proxy позволяет использовать Onion версию сайта, с которой сняты ограничения на авторские права.\n'
+                  'Данный способ подключения к сайту может быть медленнее, чем обычный прокси.',
                   style: Theme.of(context).textTheme.bodyText2,
                 ),
               ),
@@ -138,7 +147,9 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                                   setState(() {});
                                 }
                               : null,
-                          title: Text('Использовать Onion версию сайта'),
+                          title: Text(
+                            'Использовать Onion версию сайта (рекомендуется)',
+                          ),
                           subtitle: Text(kFlibustaOnionUrl),
                         );
                       },
@@ -157,12 +168,30 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                     child: CheckboxListTile(
                       title: Text('Автозапуск'),
                       subtitle: Text(
-                        'Автоматически включать Tor при запуске приложения',
+                        'Запуск Tor при открытии приложения',
                       ),
                       value: false,
                       onChanged: null,
                     ),
                   ),
+                ),
+              ),
+              Divider(),
+              SizedBox(height: 40),
+              Divider(),
+              Material(
+                type: MaterialType.card,
+                borderRadius: BorderRadius.zero,
+                child: ListTile(
+                  title: Text('Подробнее о Tor'),
+                  trailing: kIconArrowForward,
+                  onTap: () async {
+                    var torUrlString = 'https://www.torproject.org/';
+
+                    if (await canLaunch(torUrlString)) {
+                      launch(torUrlString);
+                    }
+                  },
                 ),
               ),
               Divider(),

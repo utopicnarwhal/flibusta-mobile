@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -20,8 +20,12 @@ class ProxyListBloc {
 
   ProxyListBloc() {
     cancelToken = CancelToken();
-    LocalStorage().getProxies().then((proxyList) => _proxyListController.add(proxyList));
-    LocalStorage().getActualProxy().then((actualProxy) => _actualProxyController.add(actualProxy));
+    LocalStorage()
+        .getProxies()
+        .then((proxyList) => _proxyListController.add(proxyList));
+    LocalStorage()
+        .getActualProxy()
+        .then((actualProxy) => _actualProxyController.add(actualProxy));
   }
 
   setActualProxy(String proxy) {

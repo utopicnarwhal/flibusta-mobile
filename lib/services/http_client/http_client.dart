@@ -5,7 +5,7 @@ import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
-import 'package:flibusta/services/curl_http_client_adapter.dart';
+import 'package:flibusta/services/http_client/dio_http_client_adapters/socks_http_client_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:path_provider/path_provider.dart';
@@ -97,7 +97,7 @@ class ProxyHttpClient {
 
     var newDio = Dio(defaultDioOptions);
     if (isSocks4aProxy) {
-      newDio.httpClientAdapter = CurlHttpClientAdapter();
+      newDio.httpClientAdapter = SocksHttpClientAdapter();
     }
 
     newDio.interceptors.add(
@@ -124,15 +124,7 @@ class ProxyHttpClient {
       ),
     );
 
-    if (newDio.httpClientAdapter is CurlHttpClientAdapter) {
-      if (isSocks4aProxy) {
-        (newDio.httpClientAdapter as CurlHttpClientAdapter).socks4aHostPort =
-            hostPort;
-      } else {
-        (newDio.httpClientAdapter as CurlHttpClientAdapter)
-            .httpProxyCredHostPort = hostPort;
-      }
-    } else if (newDio.httpClientAdapter is DefaultHttpClientAdapter) {
+    if (newDio.httpClientAdapter is DefaultHttpClientAdapter) {
       (newDio.httpClientAdapter as DefaultHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {
         client.badCertificateCallback =
@@ -144,7 +136,7 @@ class ProxyHttpClient {
           return client;
         }
         client.findProxy = (url) {
-          return 'PROXY $hostPort';
+          return '${isSocks4aProxy ? 'SOCKS4A' : 'PROXY'} $hostPort';
         };
         return client;
       };

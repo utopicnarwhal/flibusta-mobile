@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flibusta/blocs/tor_proxy/tor_proxy_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
@@ -5,6 +7,7 @@ import 'package:flibusta/ds_controls/ui/svg_icon.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/pages/tor_onion_proxy_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 
 class TorOnionProxyCard extends StatefulWidget {
   @override
@@ -79,7 +82,13 @@ class _TorOnionProxyCardState extends State<TorOnionProxyCard> {
                 ),
               ),
               onTap: () {
-                Navigator.of(context).pushNamed(TorOnionProxyPage.routeName);
+                if (Platform.isAndroid) {
+                  Navigator.of(context).pushNamed(TorOnionProxyPage.routeName);
+                  return;
+                }
+                ToastManager().showToast(
+                  'Данная функция доступна только на Android',
+                );
               },
             ),
           ),

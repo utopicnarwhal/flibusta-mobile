@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flibusta/blocs/tor_proxy/tor_proxy_bloc.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
@@ -118,11 +119,13 @@ class BookPageState extends State<BookPage> {
         builder: (context) {
           Widget appBarBackground;
           if (_getBookCoverImageError != null) {
-            appBarBackground = Center(
-              child: Text(
-                _getBookCoverImageError.toString(),
-                style: Theme.of(context).textTheme.headline5,
-                textAlign: TextAlign.center,
+            appBarBackground = SafeArea(
+              child: Center(
+                child: Text(
+                  _getBookCoverImageError.toString(),
+                  style: Theme.of(context).textTheme.headline5,
+                  textAlign: TextAlign.center,
+                ),
               ),
             );
           } else if (_coverImage == null) {
@@ -139,36 +142,38 @@ class BookPageState extends State<BookPage> {
               ),
               SliverList(
                 delegate: SliverChildListDelegate([
-                  Material(
-                    type: MaterialType.card,
-                    borderRadius: BorderRadius.zero,
-                    color: Colors.red.withOpacity(0.6),
-                    child: ListTile(
-                      dense: true,
-                      leading: Icon(
-                        FontAwesomeIcons.copyright,
-                        color: Colors.white,
+                  if (!(TorProxyBloc().state is InTorProxyState)) ...[
+                    Material(
+                      type: MaterialType.card,
+                      borderRadius: BorderRadius.zero,
+                      color: Colors.red.withOpacity(0.6),
+                      child: ListTile(
+                        dense: true,
+                        leading: Icon(
+                          FontAwesomeIcons.copyright,
+                          color: Colors.white,
+                        ),
+                        title: Text(
+                          'У меня есть права на это произведение и я хочу убрать её из библиотеки.',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 0,
+                          horizontal: 16,
+                        ),
+                        onTap: () {
+                          DialogUtils.simpleAlert(
+                            context,
+                            'Права на произведение',
+                            content: Text(
+                              'Напишите администратору сайта на почту lib.contact.email@gmail.com',
+                            ),
+                          );
+                        },
                       ),
-                      title: Text(
-                        'У меня есть права на это произведение и я хочу убрать её из библиотеки.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 16,
-                      ),
-                      onTap: () {
-                        DialogUtils.simpleAlert(
-                          context,
-                          'Права на произведение',
-                          content: Text(
-                            'Напишите администратору сайта на почту lib.contact.email@gmail.com',
-                          ),
-                        );
-                      },
                     ),
-                  ),
-                  Divider(),
+                    Divider(),
+                  ],
                   ListTile(
                     title: Text(_bookInfo.title ?? ''),
                     subtitle: Text('Название произведения'),

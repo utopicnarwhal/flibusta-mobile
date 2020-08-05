@@ -12,11 +12,13 @@
 # VSCode related
 
 .vscode/*
+/.vscode/
 
 # IntelliJ related
 *.iml
 *.ipr
 *.iws
+/.idea/
 .idea/*
 
 # Flutter/Dart/Pub related

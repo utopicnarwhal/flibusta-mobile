@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
 import 'package:flibusta/pages/home/components/show_download_format_mbs.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_notification_service.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/file_utils.dart';
@@ -45,7 +45,7 @@ class BookService {
     return response.data;
   }
 
-  static Future<Null> downloadBook(
+  static Future<void> downloadBook(
     BuildContext context,
     BookCard bookCard,
     void Function(double) downloadProgressCallback,
@@ -118,7 +118,7 @@ class BookService {
               NotificationService().cancelNotification(bookCard.id);
               downloadProgressCallback(null);
               cancelToken.cancel(
-                'Доступ к книге ограничен по требованию правоторговца',
+                'Доступ к книге ограничен по требованию правоторговца. Воспользуйтесь Tor Onion Proxy, чтобы скачать эту книгу.',
               );
               return fileUri;
             }

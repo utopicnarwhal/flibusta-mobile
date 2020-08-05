@@ -73,21 +73,24 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                   ],
                 ),
               ),
-              Table(
-                children: [
-                  TableRow(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ServerStatusChecker(),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: TorOnionProxyCard(),
-                      ),
-                    ],
-                  ),
-                ],
+              ListFadeInSlideStagger(
+                index: 0,
+                child: Table(
+                  children: [
+                    TableRow(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ServerStatusChecker(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TorOnionProxyCard(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 16),
               Text(
@@ -119,7 +122,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                         'Выбор прокси-серверов отключен, пока работает Tor Onion Proxy.');
                   }
                   return ListFadeInSlideStagger(
-                    index: 2,
+                    index: 1,
                     child: Card(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(kCardBorderRadius),
@@ -219,7 +222,7 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                         color: Theme.of(context).accentColor,
                                       ),
                                     ),
-                                    title: Text('Добавить свой прокси'),
+                                    title: Text('Добавить свой HTTP-прокси'),
                                     onTap: () async {
                                       var userProxy = await showDialog<String>(
                                         context: context,
@@ -228,7 +231,8 @@ class _ProxySettingsPageState extends State<ProxySettingsPage> {
                                               proxyHostController =
                                               TextEditingController();
                                           return SimpleDialog(
-                                            title: Text('Добавить свой прокси'),
+                                            title: Text(
+                                                'Добавить свой HTTP-прокси'),
                                             children: [
                                               Padding(
                                                 padding: EdgeInsets.all(16),

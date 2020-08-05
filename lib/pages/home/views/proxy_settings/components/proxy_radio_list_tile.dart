@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
-import 'package:flibusta/services/http_client.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
