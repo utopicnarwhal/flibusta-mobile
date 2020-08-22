@@ -298,7 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
         },
       ),
       Divider(indent: 72),
-      FutureBuilder<SortBooksBy>(
+      FutureBuilder<SortAuthorBooksBy>(
         future: LocalStorage().getPreferredAuthorBookSort(),
         builder: (context, preferredSortBooksBySnapshot) {
           return ListTile(
@@ -310,11 +310,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             title: Text('Сортировка книг автора по'),
             subtitle: Text(
-              sortBooksByToString(preferredSortBooksBySnapshot.data),
+              sortAuthorBooksByToString(preferredSortBooksBySnapshot.data),
             ),
             trailing: kIconArrowForward,
             onTap: () async {
-              var result = await showDialog<SortBooksBy>(
+              var result = await showDialog<SortAuthorBooksBy>(
                 context: context,
                 builder: (context) {
                   return SimpleDialog(
@@ -322,18 +322,18 @@ class _SettingsPageState extends State<SettingsPage> {
                       'Выберите предпочитаемую сортировку книг автора',
                     ),
                     children: [
-                      ...SortBooksBy.values.map((sortBooksBy) {
-                        SortBooksBy value;
+                      ...SortAuthorBooksBy.values.map((sortBooksBy) {
+                        SortAuthorBooksBy value;
                         if (sortBooksBy != null) {
                           value = sortBooksBy;
                         }
-                        return RadioListTile<SortBooksBy>(
+                        return RadioListTile<SortAuthorBooksBy>(
                           onChanged: (_) {
                             Navigator.of(context).pop(sortBooksBy);
                           },
                           groupValue: preferredSortBooksBySnapshot.data,
                           value: value,
-                          title: Text(sortBooksByToString(sortBooksBy)),
+                          title: Text(sortAuthorBooksByToString(sortBooksBy)),
                         );
                       }).toList(),
                       ButtonBar(

@@ -3,7 +3,7 @@ import 'package:flibusta/model/genre.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GenresListBloc {
-  var _selectedGenresListController = BehaviorSubject<List<Genre>>.seeded([]);
+  var _selectedGenresListController;
   //output
   Stream<List<Genre>> get selectedGenresListStream =>
       _selectedGenresListController.stream;
@@ -18,28 +18,34 @@ class GenresListBloc {
   //input
   Sink<List<Genre>> get _allGenresListSink => _allGenresListController.sink;
 
-  GenresListBloc() {
+  GenresListBloc({List<Genre> selectedGenresList}) {
+    _selectedGenresListController =
+        BehaviorSubject<List<Genre>>.seeded(selectedGenresList ?? []);
     GridDataRepository().getGenres(null).then((genresList) {
       if (_allGenresListController.isClosed) return;
       _allGenresListSink.add(genresList);
     });
   }
 
-  refreshGenresList() {
+  List<Genre> getSelectedGenres() {
+    return _selectedGenresListController.value;
+  }
+
+  void refreshGenresList() {
     GridDataRepository().getGenres(null).then((genresList) {
       if (_allGenresListController.isClosed) return;
       _allGenresListSink.add(genresList);
     });
   }
 
-  addToGenresList(Genre genre) {
+  void addToGenresList(Genre genre) {
     if (!_selectedGenresListController.value.contains(genre)) {
       _selectedGenresListSink
           .add(_selectedGenresListController.value..add(genre));
     }
   }
 
-  removeFromGenresList(Genre genre) {
+  void removeFromGenresList(Genre genre) {
     _selectedGenresListSink
         .add(_selectedGenresListController.value..remove(genre));
   }

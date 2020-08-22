@@ -153,27 +153,55 @@ class LocalStorage {
     }
   }
 
-  Future<SortBooksBy> getPreferredAuthorBookSort() async {
+  Future<SortAuthorBooksBy> getPreferredAuthorBookSort() async {
     var prefs = await _prefs;
     try {
       var preferredAuthorBookSort =
           prefs.getInt('PreferredAuthorBookSort') ?? 0;
-      if (SortBooksBy.values.length > preferredAuthorBookSort) {
-        return SortBooksBy.values[preferredAuthorBookSort];
+      if (SortAuthorBooksBy.values.length > preferredAuthorBookSort) {
+        return SortAuthorBooksBy.values[preferredAuthorBookSort];
       }
-      return SortBooksBy.values[0];
+      return SortAuthorBooksBy.values[0];
     } catch (e) {
       return null;
     }
   }
 
   Future<bool> setPreferredAuthorBookSort(
-      SortBooksBy preferredAuthorBookSort) async {
+      SortAuthorBooksBy preferredAuthorBookSort) async {
     var prefs = await _prefs;
     try {
       await prefs.setInt(
         'PreferredAuthorBookSort',
         preferredAuthorBookSort.index,
+      );
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<SortGenreBooksBy> getPreferredGenreBookSort() async {
+    var prefs = await _prefs;
+    try {
+      var preferredGenreBookSort = prefs.getInt('PreferredGenreBookSort') ?? 0;
+      if (SortGenreBooksBy.values.length > preferredGenreBookSort) {
+        return SortGenreBooksBy.values[preferredGenreBookSort];
+      }
+      return SortGenreBooksBy.values[0];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> setPreferredGenreBookSort(
+      SortGenreBooksBy preferredGenreBookSort) async {
+    var prefs = await _prefs;
+    try {
+      await prefs.setInt(
+        'PreferredGenreBookSort',
+        preferredGenreBookSort.index,
       );
       return true;
     } catch (e) {
@@ -612,7 +640,18 @@ class LocalStorage {
   Future<bool> addDownloadedBook(BookCard book) async {
     var prefs = await _prefs;
     var downloadedBooks = await getDownloadedBooks();
-    downloadedBooks.add(book);
+    downloadedBooks = [book, ...downloadedBooks];
+
+    return await prefs.setStringList(
+      'DownloadedBooks',
+      downloadedBooks.map((book) => json.encode(book.toJson())).toList(),
+    );
+  }
+
+  Future<bool> deleteDownloadedBook(BookCard downloadedBook) async {
+    var prefs = await _prefs;
+    var downloadedBooks = await getDownloadedBooks();
+    downloadedBooks.removeWhere((book) => downloadedBook.id == book.id);
 
     return await prefs.setStringList(
       'DownloadedBooks',
@@ -634,19 +673,39 @@ class LocalStorage {
     try {
       var useOnionSiteWithTor = prefs.getBool('UseOnionSiteWithTor');
       if (useOnionSiteWithTor == null) {
-        await prefs.setBool('UseOnionSiteWithTor', false);
-        useOnionSiteWithTor = false;
+        await prefs.setBool('UseOnionSiteWithTor', true);
+        useOnionSiteWithTor = true;
       }
       return useOnionSiteWithTor;
     } catch (e) {
-      await prefs.setBool('UseOnionSiteWithTor', false);
-      return false;
+      await prefs.setBool('UseOnionSiteWithTor', true);
+      return true;
     }
   }
 
   Future<bool> setUseOnionSiteWithTor(bool value) async {
     var prefs = await _prefs;
     return await prefs.setBool('UseOnionSiteWithTor', value);
+  }
+
+  Future<bool> getStartUpTor() async {
+    var prefs = await _prefs;
+    try {
+      var startUpTor = prefs.getBool('StartUpTor');
+      if (startUpTor == null) {
+        await prefs.setBool('StartUpTor', false);
+        startUpTor = false;
+      }
+      return startUpTor;
+    } catch (e) {
+      await prefs.setBool('StartUpTor', false);
+      return false;
+    }
+  }
+
+  Future<bool> setStartUpTor(bool value) async {
+    var prefs = await _prefs;
+    return await prefs.setBool('StartUpTor', value);
   }
 
   Future<void> checkVersion() async {

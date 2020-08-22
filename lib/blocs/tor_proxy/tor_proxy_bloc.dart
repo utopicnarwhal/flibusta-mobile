@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
@@ -8,6 +9,7 @@ import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 import 'package:utopic_tor_onion_proxy/utopic_tor_onion_proxy.dart';
 
 part 'tor_proxy_event.dart';
@@ -15,6 +17,8 @@ part 'tor_proxy_state.dart';
 
 class TorProxyBloc extends Bloc<TorProxyEvent, TorProxyState> {
   static final TorProxyBloc _torProxyBlocSingleton = TorProxyBloc._internal();
+
+  Timer torCheckerTimer;
 
   factory TorProxyBloc() {
     return _torProxyBlocSingleton;
@@ -33,6 +37,13 @@ class TorProxyBloc extends Bloc<TorProxyEvent, TorProxyState> {
       return;
     }
     _torProxyBlocSingleton.add(StartTorProxyEvent());
+  }
+
+  void checkTorProxy() {
+    if (state is StartingTorProxyState || state is UnTorProxyState) {
+      return;
+    }
+    _torProxyBlocSingleton.add(CheckRunningTorProxyEvent());
   }
 
   @override

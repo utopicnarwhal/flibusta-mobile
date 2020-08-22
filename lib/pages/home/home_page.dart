@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flibusta/blocs/grid/grid_data/grid_data_bloc.dart';
 import 'package:flibusta/blocs/grid/selected_view_type/selected_view_type_bloc.dart';
+import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/blocs/user_contact_data/user_contact_data_bloc.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/pages/home/views/books_view/books_view.dart';
@@ -10,6 +11,7 @@ import 'package:flibusta/pages/home/views/profile_view/profile_view.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/proxy_settings_page.dart';
 import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/services/server_status_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -29,6 +31,9 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription _selectedNavItemSubscription;
   BehaviorSubject<List<String>> _favoriteGenreCodesController;
 
+  ProxyListBloc _proxyListBloc;
+  ServerStatusChecker _serverStatusChecker;
+
   List<GridDataBloc> _gridDataBlocsList = [];
   TextEditingController _searchTextController = TextEditingController();
 
@@ -41,6 +46,8 @@ class _HomePageState extends State<HomePage> {
       UserContactDataBloc().fetchUserContactData();
     }
     _favoriteGenreCodesController = BehaviorSubject<List<String>>();
+    _proxyListBloc = ProxyListBloc();
+    _serverStatusChecker = ServerStatusChecker();
   }
 
   void _initNavItemController() async {
@@ -116,7 +123,9 @@ class _HomePageState extends State<HomePage> {
           case 2:
             return ProxySettingsPage(
               scaffoldKey: _scaffoldKey,
+              proxyListBloc: _proxyListBloc,
               selectedNavItemController: _selectedNavItemController,
+              serverStatusChecker: _serverStatusChecker,
             );
           case 3:
             return ProfileView(
@@ -141,6 +150,8 @@ class _HomePageState extends State<HomePage> {
     _selectedViewTypeSubscription?.cancel();
     _selectedViewTypeBloc?.close();
     _favoriteGenreCodesController?.close();
+    _proxyListBloc?.dispose();
+    _serverStatusChecker?.dispose();
     super.dispose();
   }
 }

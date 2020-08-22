@@ -45,7 +45,7 @@
 
 ### Комманды сборки
 
-**APK**: `flutter build apk --no-shrink`  
+**APK**: `flutter build apk --no-shrink` или `flutter build apk --split-per-abi --no-shrink`  
 **Bundle**: `flutter build appbundle --no-shrink`  
 
 ## Как помочь кодом?

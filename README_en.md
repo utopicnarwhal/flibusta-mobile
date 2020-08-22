@@ -39,7 +39,7 @@ This application can be compiled for iOS (Tor Onion Proxy will not work), and th
 **Generating JSON Model Serialization**: `flutter packages pub run build_runner watch --delete-conflicting-outputs`
 
 **Install on connected device**: `flutter run --release`  
-**APK**: `flutter build apk --no-shrink`  
+**APK**: `flutter build apk --no-shrink` or `flutter build apk --split-per-abi --no-shrink`  
 **Bundle**: `flutter build appbundle --no-shrink`  
 
 ## Contributing to `Flibusta Browser`

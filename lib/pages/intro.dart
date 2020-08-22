@@ -135,7 +135,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
         'Включить прокси создателя приложения?',
         builder: (context) {
           return Text(
-            'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране. Но оно не работает на мобильном интернете Yota. Если вы знаете, как сделать так, чтобы оно работало, напишите мне на почту gigok@bk.ru',
+            'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране. Но оно не работает на мобильном интернете Yota. Данный прокси перестанет работать 21 сентября.',
           );
         },
         builderPadding: true,
@@ -144,9 +144,9 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
 
       if (turnProxyOn == true) {
         LocalStorage()
-            .setActualProxy('flibustauser:ilovebooks@35.217.29.210:1194');
+            .setActualProxy('flibustauser:ilovebooks@35.228.73.110:3128');
         ProxyHttpClient()
-            .setProxy('flibustauser:ilovebooks@35.217.29.210:1194');
+            .setProxy('flibustauser:ilovebooks@35.228.73.110:3128');
       }
 
       var downloadPath = await LocalStorage().getBooksDirectory();

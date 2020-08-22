@@ -1,15 +1,17 @@
+import 'package:flibusta/model/genre.dart';
+
 class AdvancedSearchParams {
   String title;
   String lastname;
   String firstname;
   String middlename;
-  String genres;
+  List<Genre> genres;
   String sizeStart;
   String sizeEnd;
   String issueYearMin;
   String issueYearMax;
-  String format;
-  String language;
+  String formats;
+  String languages;
 
   AdvancedSearchParams({
     this.title,
@@ -21,7 +23,7 @@ class AdvancedSearchParams {
     this.sizeEnd,
     this.issueYearMin,
     this.issueYearMax,
-    this.format,
-    this.language,
+    this.formats,
+    this.languages,
   });
 }

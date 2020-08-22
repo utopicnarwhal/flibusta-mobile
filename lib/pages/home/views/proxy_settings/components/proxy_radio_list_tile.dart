@@ -1,73 +1,73 @@
 import 'package:dio/dio.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
-import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 
 class ProxyRadioListTile extends StatelessWidget {
-  final String _title;
-  final String _value;
-  final String _groupValue;
-  final void Function(String) _onChanged;
-  final void Function(String) _onDelete;
-  final CancelToken _cancelToken;
+  final String title;
+  final String value;
+  final String groupValue;
+  final void Function(String) onChanged;
+  final void Function(String) onDelete;
+  final CancelToken cancelToken;
+  final BehaviorSubject<ConnectionCheckResult> connectionCheckResultController;
 
   ProxyRadioListTile({
     Key key,
-    @required String title,
-    @required String value,
-    @required String groupValue,
-    @required void Function(String) onChanged,
-    void Function(String) onDelete,
-    CancelToken cancelToken,
-  })  : _title = title,
-        _value = value,
-        _groupValue = groupValue,
-        _onChanged = onChanged,
-        _onDelete = onDelete,
-        _cancelToken = cancelToken,
-        super(key: key);
+    @required this.title,
+    @required this.value,
+    @required this.groupValue,
+    @required this.onChanged,
+    @required this.connectionCheckResultController,
+    this.onDelete,
+    this.cancelToken,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        Clipboard.setData(ClipboardData(text: _title));
+        Clipboard.setData(ClipboardData(text: title));
+        ToastManager().showToast('Прокси скопирован в буфер обмена');
       },
       child: RadioListTile(
-        title: Text(_title),
-        subtitle: FutureBuilder<ConnectionCheckResult>(
-          future: ProxyHttpClient()
-              .connectionCheck(_value, cancelToken: _cancelToken),
-          builder: (context, connectionCheckSnapshot) {
+        title: Text(title),
+        subtitle: StreamBuilder<ConnectionCheckResult>(
+          stream: connectionCheckResultController,
+          builder: (context, connectionCheckResultSnapshot) {
             var subtitleText = '';
             var subtitleColor;
-            if (connectionCheckSnapshot.data != null &&
-                connectionCheckSnapshot.connectionState !=
-                    ConnectionState.waiting) {
-              if (connectionCheckSnapshot.data.ping >= 0) {
+            if (connectionCheckResultSnapshot.hasData) {
+              if (connectionCheckResultSnapshot.data.latency >= 0) {
                 subtitleText =
-                    'Доступно (пинг: ${connectionCheckSnapshot.data.ping.toString()}мс)';
+                    'Доступно (пинг: ${connectionCheckResultSnapshot.data.latency.toString()}мс)';
                 subtitleColor = Colors.green;
               } else {
-                subtitleText = 'Ошибка. ${connectionCheckSnapshot.data.error}';
+                subtitleText =
+                    'Ошибка. ${connectionCheckResultSnapshot.data.error}';
                 subtitleColor = Colors.red;
               }
             } else {
               subtitleText = 'Проверка...';
               subtitleColor = Colors.grey[400];
             }
-            return Text(subtitleText, style: TextStyle(color: subtitleColor));
+
+            return Text(
+              subtitleText,
+              style: TextStyle(color: subtitleColor),
+            );
           },
         ),
-        groupValue: _groupValue,
-        value: _value,
-        onChanged: _onChanged,
-        secondary: _onDelete != null
+        groupValue: groupValue,
+        value: value,
+        onChanged: onChanged,
+        secondary: onDelete != null
             ? IconButton(
                 icon: Icon(Icons.delete),
                 tooltip: 'Удалить прокси',
-                onPressed: () => _onDelete(_value),
+                onPressed: () => onDelete(value),
               )
             : null,
       ),

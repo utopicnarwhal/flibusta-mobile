@@ -18,80 +18,62 @@ class _TorOnionProxyCardState extends State<TorOnionProxyCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ClipRRect(
+      child: Material(
+        type: MaterialType.card,
         borderRadius: BorderRadius.circular(kCardBorderRadius),
-        child: Banner(
-          message: 'Тест',
-          location: BannerLocation.topEnd,
-          color: Color(0xFF7D4698),
-          child: Material(
-            type: MaterialType.card,
-            borderRadius: BorderRadius.circular(kCardBorderRadius),
-            child: InkWell(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgIcon(
-                            assetPath: 'assets/img/tor_logo.svg',
-                            size: 38,
-                            color: Color(0xFF7D4698),
-                          ),
-                        ],
-                      ),
-                      title: Text('Onion Proxy'),
-                    ),
-                    BlocBuilder<TorProxyBloc, TorProxyState>(
-                      cubit: TorProxyBloc(),
-                      builder: (context, torProxyState) {
-                        Widget stateWidget = Text('Неизвестно');
-
-                        if (torProxyState is UnTorProxyState) {
-                          stateWidget = Text('Выключен');
-                        } else if (torProxyState is InTorProxyState) {
-                          stateWidget = Text(
-                            'Включен',
-                            style: TextStyle(
-                              color: Colors.green,
-                            ),
-                          );
-                        } else if (torProxyState is StartingTorProxyState) {
-                          stateWidget = Text('Запускается');
-                        } else if (torProxyState is ErrorTorProxyState) {
-                          stateWidget = Text(
-                            'Ошибка',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          );
-                        }
-
-                        return ListTile(
-                          trailing: kIconArrowForward,
-                          title: Text('Состояние:'),
-                          subtitle: stateWidget,
-                        );
-                      },
-                    ),
-                  ],
+        child: InkWell(
+          borderRadius: BorderRadius.circular(kCardBorderRadius),
+          child: ListTile(
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgIcon(
+                  assetPath: 'assets/img/tor_logo.svg',
+                  size: 38,
+                  color: kTorColor,
                 ),
-              ),
-              onTap: () {
-                if (Platform.isAndroid) {
-                  Navigator.of(context).pushNamed(TorOnionProxyPage.routeName);
-                  return;
+              ],
+            ),
+            title: Text('Onion Proxy'),
+            subtitle: BlocBuilder<TorProxyBloc, TorProxyState>(
+              cubit: TorProxyBloc(),
+              builder: (context, torProxyState) {
+                Widget stateWidget = Text('Неизвестно');
+
+                if (torProxyState is UnTorProxyState) {
+                  stateWidget = Text('Выключен');
+                } else if (torProxyState is InTorProxyState) {
+                  stateWidget = Text(
+                    'Включен',
+                    style: TextStyle(
+                      color: Colors.green,
+                    ),
+                  );
+                } else if (torProxyState is StartingTorProxyState) {
+                  stateWidget = Text('Запускается');
+                } else if (torProxyState is ErrorTorProxyState) {
+                  stateWidget = Text(
+                    'Ошибка',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  );
                 }
-                ToastManager().showToast(
-                  'Данная функция доступна только на Android',
-                );
+
+                return stateWidget;
               },
             ),
+            trailing: kIconArrowForward,
           ),
+          onTap: () {
+            if (Platform.isAndroid) {
+              Navigator.of(context).pushNamed(TorOnionProxyPage.routeName);
+              return;
+            }
+            ToastManager().showToast(
+              'Данная функция доступна только на Android',
+            );
+          },
         ),
       ),
     );

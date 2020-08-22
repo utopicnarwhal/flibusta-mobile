@@ -72,8 +72,22 @@ class GridDataRepository {
     if (advancedSearchParams?.middlename?.isNotEmpty == true) {
       queryParams.addAll({'mn': advancedSearchParams.middlename});
     }
+
     if (advancedSearchParams?.genres?.isNotEmpty == true) {
-      queryParams.addAll({'g': advancedSearchParams.genres});
+      var selectedGenresString = '';
+      advancedSearchParams.genres.forEach((selectedGenre) {
+        if (selectedGenresString.isNotEmpty) {
+          selectedGenresString = selectedGenresString + ",";
+        }
+        selectedGenresString = selectedGenresString + selectedGenre.code;
+      });
+      queryParams.addAll({'g': selectedGenresString});
+    }
+    if (advancedSearchParams?.formats?.isNotEmpty == true) {
+      queryParams.addAll({'e': advancedSearchParams.formats});
+    }
+    if (advancedSearchParams?.languages?.isNotEmpty == true) {
+      queryParams.addAll({'lng': advancedSearchParams.languages});
     }
     Uri url = Uri.https(
       ProxyHttpClient().getHostAddress(),
@@ -198,7 +212,7 @@ class GridDataRepository {
     return result;
   }
 
-  Future<List<GridData>> getGenres(int page, {String searchString}) async {
+  Future<List<Genre>> getGenres(int page, {String searchString}) async {
     if (cachedGenreList != null) {
       var result = cachedGenreList;
       if (searchString?.isNotEmpty == true) {
@@ -239,7 +253,6 @@ class GridDataRepository {
     response.data.forEach((headIndex, headGenre) {
       headGenre.forEach((genre) {
         result.add(Genre(
-          id: int.tryParse(genre['id']),
           name: genre['name'],
           code: genre['code'],
         ));

@@ -180,31 +180,52 @@ class ProxyHttpClient {
           return 'PROXY $hostPort';
         };
       };
+      dioForConnectionCheck.interceptors.add(
+        InterceptorsWrapper(
+          onError: (dioError) {
+            if (dioError?.message?.contains(
+                    'Proxy failed to establish tunnel (302 Found)') ==
+                true) {
+              return _dio.requestUri(
+                dioError.request.uri,
+                data: dioError.request.data,
+                options: Options(
+                  method: dioError.request.method,
+                  responseType: dioError.request.responseType,
+                  contentType: dioError.request.contentType,
+                ),
+                onReceiveProgress: dioError.request.onReceiveProgress,
+                onSendProgress: dioError.request.onSendProgress,
+                cancelToken: dioError.request.cancelToken,
+              );
+            }
+            return DsError.fromDioError(dioError: dioError);
+          },
+        ),
+      );
     }
 
-    var result = ConnectionCheckResult(ping: -1);
+    var result = ConnectionCheckResult(latency: -1);
     var stopWatch = new Stopwatch()..start();
 
     try {
-      var request = dioForConnectionCheck.getUri(
+      var response = await dioForConnectionCheck.getUri(
         Uri.https(getHostAddress(), '/'),
         cancelToken: cancelToken,
       );
-
-      var response = await request;
       stopWatch.stop();
 
       switch (response.statusCode) {
         case 302:
         case 200:
-          result.ping = stopWatch.elapsedMilliseconds;
+          result.latency = stopWatch.elapsedMilliseconds;
           break;
         default:
-          result.ping = -1;
+          result.latency = -1;
       }
     } on DioError catch (dioError) {
       stopWatch.stop();
-      result.ping = -1;
+      result.latency = -1;
       result.error = DsError.fromDioError(dioError: dioError);
     }
     dioForConnectionCheck.clear();

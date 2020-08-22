@@ -738,6 +738,56 @@ List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
   return result;
 }
 
+List<BookCard> parseHtmlFromGetGenreInfo(String htmlString) {
+  List<BookCard> result = [];
+  htmldom.Document document = parse(htmlString);
+
+  var olElement = document.getElementsByTagName('ol');
+  if (olElement?.isEmpty != false) return result;
+
+  String currentAddedToLibraryDate;
+  AuthorCard currentAuthor;
+
+  olElement.first.children.forEach((element) {
+    switch (element.localName) {
+      case 'h4':
+        currentAddedToLibraryDate = element.text;
+        return;
+      case 'h5':
+        if (element.children?.isEmpty != false) return;
+
+        var authorAElement = element.children.first;
+        var href = authorAElement.attributes['href'];
+
+        if (href?.contains('/a/') != true) return;
+
+        currentAuthor = AuthorCard(
+          id: int.tryParse(href.replaceAll('/a/', '')),
+          name: authorAElement.text,
+        );
+        return;
+      case 'a':
+        var href = element.attributes['href'];
+
+        if (href?.contains('/b/') != true) return;
+
+        result.add(
+          BookCard(
+            id: int.tryParse(href.replaceAll('/b/', '')),
+            title: element.text,
+            authors: Authors([
+              {currentAuthor.id: currentAuthor.name},
+            ]),
+            addedToLibraryDate: currentAddedToLibraryDate,
+          ),
+        );
+        return;
+    }
+  });
+
+  return result;
+}
+
 UserContactData parseHtmlFromUserMeEdit(String htmlString) {
   var result = UserContactData();
 

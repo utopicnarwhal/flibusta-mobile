@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 const kFlibustaOnionUrl = "flibustahezeous3.onion";
 
+const kTorColor = Color(0xFF7D4698);
+
 const kBouncingAlwaysScrollableScrollPhysics = BouncingScrollPhysics(
   parent: AlwaysScrollableScrollPhysics(),
 );

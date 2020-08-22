@@ -63,7 +63,10 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                       return Center(
                         child: DsOutlineButton(
                           padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text('Запустить'),
+                          child: Text(
+                            'Запустить',
+                            style: TextStyle(color: kTorColor),
+                          ),
                           onPressed: () {
                             TorProxyBloc().startTorProxy();
                           },
@@ -77,7 +80,10 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                           SizedBox(height: 16),
                           DsOutlineButton(
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Выключить'),
+                            child: Text(
+                              'Выключить',
+                              style: TextStyle(color: kTorColor),
+                            ),
                             onPressed: () {
                               TorProxyBloc().stopTorProxy();
                             },
@@ -88,11 +94,16 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          DsCircularProgressIndicator(),
+                          DsCircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(kTorColor),
+                          ),
                           SizedBox(height: 16),
                           DsOutlineButton(
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Остановить'),
+                            child: Text(
+                              'Остановить',
+                              style: TextStyle(color: kTorColor),
+                            ),
                             onPressed: () {
                               TorProxyBloc().stopTorProxy();
                             },
@@ -106,7 +117,10 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                           Text('Произошла ошибка: ${torProxyState.error}'),
                           DsOutlineButton(
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Проверить'),
+                            child: Text(
+                              'Проверить',
+                              style: TextStyle(color: kTorColor),
+                            ),
                             onPressed: () async {
                               TorProxyBloc().stopTorProxy();
                             },
@@ -126,7 +140,7 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                 child: BlocBuilder<TorProxyBloc, TorProxyState>(
                   cubit: TorProxyBloc(),
                   builder: (context, torProxyState) {
-                    return FutureBuilder<Object>(
+                    return FutureBuilder<bool>(
                       future: LocalStorage().getUseOnionSiteWithTor(),
                       builder: (context, useOnionSiteWithTorSnapshot) {
                         return CheckboxListTile(
@@ -161,17 +175,25 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
               ClipRect(
                 child: Banner(
                   location: BannerLocation.topEnd,
-                  message: 'В работе',
+                  message: 'Тест',
                   child: Material(
                     type: MaterialType.card,
                     borderRadius: BorderRadius.zero,
-                    child: CheckboxListTile(
-                      title: Text('Автозапуск'),
-                      subtitle: Text(
-                        'Запуск Tor при открытии приложения',
-                      ),
-                      value: false,
-                      onChanged: null,
+                    child: FutureBuilder<bool>(
+                      future: LocalStorage().getStartUpTor(),
+                      builder: (context, startUpTorSnapshot) {
+                        return CheckboxListTile(
+                          value: startUpTorSnapshot.data == true,
+                          onChanged: (value) async {
+                            await LocalStorage().setStartUpTor(value);
+
+                            if (!mounted) return;
+                            setState(() {});
+                          },
+                          title: Text('Автозапуск'),
+                          subtitle: Text('Запуск Tor при открытии приложения'),
+                        );
+                      },
                     ),
                   ),
                 ),

@@ -9,15 +9,14 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/ui/decor/error_screen.dart';
 import 'package:flibusta/ds_controls/ui/decor/shimmers.dart';
 import 'package:flibusta/ds_controls/ui/decor/staggers.dart';
-import 'package:flibusta/model/advancedSearchParams.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/gridViewType.dart';
 import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/grid_data/grid_data.dart';
 import 'package:flibusta/model/searchResults.dart';
-import 'package:flibusta/pages/advanced_search/advanced_search.dart';
 import 'package:flibusta/pages/author/author_page.dart';
 import 'package:flibusta/pages/book/book_page.dart';
+import 'package:flibusta/pages/genre/genre_page.dart';
 import 'package:flibusta/pages/sequence/sequence_page.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -124,7 +123,7 @@ class GridTilesBuilder extends StatelessWidget {
         itemBuilder: (context, index) {
           if (index == gridData.length) {
             return Column(
-              children: <Widget>[
+              children: [
                 Divider(indent: 80),
                 ShimmerListTile(
                   index: index,
@@ -133,6 +132,7 @@ class GridTilesBuilder extends StatelessWidget {
               ],
             );
           }
+
           List<String> genresStrings;
           int score;
           if (gridData[index] is BookCard) {
@@ -143,6 +143,49 @@ class GridTilesBuilder extends StatelessWidget {
             score = (gridData[index] as BookCard)?.fileScore;
           }
 
+          Widget trailingIcon;
+          if (gridData[index] is Genre) {
+            trailingIcon = StreamBuilder<List<String>>(
+              stream: favoriteGenreCodesController,
+              builder: (context, favoriteGenreCodesSnapshot) {
+                var isFavorite = favoriteGenreCodesSnapshot.data
+                    ?.contains((gridData[index] as Genre).code);
+                return IconButton(
+                  icon: Icon(
+                    isFavorite == true
+                        ? FontAwesomeIcons.solidStar
+                        : FontAwesomeIcons.star,
+                    color: isFavorite == true ? Colors.yellow : null,
+                  ),
+                  onPressed: () {
+                    if (isFavorite == null) {
+                      return;
+                    }
+                    if (isFavorite) {
+                      favoriteGenreCodesController.add([
+                        ...favoriteGenreCodesSnapshot.data
+                          ..remove(
+                            (gridData[index] as Genre).code,
+                          ),
+                      ]);
+                      LocalStorage().deleteFavoriteGenre(
+                        (gridData[index] as Genre).code,
+                      );
+                    } else {
+                      favoriteGenreCodesController.add([
+                        (gridData[index] as Genre).code,
+                        ...favoriteGenreCodesSnapshot.data,
+                      ]);
+                      LocalStorage().addFavoriteGenre(
+                        (gridData[index] as Genre).code,
+                      );
+                    }
+                  },
+                );
+              },
+            );
+          }
+
           return GridDataTile(
             index: index,
             isFirst: index == 0,
@@ -151,47 +194,7 @@ class GridTilesBuilder extends StatelessWidget {
             subtitle: gridData[index].tileSubtitle,
             genres: genresStrings,
             score: score,
-            trailingIcon: gridData[index] is Genre
-                ? StreamBuilder<List<String>>(
-                    stream: favoriteGenreCodesController,
-                    builder: (context, favoriteGenreCodesSnapshot) {
-                      var isFavorite = favoriteGenreCodesSnapshot.data
-                          ?.contains((gridData[index] as Genre).code);
-                      return IconButton(
-                        icon: Icon(
-                          isFavorite == true
-                              ? FontAwesomeIcons.solidStar
-                              : FontAwesomeIcons.star,
-                          color: isFavorite == true ? Colors.yellow : null,
-                        ),
-                        onPressed: () {
-                          if (isFavorite == null) {
-                            return;
-                          }
-                          if (isFavorite) {
-                            favoriteGenreCodesController.add([
-                              ...favoriteGenreCodesSnapshot.data
-                                ..remove(
-                                  (gridData[index] as Genre).code,
-                                ),
-                            ]);
-                            LocalStorage().deleteFavoriteGenre(
-                              (gridData[index] as Genre).code,
-                            );
-                          } else {
-                            favoriteGenreCodesController.add([
-                              (gridData[index] as Genre).code,
-                              ...favoriteGenreCodesSnapshot.data,
-                            ]);
-                            LocalStorage().addFavoriteGenre(
-                              (gridData[index] as Genre).code,
-                            );
-                          }
-                        },
-                      );
-                    },
-                  )
-                : null,
+            trailingIcon: trailingIcon,
             onTap: () async {
               if (gridData[index] is BookCard) {
                 LocalStorage().addToLastOpenBooks(gridData[index]);
@@ -199,10 +202,6 @@ class GridTilesBuilder extends StatelessWidget {
                   BookPage.routeName,
                   arguments: gridData[index].id,
                 );
-                try {
-                  BlocProvider.of<GridDataBloc>(context)
-                      .searchByString(searchTextController?.text);
-                } on FlutterError catch (_) {}
                 return;
               }
               if (gridData[index] is AuthorCard) {
@@ -220,30 +219,33 @@ class GridTilesBuilder extends StatelessWidget {
                 return;
               }
               if (gridData[index] is Genre) {
-                print(gridData[index]);
                 Navigator.of(context).pushNamed(
-                  AdvancedSearchPage.routeName,
-                  arguments: AdvancedSearchParams(
-                    genres: (gridData[index] as Genre).code,
-                  ),
+                  GenrePage.routeName,
+                  arguments: gridData[index] as Genre,
                 );
                 return;
               }
             },
-            onLongPress: () {
+            onLongPress: () async {
               if (gridData[index] is BookCard) {
-                showCupertinoModalPopup(
+                var toDelete = await showCupertinoModalPopup<bool>(
                   filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
                   context: context,
                   builder: (context) {
                     return Center(
                       child: FullInfoCard<GridData>(
+                        isDeletable: gridViewType == GridViewType.downloaded,
                         data: gridData[index],
                       ),
                     );
                   },
                 );
-                return;
+                if (toDelete == true) {
+                  await LocalStorage().deleteDownloadedBook(
+                    (gridData[index] as BookCard),
+                  );
+                  BlocProvider.of<GridDataBloc>(context)?.fetchGridData();
+                }
               }
             },
           );

@@ -15,6 +15,9 @@ class BookCard extends GridData {
   String size;
 
   @JsonKey(ignore: true)
+  String addedToLibraryDate;
+
+  @JsonKey(ignore: true)
   int fileScore;
 
   DownloadFormats downloadFormats;
@@ -39,6 +42,7 @@ class BookCard extends GridData {
     this.title,
     this.size,
     this.downloadFormats,
+    this.addedToLibraryDate,
     this.authors,
     this.translators,
     this.localPath,
@@ -51,6 +55,8 @@ class BookCard extends GridData {
 }
 
 String fileScoreToString(int fileScore) {
+  if (fileScore == null) return null;
+
   switch (fileScore) {
     case 1:
       return 'Файл на 1';

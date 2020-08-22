@@ -31,6 +31,11 @@ class StartTorProxyEvent extends TorProxyEvent {
         ProxyHttpClient().setHostAddress(kFlibustaOnionUrl);
       }
 
+      bloc.torCheckerTimer?.cancel();
+      bloc.torCheckerTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+        bloc.checkTorProxy();
+      });
+
       return InTorProxyState(
         port: port,
       );
@@ -51,15 +56,41 @@ class CheckRunningTorProxyEvent extends TorProxyEvent {
       {TorProxyState currentState, TorProxyBloc bloc}) async {
     try {
       if (await UtopicTorOnionProxy.isTorRunning()) {
-        if (currentState is InTorProxyState && currentState.port == null) {
-          await UtopicTorOnionProxy.stopTor();
-          return UnTorProxyState();
+        if (currentState is InTorProxyState) {
+          if (currentState.port == null) {
+            var newPort = await UtopicTorOnionProxy.startTor();
+
+            await ProxyHttpClient().setProxy(
+              '${InternetAddress.loopbackIPv4.host}:$newPort',
+              isSocks4aProxy: true,
+            );
+            if (await LocalStorage().getUseOnionSiteWithTor()) {
+              ProxyHttpClient().setHostAddress(kFlibustaOnionUrl);
+            }
+            return InTorProxyState(
+              port: newPort,
+            );
+          }
         }
-        return UnTorProxyState();
+
+        return currentState;
       }
-      return ErrorTorProxyState(
-        error: DsError(userMessage: 'Не удалось остановить Tor'),
+
+      ToastManager().showToast(
+        'Tor Onion PRoxy отключен, перезапустите его вручную.',
       );
+
+      ProxyHttpClient().setProxy(
+        await LocalStorage().getActualProxy(),
+        isSocks4aProxy: false,
+      );
+
+      ProxyHttpClient().setHostAddress(await LocalStorage().getHostAddress());
+
+      bloc.torCheckerTimer?.cancel();
+      bloc.torCheckerTimer = null;
+
+      return UnTorProxyState();
     } on PlatformException catch (e) {
       return ErrorTorProxyState(
         error: DsError(userMessage: e.message),
@@ -83,6 +114,9 @@ class StopTorProxyEvent extends TorProxyEvent {
         );
 
         ProxyHttpClient().setHostAddress(await LocalStorage().getHostAddress());
+
+        bloc.torCheckerTimer?.cancel();
+        bloc.torCheckerTimer = null;
 
         return UnTorProxyState();
       }

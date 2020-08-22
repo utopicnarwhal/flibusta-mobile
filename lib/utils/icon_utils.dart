@@ -19,6 +19,8 @@ IconData gridRowNameToIcon(String rowName) {
       return Icons.data_usage;
     case 'Форматы файлов':
       return Icons.file_download;
+    case 'Добавлена в библиотеку':
+      return FontAwesomeIcons.calendarAlt;
     case 'Путь к файлу':
       return FontAwesomeIcons.folder;
     case 'Количество книг':

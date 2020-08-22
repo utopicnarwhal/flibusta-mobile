@@ -96,7 +96,8 @@ class SocksHttpClientAdapter extends DefaultHttpClientAdapter {
       stream,
       responseStream.statusCode,
       headers: headers,
-      isRedirect: responseStream.isRedirect,
+      isRedirect:
+          responseStream.isRedirect || responseStream.redirects.isNotEmpty,
       redirects: responseStream.redirects
           .map((e) => RedirectRecord(e.statusCode, e.method, e.location))
           .toList(),
@@ -110,6 +111,7 @@ class SocksHttpClientAdapter extends DefaultHttpClientAdapter {
         : null;
     if (cancelFuture != null) {
       var _httpClient = _HttpClient(SecurityContext.defaultContext);
+      _httpClient.userAgent = null;
       if (onHttpClientCreate != null) {
         //user can return a HttpClient instance
         _httpClient = onHttpClientCreate(_httpClient) ?? _httpClient;

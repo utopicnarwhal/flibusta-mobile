@@ -1,4 +1,4 @@
-enum SortBooksBy {
+enum SortAuthorBooksBy {
   alphabet,
   sequence,
   date,
@@ -6,36 +6,73 @@ enum SortBooksBy {
   genre,
 }
 
-String sortBooksByToString(SortBooksBy sortBooksBy) {
+String sortAuthorBooksByToString(SortAuthorBooksBy sortBooksBy) {
   switch (sortBooksBy) {
-    case SortBooksBy.alphabet:
+    case SortAuthorBooksBy.alphabet:
       return 'Алфавиту';
-    case SortBooksBy.date:
+    case SortAuthorBooksBy.date:
       return 'Дате поступления';
-    case SortBooksBy.genre:
+    case SortAuthorBooksBy.genre:
       return 'Жанрам';
-    case SortBooksBy.popularity:
+    case SortAuthorBooksBy.popularity:
       return 'Популярности';
-    case SortBooksBy.sequence:
-      return 'Сериям';
+    case SortAuthorBooksBy.sequence:
+      return 'SortAuthorBooksBy';
     default:
       return 'Неизвестное значение';
   }
 }
 
-String sortBooksByToQueryParam(SortBooksBy sortBooksBy) {
+String sortAuthorBooksByToQueryParam(SortAuthorBooksBy sortBooksBy) {
   switch (sortBooksBy) {
-    case SortBooksBy.alphabet:
+    case SortAuthorBooksBy.alphabet:
       return 'a';
-    case SortBooksBy.date:
+    case SortAuthorBooksBy.date:
       return 't';
-    case SortBooksBy.genre:
+    case SortAuthorBooksBy.genre:
       return 'g';
-    case SortBooksBy.popularity:
+    case SortAuthorBooksBy.popularity:
       return 'p';
-    case SortBooksBy.sequence:
+    case SortAuthorBooksBy.sequence:
       return 'b';
     default:
+      return 't';
+  }
+}
+
+enum SortGenreBooksBy {
+  alphabet,
+  authors,
+  date,
+  popularity,
+}
+
+String sortGenreBooksByToString(SortGenreBooksBy sortBooksBy) {
+  switch (sortBooksBy) {
+    case SortGenreBooksBy.alphabet:
+      return 'Алфавиту';
+    case SortGenreBooksBy.date:
+      return 'Дате поступления';
+    case SortGenreBooksBy.authors:
+      return 'Авторам';
+    case SortGenreBooksBy.popularity:
+      return 'Популярности';
+    default:
       return 'Неизвестное значение';
+  }
+}
+
+String sortGenreBooksByToQueryParam(SortGenreBooksBy sortBooksBy) {
+  switch (sortBooksBy) {
+    case SortGenreBooksBy.alphabet:
+      return 'Title';
+    case SortGenreBooksBy.date:
+      return 'Time';
+    case SortGenreBooksBy.authors:
+      return 'Author';
+    case SortGenreBooksBy.popularity:
+      return 'Pop';
+    default:
+      return '';
   }
 }
