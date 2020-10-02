@@ -9,6 +9,12 @@ import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
+  static final LocalStorage _localStorageSingleton = LocalStorage._internal();
+  factory LocalStorage() {
+    return _localStorageSingleton;
+  }
+  LocalStorage._internal();
+
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<List<String>> getPreviousBookSearches() async {

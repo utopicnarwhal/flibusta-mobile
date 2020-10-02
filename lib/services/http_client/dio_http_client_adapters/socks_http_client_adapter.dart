@@ -8,7 +8,6 @@ import 'dart:math';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:flibusta/constants.dart';
 
 part 'my_http_impl.dart';
 
@@ -35,14 +34,9 @@ class SocksHttpClientAdapter extends DefaultHttpClientAdapter {
       throw Exception(
           "Can't establish connection after [HttpClientAdapter] closed!");
     }
-    var uri = options.uri;
-
-    if (options.uri.host == kFlibustaOnionUrl) {
-      uri = Uri.http(kFlibustaOnionUrl, uri.path, uri.queryParameters);
-    }
 
     var _httpClient = _configHttpClient(cancelFuture, options.connectTimeout);
-    Future requestFuture = _httpClient.openUrl(options.method, uri);
+    Future requestFuture = _httpClient.openUrl(options.method, options.uri);
 
     void _throwConnectingTimeout() {
       throw DioError(

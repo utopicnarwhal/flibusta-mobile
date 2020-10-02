@@ -171,6 +171,12 @@ final _bottomSheetTheme = BottomSheetThemeData(
 );
 
 final _buttonBarTheme = ButtonBarThemeData();
+const _pageTransitionTheme = PageTransitionsTheme(
+  builders: <TargetPlatform, PageTransitionsBuilder>{
+    TargetPlatform.android: ZoomPageTransitionsBuilder(),
+    TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+  },
+);
 
 final ThemeData kFlibustaLightTheme = ThemeData(
   brightness: Brightness.light,
@@ -191,6 +197,7 @@ final ThemeData kFlibustaLightTheme = ThemeData(
     primaryColor: CupertinoColors.systemBlue,
     brightness: Brightness.light,
   ),
+  pageTransitionsTheme: _pageTransitionTheme,
 );
 
 final ThemeData kFlibustaDarkTheme = ThemeData(
@@ -215,4 +222,5 @@ final ThemeData kFlibustaDarkTheme = ThemeData(
     primaryColor: CupertinoColors.systemBlue,
     brightness: Brightness.dark,
   ),
+  pageTransitionsTheme: _pageTransitionTheme,
 );

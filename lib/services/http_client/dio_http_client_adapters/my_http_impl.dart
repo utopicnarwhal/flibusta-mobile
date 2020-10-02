@@ -1258,6 +1258,9 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
     Uint8List headerBytes = buffer.takeBytes();
     _outgoing.setHeader(headerBytes, headerBytes.length);
   }
+
+  @override
+  void abort([Object exception, StackTrace stackTrace]) {}
 }
 
 // Used by _HttpOutgoing as a target of a chunked converter for gzip

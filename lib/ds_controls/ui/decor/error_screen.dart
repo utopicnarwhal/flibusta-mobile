@@ -42,7 +42,7 @@ class ErrorScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(18),
             child: Text(
-              'Пожалуйста, проверьте свое подключение к${'\u00A0'}интернету, работоспособность сайта и прокси.',
+              'Пожалуйста, проверьте работоспособность сайта и${'\u00A0'}прокси.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.caption.copyWith(
                     fontSize: 15,

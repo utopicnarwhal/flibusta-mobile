@@ -20,7 +20,7 @@ class ServerStatusCheckerCard extends StatelessWidget {
             builder: (context, serverStatusResultSnapshot) {
               Widget siteStatusIcon = SizedBox();
 
-              var status = serverStatusResultSnapshot.data?.status;
+              var statusResult = serverStatusResultSnapshot.data;
 
               if (!serverStatusResultSnapshot.hasData) {
                 siteStatusIcon = SizedBox(
@@ -28,31 +28,31 @@ class ServerStatusCheckerCard extends StatelessWidget {
                   width: 32,
                   child: DsCircularProgressIndicator(),
                 );
-              } else if (status != null && status['isDown'] == false) {
+              } else if (!statusResult.isDown) {
                 siteStatusIcon = Icon(
                   FontAwesomeIcons.check,
                   color: Colors.green,
-                  size: 32,
+                  size: 34,
                 );
-              } else if (status != null && status['isDown'] == true) {
+              } else if (statusResult.isDown) {
                 siteStatusIcon = Icon(
                   FontAwesomeIcons.ban,
                   color: Colors.red,
-                  size: 32,
+                  size: 34,
                 );
-              } else if (serverStatusResultSnapshot.data?.error != null) {
+              } else if (statusResult.error != null) {
                 siteStatusIcon = Icon(
                   FontAwesomeIcons.question,
                   color: Theme.of(context).disabledColor,
-                  size: 32,
+                  size: 34,
                 );
               }
 
               return ListTile(
                 title: Text('Состояние сайта:'),
                 subtitle: Text(
-                  status != null
-                      ? status['statusText']
+                  statusResult != null
+                      ? statusResult.statusText
                       : (serverStatusResultSnapshot.data?.error != null
                           ? 'Неизвестно'
                           : 'Проверка...'),

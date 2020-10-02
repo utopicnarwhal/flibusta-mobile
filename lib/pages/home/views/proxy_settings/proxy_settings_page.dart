@@ -69,14 +69,6 @@ class ProxySettingsPage extends StatelessWidget {
                 'Использование прокси-сервера может помочь, если Флибуста заблокирована Вашим интернет-провайдером.',
                 style: Theme.of(context).textTheme.bodyText2,
               ),
-              SizedBox(height: 16),
-              Text(
-                'Прокси-сервера создателя приложения будут отключены 21 сентября 2020 года.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2
-                    .copyWith(color: Colors.red),
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -103,7 +95,8 @@ class ProxySettingsPage extends StatelessWidget {
                 builder: (context, torProxyState) {
                   if (torProxyState is InTorProxyState) {
                     return Text(
-                        'Выбор прокси-серверов отключен, пока работает Tor Onion Proxy.');
+                      'Выбор прокси-серверов отключен, пока работает Tor Onion Proxy.',
+                    );
                   }
                   return ListFadeInSlideStagger(
                     index: 3,

@@ -49,65 +49,72 @@ class _ProfileViewState extends State<ProfileView> {
                     minHeight: constraints.maxHeight,
                     maxWidth: constraints.maxWidth,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Column(
+                  child: BlocBuilder<UserContactDataBloc, UserContactDataState>(
+                    cubit: UserContactDataBloc(),
+                    builder: (context, userContactDataState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 16),
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12.0),
-                            child: Text(
-                              'Профиль',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4
-                                  .copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .color,
-                                  ),
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          ProfileScreen(),
-                        ],
-                      ),
-                      if (ProxyHttpClient().isAuthorized())
-                        ListFadeInSlideStagger(
-                          index: 2,
-                          child: Card(
-                            margin: EdgeInsets.only(bottom: 16),
-                            child: ListTile(
-                              title: Text(
-                                'Выйти',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .button
-                                    .copyWith(fontSize: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 16),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12.0),
+                                child: Text(
+                                  'Профиль',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline4
+                                      .copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2
+                                            .color,
+                                      ),
+                                ),
                               ),
-                              onTap: () async {
-                                var signOutConfirm =
-                                    await DialogUtils.confirmationDialog(
-                                  context,
-                                  'Выйти из аккаунта?',
-                                );
-                                if (signOutConfirm == true) {
-                                  setState(() {
-                                    ProxyHttpClient().signOut();
-                                  });
-                                }
-                              },
-                            ),
+                              SizedBox(height: 8),
+                              ProfileScreen(
+                                userContactDataState: userContactDataState,
+                              ),
+                            ],
                           ),
-                        ),
-                    ],
+                          if (!(userContactDataState is UnUserContactDataState))
+                            ListFadeInSlideStagger(
+                              index: 2,
+                              child: Card(
+                                margin: EdgeInsets.only(bottom: 16),
+                                child: ListTile(
+                                  title: Text(
+                                    'Выйти',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .button
+                                        .copyWith(fontSize: 16),
+                                  ),
+                                  onTap: () async {
+                                    var signOutConfirm =
+                                        await DialogUtils.confirmationDialog(
+                                      context,
+                                      'Выйти из аккаунта?',
+                                    );
+                                    if (signOutConfirm == true) {
+                                      ProxyHttpClient().signOut();
+                                      UserContactDataBloc()
+                                          .signOutUserContactData();
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               );
@@ -125,121 +132,139 @@ class _ProfileViewState extends State<ProfileView> {
 }
 
 class ProfileScreen extends StatelessWidget {
+  final UserContactDataState userContactDataState;
+
+  ProfileScreen({
+    @required this.userContactDataState,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (!ProxyHttpClient().isAuthorized()) ...[
-          ListFadeInSlideStagger(
-            index: 0,
-            child: Card(
-              child: ClipRRect(
+    var isAuthorized = !(userContactDataState is UnUserContactDataState);
+
+    var children = [];
+
+    if (!isAuthorized) {
+      children.addAll([
+        ListFadeInSlideStagger(
+          index: 0,
+          child: Card(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(kCardBorderRadius),
+              child: Material(
+                type: MaterialType.card,
                 borderRadius: BorderRadius.circular(kCardBorderRadius),
-                child: Material(
-                  type: MaterialType.card,
-                  borderRadius: BorderRadius.circular(kCardBorderRadius),
-                  child: ListTile(
-                    leading: Icon(FontAwesomeIcons.signInAlt),
-                    title: Text('Авторизоваться'),
-                    onTap: () {
-                      Navigator.of(context).pushNamed(LoginPage.routeName);
-                    },
-                  ),
+                child: ListTile(
+                  leading: Icon(FontAwesomeIcons.signInAlt),
+                  title: Text('Авторизоваться'),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(LoginPage.routeName);
+                  },
                 ),
               ),
             ),
           ),
-          SizedBox(height: 4),
-          ListFadeInSlideStagger(
-            index: 0,
-            child: Align(
-              alignment: Alignment.topRight,
-              child: FlatButton(
-                child: Text('Что позволяет авторизация?'),
-                onPressed: () {
-                  DialogUtils.simpleAlert(
-                    context,
-                    'Что позволяет авторизация?',
-                    content: Text(
-                        'Вроде бы, вам становится доступна иностранная литература.'),
-                  );
-                },
-              ),
+        ),
+        SizedBox(height: 4),
+        ListFadeInSlideStagger(
+          index: 0,
+          child: Align(
+            alignment: Alignment.topRight,
+            child: FlatButton(
+              child: Text('Что позволяет авторизация?'),
+              onPressed: () {
+                DialogUtils.simpleAlert(
+                  context,
+                  'Что позволяет авторизация?',
+                  content: Text(
+                      'Вроде бы, вам становится доступна иностранная литература.'),
+                );
+              },
             ),
           ),
-        ],
-        if (ProxyHttpClient().isAuthorized())
-          ListFadeInSlideStagger(
-            index: 0,
-            child: Card(
-              child: ClipRRect(
+        ),
+      ]);
+    } else {
+      children.add(
+        ListFadeInSlideStagger(
+          index: 0,
+          child: Card(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(kCardBorderRadius),
+              child: Material(
+                type: MaterialType.card,
                 borderRadius: BorderRadius.circular(kCardBorderRadius),
-                child: Material(
-                  type: MaterialType.card,
-                  borderRadius: BorderRadius.circular(kCardBorderRadius),
-                  child: BlocBuilder<UserContactDataBloc, UserContactDataState>(
-                    cubit: UserContactDataBloc(),
-                    builder: (context, userContactDataState) {
-                      if (userContactDataState is InUserContactDataState) {
-                        return ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 18,
-                          ),
-                          trailing: CircleAvatar(
-                            radius: 30,
-                            child: userContactDataState
-                                        .userContactData.profileImgSrc ==
-                                    null
-                                ? Icon(
-                                    EvaIcons.personOutline,
-                                    size: 34,
-                                  )
-                                : ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Image.memory(
-                                      userContactDataState
-                                          .userContactData.profileImg,
-                                      fit: BoxFit.cover,
-                                    ),
+                child: Builder(
+                  builder: (context) {
+                    if (userContactDataState is InUserContactDataState) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 18,
+                        ),
+                        trailing: CircleAvatar(
+                          radius: 30,
+                          child: userContactDataState
+                                      .userContactData.profileImgSrc ==
+                                  null
+                              ? Icon(
+                                  EvaIcons.personOutline,
+                                  size: 34,
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image.memory(
+                                    userContactDataState
+                                        .userContactData.profileImg,
+                                    fit: BoxFit.cover,
                                   ),
+                                ),
+                        ),
+                        title: Text(
+                          userContactDataState.userContactData.nickname ?? '',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
                           ),
-                          title: Text(
-                            userContactDataState.userContactData.nickname ?? '',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          subtitle: Text(
-                            userContactDataState.userContactData.email ?? '',
-                          ),
-                        );
-                      }
-                      if (userContactDataState is ErrorUserContactDataState) {
-                        return ErrorScreen(
-                          errorMessage: userContactDataState.error.userMessage,
-                          showTextToCheckInternet: false,
-                          showIcon: false,
-                          onTryAgain: () {
-                            UserContactDataBloc().refreshUserContactData();
-                          },
-                        );
-                      }
-
-                      return Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-                        child: Center(
-                          child: DsCircularProgressIndicator(),
+                        ),
+                        subtitle: Text(
+                          userContactDataState.userContactData.email ?? '',
                         ),
                       );
-                    },
-                  ),
+                    }
+                    if (userContactDataState is ErrorUserContactDataState) {
+                      return ErrorScreen(
+                        errorMessage:
+                            (userContactDataState as ErrorUserContactDataState)
+                                .error
+                                .userMessage,
+                        showTextToCheckInternet: false,
+                        showIcon: false,
+                        onTryAgain: () {
+                          UserContactDataBloc().refreshUserContactData();
+                        },
+                      );
+                    }
+
+                    return Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                      child: Center(
+                        child: DsCircularProgressIndicator(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
           ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        ...children,
         SizedBox(height: 16),
         ListFadeInSlideStagger(
           index: 1,

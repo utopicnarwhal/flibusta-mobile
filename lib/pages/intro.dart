@@ -126,28 +126,20 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
     }
 
     if (value == 'flibusta.is') {
-      ProxyHttpClient().setHostAddress(value);
+      ProxyHttpClient().setHostAddress(value, false);
       LocalStorage().setHostAddress(value);
       LocalStorage().setIntroCompleted();
 
-      var turnProxyOn = await DialogUtils.confirmationDialog(
+      await DialogUtils.simpleAlert(
         context,
-        'Включить прокси создателя приложения?',
-        builder: (context) {
-          return Text(
-            'Вам необходимо включить прокси, если flibusta.is заблокирован в вашей стране. Но оно не работает на мобильном интернете Yota. Данный прокси перестанет работать 21 сентября.',
-          );
-        },
-        builderPadding: true,
-        barrierDismissible: false,
+        'Важно!',
+        content: Text(
+          'Возможно, сайт flibusta.is заблокирован в Вашей стране.\n'
+          'В этом случае, чтобы данное приложение заработало, необходимо перейти в раздел "Прокси" '
+          'и настроить подключение.',
+        ),
+        confirmText: 'Ок',
       );
-
-      if (turnProxyOn == true) {
-        LocalStorage()
-            .setActualProxy('flibustauser:ilovebooks@35.228.73.110:3128');
-        ProxyHttpClient()
-            .setProxy('flibustauser:ilovebooks@35.228.73.110:3128');
-      }
 
       var downloadPath = await LocalStorage().getBooksDirectory();
 
@@ -155,8 +147,17 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
         context,
         'Папка для загрузки книг',
         builder: (context) {
-          return Text(
-            'Сейчас файлы будут загружаться в папку "${downloadPath.path}". Хотите ли указать свой путь? Вы всегда можете изменить этот путь в настройках.',
+          return Text.rich(
+            TextSpan(
+              text:
+                  'Сейчас файлы будут загружаться в папку "${downloadPath.path}".\nХотите ли указать свой путь?\n\n',
+              children: [
+                TextSpan(
+                  text: 'Вы всегда можете изменить этот путь в настройках.',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ],
+            ),
           );
         },
         builderPadding: true,

@@ -3,10 +3,12 @@ import 'dart:math';
 import 'package:flibusta/model/authorInfo.dart';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/bookInfo.dart';
+import 'package:flibusta/model/genre.dart';
 import 'package:flibusta/model/searchResults.dart';
 import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:flibusta/model/userContactData.dart';
 import 'package:flibusta/services/http_client/http_client.dart';
+import 'package:flibusta/services/server_status_checker.dart';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
@@ -147,6 +149,166 @@ List<BookCard> parseHtmlFromMakeBookList(
       size: size.text,
       fileScore: score,
       downloadFormats: DownloadFormats(downloadFormats),
+    ));
+  }
+
+  return result;
+}
+
+List<BookCard> parseHtmlFromLatestArrivals(
+  String htmlString, [
+  List<Map<int, String>> lastGenres,
+]) {
+  if (htmlString
+      .contains('<form name="bk" action="/mass/download" target="_blank">')) {
+    htmlString = htmlString.replaceFirst(
+      '<form name="bk" action="/mass/download" target="_blank">',
+      '<form id="data">',
+    );
+  } else {
+    htmlString = htmlString.replaceFirst('</form>', '</form><form id="data">');
+  }
+  htmldom.Document document = parse(htmlString);
+
+  var result = List<BookCard>();
+  var form = document.getElementById('data');
+  if (form == null) {
+    return result;
+  }
+
+  var formChildren = form.children;
+  String addedToLibraryDate;
+
+  for (var i = 0; i < formChildren.length; ++i) {
+    if (formChildren[i].localName != 'div') {
+      if (formChildren[i].localName == 'h4') {
+        addedToLibraryDate = formChildren[i].text;
+      }
+      continue;
+    }
+    int score;
+    var allImgTags = formChildren[i].getElementsByTagName('img');
+    if (allImgTags.isNotEmpty) {
+      switch (allImgTags.first.attributes['src']) {
+        case '/img/znak.gif':
+          score = 0;
+          break;
+        case '/img/znak1.gif':
+          score = 1;
+          break;
+        case '/img/znak2.gif':
+          score = 2;
+          break;
+        case '/img/znak3.gif':
+          score = 3;
+          break;
+        case '/img/znak4.gif':
+          score = 4;
+          break;
+        case '/img/znak5.gif':
+          score = 5;
+          break;
+        default:
+      }
+    }
+
+    var allATags = formChildren[i].getElementsByTagName('a');
+    if (allATags.isEmpty) {
+      continue;
+    }
+
+    var genres = List<Map<int, String>>();
+    if (formChildren[i].getElementsByTagName('p').isNotEmpty) {
+      formChildren[i]
+          .getElementsByTagName('p')
+          ?.first
+          ?.getElementsByTagName('a')
+          ?.forEach((f) {
+        genres.add({
+          int.tryParse(
+              f.attributes['href'].replaceAll('/g/', '')?.split('?')[0]): f.text
+        });
+      });
+    } else {
+      if (result?.isNotEmpty == true) {
+        genres = result.last.genres.list;
+      } else {
+        genres = lastGenres;
+      }
+    }
+
+    var title = formChildren[i]
+        .getElementsByTagName('a')
+        .where((element) => element.attributes['href'].contains('/b/'))
+        ?.first;
+
+    var translators = List<Map<int, String>>();
+    htmldom.Element sequence;
+
+    var temp = title.nextElementSibling;
+    while (temp.localName != 'span') {
+      if (temp.attributes['href'] != null &&
+          temp.attributes['href'].contains('/a/')) {
+        translators.add({
+          int.tryParse(temp?.attributes['href']
+              ?.replaceAll('/a/', '')
+              ?.split('?')[0]): temp.text
+        });
+      } else if (temp.attributes['href'] != null &&
+          temp.attributes['href'].contains('/s/')) {
+        sequence = temp;
+      }
+      temp = temp.nextElementSibling;
+    }
+    var size = temp;
+
+    var downloadFormats = List<Map<String, String>>();
+    for (temp = size.nextElementSibling;
+        temp != null &&
+            temp.attributes['href'] != null &&
+            temp.attributes['href'].contains('/b/');
+        temp = temp.nextElementSibling) {
+      if (!ProxyHttpClient().isAuthorized()) {
+        var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
+        if (downloadFormatName == 'читать' || downloadFormatName == 'mail') {
+          continue;
+        }
+        downloadFormatName =
+            downloadFormatName.replaceAll('скачать ', '').trim();
+        var downloadFormatType =
+            temp.attributes['href'].split('/').last.split('?')[0];
+        downloadFormats.add({downloadFormatName: downloadFormatType});
+      }
+    }
+
+    var authors = List<Map<int, String>>();
+    for (;
+        temp != null &&
+            temp.attributes['href'] != null &&
+            temp.attributes['href'].contains('/a/');
+        temp = temp.nextElementSibling) {
+      authors.add({
+        int.tryParse(
+                temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]):
+            temp.text
+      });
+    }
+
+    result.add(BookCard(
+      id: int.tryParse(title?.attributes['href']?.replaceAll('/b/', '')),
+      genres: Genres(genres),
+      title: title?.text,
+      authors: Authors(authors),
+      sequenceId: sequence != null
+          ? int.tryParse(
+              sequence?.attributes['href'].replaceAll('/s/', '').split('?')[0])
+          : null,
+      sequenceTitle: sequence?.text,
+      translators: Translators(translators),
+      size: size.text,
+      fileScore: score,
+      downloadFormats: DownloadFormats(downloadFormats),
+      addedToLibraryDate: addedToLibraryDate,
     ));
   }
 
@@ -698,6 +860,16 @@ $htmlString
   return result;
 }
 
+List<Genre> parseHtmlFromGetGenres(String htmlString) {
+  var result = List<Genre>();
+
+  htmldom.Document document = parse(htmlString);
+
+  // TODO: add implimentation
+
+  return result;
+}
+
 List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
   var result = List<SequenceCard>();
 
@@ -814,6 +986,35 @@ UserContactData parseHtmlFromUserMeEdit(String htmlString) {
     if (elementsClassImg?.isNotEmpty == true) {
       result.profileImgSrc = elementsClassImg.first?.attributes['src'];
     }
+  }
+
+  return result;
+}
+
+ServerStatusResult parseHtmlFromIsItDownRightNow(String htmlString) {
+  var result = ServerStatusResult();
+
+  htmldom.Document document = parse(htmlString);
+
+  try {
+    var bodyElement = document.getElementsByTagName('body').first;
+    var divWithStatus = bodyElement.children[4];
+    switch (divWithStatus.children.first.text) {
+      case 'DOWN':
+        result.isDown = true;
+        break;
+      case 'UP':
+        result.isDown = false;
+        break;
+    }
+    var engStatusText = divWithStatus.children.elementAt(1).text;
+    if (engStatusText.contains('is UP and reachable by us.')) {
+      result.statusText = 'Работает';
+    } else if (engStatusText.contains('is DOWN  for everyone.')) {
+      result.statusText = 'Не работает';
+    }
+  } on StateError catch (error) {
+    print(error);
   }
 
   return result;

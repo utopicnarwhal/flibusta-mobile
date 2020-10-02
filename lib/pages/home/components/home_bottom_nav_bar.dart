@@ -36,11 +36,11 @@ class HomeBottomNavBar extends StatelessWidget {
         items: [
           BottomNavigationBarItem(
             icon: Icon(EvaIcons.homeOutline),
-            title: Text('Главная'),
+            label: 'Главная',
           ),
           BottomNavigationBarItem(
             icon: Icon(FontAwesomeIcons.book),
-            title: Text('Книги'),
+            label: 'Книги',
           ),
           BottomNavigationBarItem(
             icon: Padding(
@@ -50,11 +50,11 @@ class HomeBottomNavBar extends StatelessWidget {
                 size: 18,
               ),
             ),
-            title: Text('Прокси'),
+            label: 'Прокси',
           ),
           BottomNavigationBarItem(
             icon: Icon(EvaIcons.personOutline),
-            title: Text('Профиль'),
+            label: 'Профиль',
           ),
         ],
         onTap: selectedNavItemController.add,

@@ -47,7 +47,7 @@ Future<void> initialization() async {
 
   preparationFutures.add(LocalStorage()
       .getHostAddress()
-      .then((url) => ProxyHttpClient().setHostAddress(url)));
+      .then((url) => ProxyHttpClient().setHostAddress(url, false)));
 
   preparationFutures.add(LocalStorage().getBooksDirectory().then((dir) async {
     var externalStorageDownloadDirectories = await FileUtils.getStorageDir();

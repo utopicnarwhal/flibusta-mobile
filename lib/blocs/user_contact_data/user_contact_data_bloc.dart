@@ -38,6 +38,13 @@ class UserContactDataBloc
     _userContactDataBlocSingleton.add(RefreshUserContactDataEvent());
   }
 
+  void signOutUserContactData() {
+    if (state is UnUserContactDataState) {
+      return;
+    }
+    _userContactDataBlocSingleton.add(SignOutUserContactDataEvent());
+  }
+
   @override
   Stream<UserContactDataState> mapEventToState(
     UserContactDataEvent event,

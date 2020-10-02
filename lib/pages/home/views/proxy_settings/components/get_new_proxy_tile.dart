@@ -39,16 +39,17 @@ class _GetNewProxyTileState extends State<GetNewProxyTile> {
       ),
       title: Text('Добавить прокси с сайта http://pubproxy.com'),
       onTap: () async {
+        if (!mounted) return;
         setState(() {
           requestingProxies = true;
         });
         var newProxies = await ProxyHttpClient().getNewProxies();
         newProxies.forEach(widget.callback);
-        if (mounted) {
-          setState(() {
-            requestingProxies = false;
-          });
-        }
+
+        if (!mounted) return;
+        setState(() {
+          requestingProxies = false;
+        });
       },
     );
   }

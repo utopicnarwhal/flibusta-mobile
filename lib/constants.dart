@@ -2,6 +2,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 const kFlibustaOnionUrl = "flibustahezeous3.onion";
+const kPrintRequests = true;
 
 const kTorColor = Color(0xFF7D4698);
 

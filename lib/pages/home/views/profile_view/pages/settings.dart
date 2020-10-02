@@ -6,6 +6,7 @@ import 'package:flibusta/constants.dart';
 import 'package:flibusta/ds_controls/dynamic_theme_mode.dart';
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flibusta/model/enums/sortBooksByEnum.dart';
+import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
 import 'package:flibusta/utils/dialog_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -221,6 +222,7 @@ class _SettingsPageState extends State<SettingsPage> {
               if (result == null || result == hostAddressSnapshot.data) {
                 return;
               }
+              ProxyHttpClient().setHostAddress(result);
               await LocalStorage().setHostAddress(result);
               setState(() {});
             },
@@ -355,6 +357,69 @@ class _SettingsPageState extends State<SettingsPage> {
                 return;
               }
               await LocalStorage().setPreferredAuthorBookSort(result);
+              setState(() {});
+            },
+          );
+        },
+      ),
+      Divider(indent: 72),
+      FutureBuilder<SortGenreBooksBy>(
+        future: LocalStorage().getPreferredGenreBookSort(),
+        builder: (context, preferredSortBooksBySnapshot) {
+          return ListTile(
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(FontAwesomeIcons.sort, size: 26.0),
+              ],
+            ),
+            title: Text('Сортировка книг жанра по'),
+            subtitle: Text(
+              sortGenreBooksByToString(preferredSortBooksBySnapshot.data),
+            ),
+            trailing: kIconArrowForward,
+            onTap: () async {
+              var result = await showDialog<SortGenreBooksBy>(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    title: Text(
+                      'Выберите предпочитаемую сортировку книг жанра',
+                    ),
+                    children: [
+                      ...SortGenreBooksBy.values.map((sortBooksBy) {
+                        SortGenreBooksBy value;
+                        if (sortBooksBy != null) {
+                          value = sortBooksBy;
+                        }
+                        return RadioListTile<SortGenreBooksBy>(
+                          onChanged: (_) {
+                            Navigator.of(context).pop(sortBooksBy);
+                          },
+                          groupValue: preferredSortBooksBySnapshot.data,
+                          value: value,
+                          title: Text(sortGenreBooksByToString(sortBooksBy)),
+                        );
+                      }).toList(),
+                      ButtonBar(
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Отмена'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+              if (result == null) {
+                return;
+              }
+              await LocalStorage().setPreferredGenreBookSort(result);
               setState(() {});
             },
           );

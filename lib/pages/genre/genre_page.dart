@@ -176,6 +176,10 @@ class _GenrePageState extends State<GenrePage> {
   Future<void> _getGenreInfo() async {
     List<BookCard> result;
 
+    if (widget.genre.id == null && widget.genre.code == null) {
+      Navigator.of(context).pop();
+    }
+
     if (_sortBooksBy == null) {
       _sortBooksBy = await LocalStorage().getPreferredGenreBookSort();
     }
@@ -183,7 +187,7 @@ class _GenrePageState extends State<GenrePage> {
     try {
       Uri url = Uri.https(
         ProxyHttpClient().getHostAddress(),
-        '/g/${widget.genre.code}/${sortGenreBooksByToQueryParam(_sortBooksBy)}',
+        '/g/${widget.genre.code ?? widget.genre.id}/${sortGenreBooksByToQueryParam(_sortBooksBy)}',
       );
 
       var response = await ProxyHttpClient().getDio().getUri(url);

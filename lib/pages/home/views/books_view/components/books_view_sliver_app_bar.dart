@@ -62,9 +62,10 @@ class BooksViewSliverAppBar extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: IconButton(
+                        tooltip: 'Расширенный поиск',
                         icon: Icon(
-                          FontAwesomeIcons.filter,
-                          size: 22,
+                          FontAwesomeIcons.searchengin,
+                          size: 26,
                         ),
                         onPressed: () {
                           Navigator.of(context).pushNamed(AdvancedSearchPage.routeName);

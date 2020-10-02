@@ -337,20 +337,24 @@ class GridTilesBuilder extends StatelessWidget {
         child: ListFadeInSlideStagger(
           index: 0,
           child: CustomScrollView(
+            key: ValueKey(gridViewType),
             physics: kBouncingAlwaysScrollableScrollPhysics,
-            slivers: <Widget>[
+            slivers: [
               SliverOverlapInjector(
                 handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                   context,
                 ),
               ),
               SliverList(
-                delegate: SliverChildListDelegate([
-                  Container(
-                    color: Theme.of(context).cardColor,
-                    child: gridListView,
-                  ),
-                ]),
+                delegate: SliverChildListDelegate(
+                  [
+                    Container(
+                      color: Theme.of(context).cardColor,
+                      child: gridListView,
+                    ),
+                  ],
+                  addSemanticIndexes: false,
+                ),
               ),
               SliverFillRemaining(
                 hasScrollBody: false,

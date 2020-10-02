@@ -58,14 +58,6 @@ class ProxyListBloc {
           '',
           name: 'Без прокси',
         ),
-        ProxyInfo(
-          'flibustauser:ilovebooks@35.217.29.210:1194',
-          name: 'Прокси создателя приложения 1',
-        ),
-        ProxyInfo(
-          'flibustauser:ilovebooks@35.228.73.110:3128',
-          name: 'Прокси создателя приложения 2',
-        ),
       ];
       initialProxyList.addAll(
         proxyList.map((proxyHostPort) {

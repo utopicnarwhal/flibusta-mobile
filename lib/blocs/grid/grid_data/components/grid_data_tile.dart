@@ -71,49 +71,46 @@ class GridDataTile extends StatelessWidget {
                 onTap: onDismissed,
               ),
             ],
-            child: InkWell(
+            child: ListTile(
               onLongPress: onLongPress,
               onTap: onTap,
-              splashColor: Theme.of(context).accentColor.withOpacity(0.4),
-              child: ListTile(
-                title: Text(
-                  title ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (subtitle != null)
-                      Text(
-                        subtitle ?? '',
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.fade,
-                      ),
-                    if (genres?.isNotEmpty == true || score != null) ...[
-                      _genresAndScoreBuilder(context, genres, score)
-                    ],
-                  ],
-                ),
-                isThreeLine: genres?.isNotEmpty == true && subtitle != null,
-                trailing: trailingIcon != null || onTap != null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (trailingIcon != null) trailingIcon,
-                              if (onTap != null) kIconArrowForward,
-                            ],
-                          ),
-                        ],
-                      )
-                    : SizedBox(),
+              title: Text(
+                title ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.fade,
+                softWrap: false,
               ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (subtitle != null)
+                    Text(
+                      subtitle ?? '',
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                    ),
+                  if (genres?.isNotEmpty == true || score != null) ...[
+                    _genresAndScoreBuilder(context, genres, score)
+                  ],
+                ],
+              ),
+              isThreeLine: genres?.isNotEmpty == true && subtitle != null,
+              trailing: trailingIcon != null || onTap != null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (trailingIcon != null) trailingIcon,
+                            if (onTap != null) kIconArrowForward,
+                          ],
+                        ),
+                      ],
+                    )
+                  : SizedBox(),
             ),
           ),
           if (!isLast || isFirst) Divider(indent: 16),

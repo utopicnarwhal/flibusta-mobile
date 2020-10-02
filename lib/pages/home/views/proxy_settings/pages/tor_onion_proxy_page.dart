@@ -49,7 +49,7 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Данная функция является экспериментальной, если найдете ошибку, то пишите мне на почту gigok@bk.ru',
+                  'Данная функция является экспериментальной, если найдете ошибку, то отправьте скриншот с ней мне на почту gigok@bk.ru',
                   style: Theme.of(context).textTheme.bodyText2,
                 ),
               ),
@@ -172,30 +172,24 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                 ),
               ),
               Divider(),
-              ClipRect(
-                child: Banner(
-                  location: BannerLocation.topEnd,
-                  message: 'Тест',
-                  child: Material(
-                    type: MaterialType.card,
-                    borderRadius: BorderRadius.zero,
-                    child: FutureBuilder<bool>(
-                      future: LocalStorage().getStartUpTor(),
-                      builder: (context, startUpTorSnapshot) {
-                        return CheckboxListTile(
-                          value: startUpTorSnapshot.data == true,
-                          onChanged: (value) async {
-                            await LocalStorage().setStartUpTor(value);
+              Material(
+                type: MaterialType.card,
+                borderRadius: BorderRadius.zero,
+                child: FutureBuilder<bool>(
+                  future: LocalStorage().getStartUpTor(),
+                  builder: (context, startUpTorSnapshot) {
+                    return CheckboxListTile(
+                      value: startUpTorSnapshot.data == true,
+                      onChanged: (value) async {
+                        await LocalStorage().setStartUpTor(value);
 
-                            if (!mounted) return;
-                            setState(() {});
-                          },
-                          title: Text('Автозапуск'),
-                          subtitle: Text('Запуск Tor при открытии приложения'),
-                        );
+                        if (!mounted) return;
+                        setState(() {});
                       },
-                    ),
-                  ),
+                      title: Text('Автозапуск'),
+                      subtitle: Text('Запуск Tor при открытии приложения'),
+                    );
+                  },
                 ),
               ),
               Divider(),

@@ -44,10 +44,10 @@ class LoadGridDataEvent extends GridDataEvent {
             _gridData = bookSearch.books;
             hasReachedMax = (_gridData?.length ?? 0) < 30;
           } else {
-            _gridData = await _gridDataRepository.makeBookList(
+            _gridData = await _gridDataRepository.getLatestArrivals(
               1,
             );
-            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+            hasReachedMax = false;
             if (_gridData.isEmpty == true)
               throw new DsError(
                 userMessage:
@@ -250,10 +250,10 @@ class UploadMoreGridDataEvent extends GridDataEvent {
             _gridData = bookSearch.books;
             hasReachedMax = (_gridData?.length ?? 0) < 30;
           } else {
-            _gridData = await _gridDataRepository.makeBookList(
+            _gridData = await _gridDataRepository.getLatestArrivals(
               pageNumber,
             );
-            hasReachedMax = (_gridData?.length ?? 0) < HomeGridConsts.kPageSize;
+            hasReachedMax = false;
           }
           break;
         case GridViewType.authors:

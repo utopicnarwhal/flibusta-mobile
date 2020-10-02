@@ -4,15 +4,18 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flibusta/constants.dart';
 import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/local_storage.dart';
+import 'package:flibusta/utils/html_parsers.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ServerStatusResult {
   DioError error;
-  Map<String, dynamic> status;
+  bool isDown;
+  String statusText;
 
   ServerStatusResult({
     this.error,
-    this.status,
+    this.isDown,
+    this.statusText,
   });
 }
 
@@ -37,7 +40,7 @@ class ServerStatusChecker {
       }
 
       var response = await _dioForCheck.get(
-        'https://api.downfor.cloud/httpcheck/$urlToCheck',
+        'https://www.isitdownrightnow.com/check.php?domain=$urlToCheck',
         options: Options(
           headers: {
             'user-agent':
@@ -46,8 +49,8 @@ class ServerStatusChecker {
           },
         ),
       );
-      if (response.data != null && response.data is Map<String, dynamic>) {
-        serverStatusResult.status = response.data;
+      if (response.data != null && response.data is String) {
+        serverStatusResult = parseHtmlFromIsItDownRightNow(response.data);
       }
     } on DioError catch (dioError) {
       serverStatusResult.error = dioError;

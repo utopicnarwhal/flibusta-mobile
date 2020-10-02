@@ -68,7 +68,6 @@ class DialogUtils {
           title: Text(
             title ?? '',
             style: TextStyle(
-              fontSize: 16.0,
               color: kSecondaryColor(context),
             ),
           ),

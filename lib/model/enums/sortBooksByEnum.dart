@@ -17,7 +17,7 @@ String sortAuthorBooksByToString(SortAuthorBooksBy sortBooksBy) {
     case SortAuthorBooksBy.popularity:
       return 'Популярности';
     case SortAuthorBooksBy.sequence:
-      return 'SortAuthorBooksBy';
+      return 'Серии книг';
     default:
       return 'Неизвестное значение';
   }

@@ -50,6 +50,31 @@ class GridDataRepository {
 
   static List<Genre> cachedGenreList;
 
+  Future<List<GridData>> getLatestArrivals(
+    int page, {
+    List<Map<int, String>> lastGenres,
+  }) async {
+    Map<String, String> queryParams;
+
+    if (page != null && page > 1) {
+      queryParams = {'page': (page - 1).toString()};
+    }
+  
+    Uri url = Uri.https(
+      ProxyHttpClient().getHostAddress(),
+      '/new',
+      queryParams,
+    );
+
+    var response = await ProxyHttpClient().getDio().getUri(url);
+    if (response.data == null || !(response.data is String)) {
+      return null;
+    }
+
+    var result = parseHtmlFromLatestArrivals(response.data, lastGenres);
+    return result;
+  }
+
   Future<List<GridData>> makeBookList(
     int page, {
     AdvancedSearchParams advancedSearchParams,
@@ -253,6 +278,7 @@ class GridDataRepository {
     response.data.forEach((headIndex, headGenre) {
       headGenre.forEach((genre) {
         result.add(Genre(
+          id: int.tryParse(genre['id']),
           name: genre['name'],
           code: genre['code'],
         ));

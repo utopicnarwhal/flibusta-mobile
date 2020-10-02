@@ -1,13 +1,19 @@
 import 'package:flibusta/model/grid_data/grid_data.dart';
 
 class Genre extends GridData {
-  final String name;
-  final String code;
+  int id;
+  String name;
+  String code;
+  int bookCount;
+  bool isHidden;
 
   Genre({
+    this.id,
     this.name,
     this.code,
-  }) : assert(id != null);
+    this.bookCount,
+    this.isHidden,
+  });
 
   @override
   String get tileSubtitle => this.code;

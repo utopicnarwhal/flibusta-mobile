@@ -4,11 +4,14 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flibusta/blocs/user_contact_data/user_contact_data_bloc.dart';
+import 'package:flibusta/constants.dart';
 import 'package:flibusta/model/connectionCheckResult.dart';
+import 'package:flibusta/services/http_client/custom_interceptor.dart';
 import 'package:flibusta/services/http_client/dio_http_client_adapters/socks_http_client_adapter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flibusta/model/extension_methods/dio_error_extension.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 
 class ProxyHttpClient {
   static final ProxyHttpClient _httpClientSingleton =
@@ -44,6 +47,60 @@ class ProxyHttpClient {
     return _dio;
   }
 
+  Future<Response<T>> getUri<T>(
+    Uri uri, {
+    Options options,
+    CancelToken cancelToken,
+    ProgressCallback onReceiveProgress,
+  }) {
+    return _dio.getUri(
+      uri,
+      options: options,
+      cancelToken: cancelToken,
+      onReceiveProgress: onReceiveProgress,
+    );
+  }
+
+  Future<Response<T>> postUri<T>(
+    Uri uri, {
+    data,
+    Options options,
+    CancelToken cancelToken,
+    ProgressCallback onSendProgress,
+    ProgressCallback onReceiveProgress,
+  }) {
+    return _dio.postUri(
+      uri,
+      data: data,
+      options: options,
+      cancelToken: cancelToken,
+      onReceiveProgress: onReceiveProgress,
+      onSendProgress: onSendProgress,
+    );
+  }
+
+  Future<Response> downloadUri(
+    Uri uri,
+    savePath, {
+    ProgressCallback onReceiveProgress,
+    CancelToken cancelToken,
+    bool deleteOnError = true,
+    String lengthHeader = Headers.contentLengthHeader,
+    data,
+    Options options,
+  }) {
+    return _dio.downloadUri(
+      uri,
+      savePath,
+      onReceiveProgress: onReceiveProgress,
+      cancelToken: cancelToken,
+      deleteOnError: deleteOnError,
+      lengthHeader: lengthHeader,
+      data: data,
+      options: options,
+    );
+  }
+
   Future<void> initCookieJar() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
@@ -59,32 +116,7 @@ class ProxyHttpClient {
     }
 
     _dio.interceptors.addAll([
-      InterceptorsWrapper(
-        onRequest: (RequestOptions options) async {
-          if (kReleaseMode == false) {
-            print('Send request：path = ${options.path}');
-          }
-        },
-        onError: (dioError) {
-          if (dioError?.message
-                  ?.contains('Proxy failed to establish tunnel (302 Found)') ==
-              true) {
-            return _dio.requestUri(
-              dioError.request.uri,
-              data: dioError.request.data,
-              options: Options(
-                method: dioError.request.method,
-                responseType: dioError.request.responseType,
-                contentType: dioError.request.contentType,
-              ),
-              onReceiveProgress: dioError.request.onReceiveProgress,
-              onSendProgress: dioError.request.onSendProgress,
-              cancelToken: dioError.request.cancelToken,
-            );
-          }
-          return DsError.fromDioError(dioError: dioError);
-        },
-      ),
+      CustomInterceptor(),
       if (_cookieManager != null) _cookieManager,
     ]);
   }
@@ -100,29 +132,10 @@ class ProxyHttpClient {
       newDio.httpClientAdapter = SocksHttpClientAdapter();
     }
 
-    newDio.interceptors.add(
-      InterceptorsWrapper(
-        onError: (dioError) {
-          if (dioError?.message
-                  ?.contains('Proxy failed to establish tunnel (302 Found)') ==
-              true) {
-            return _dio.requestUri(
-              dioError.request.uri,
-              data: dioError.request.data,
-              options: Options(
-                method: dioError.request.method,
-                responseType: dioError.request.responseType,
-                contentType: dioError.request.contentType,
-              ),
-              onReceiveProgress: dioError.request.onReceiveProgress,
-              onSendProgress: dioError.request.onSendProgress,
-              cancelToken: dioError.request.cancelToken,
-            );
-          }
-          return DsError.fromDioError(dioError: dioError);
-        },
-      ),
-    );
+    newDio.interceptors.addAll([
+      CustomInterceptor(),
+      if (_cookieManager != null) _cookieManager,
+    ]);
 
     if (newDio.httpClientAdapter is DefaultHttpClientAdapter) {
       (newDio.httpClientAdapter as DefaultHttpClientAdapter)
@@ -151,8 +164,15 @@ class ProxyHttpClient {
     return _proxyHostPort;
   }
 
-  void setHostAddress(String hostAddress) {
+  void setHostAddress(String hostAddress, [bool checkAuth = true]) {
     _hostAddress = hostAddress;
+    if (checkAuth) {
+      if (isAuthorized()) {
+        UserContactDataBloc().refreshUserContactData();
+      } else {
+        UserContactDataBloc().signOutUserContactData();
+      }
+    }
   }
 
   String getHostAddress() {
@@ -186,7 +206,7 @@ class ProxyHttpClient {
             if (dioError?.message?.contains(
                     'Proxy failed to establish tunnel (302 Found)') ==
                 true) {
-              return _dio.requestUri(
+              return dioForConnectionCheck.requestUri(
                 dioError.request.uri,
                 data: dioError.request.data,
                 options: Options(
@@ -255,10 +275,13 @@ class ProxyHttpClient {
       if (response.data is String) {
         result = (response.data as String).split('\n');
       }
-      print(result);
-      return result;
     } catch (error) {
       print(error);
+      if (error is DioError && error.response.statusCode == 503) {
+        ToastManager().showToast('Вы достигли лимит в 50 запросов на сегодня');
+      } else {
+        ToastManager().showToast(error.toString());
+      }
     }
     dioForGetProxyAPI.close();
     return result;
@@ -269,14 +292,18 @@ class ProxyHttpClient {
   }
 
   String getCookies() {
-    return _persistCookieJar
-        .loadForRequest(Uri.https(getHostAddress(), ''))
-        .toString();
+    var uri = Uri.https(_hostAddress, '');
+    if (_hostAddress == kFlibustaOnionUrl) {
+      uri = Uri.http(kFlibustaOnionUrl, '');
+    }
+    return _persistCookieJar.loadForRequest(uri).toString();
   }
 
   bool isAuthorized() {
-    return _persistCookieJar
-        .loadForRequest(Uri.https(getHostAddress(), ''))
-        .isNotEmpty;
+    var uri = Uri.https(_hostAddress, '');
+    if (_hostAddress == kFlibustaOnionUrl) {
+      uri = Uri.http(kFlibustaOnionUrl, '');
+    }
+    return _persistCookieJar.loadForRequest(uri).isNotEmpty;
   }
 }

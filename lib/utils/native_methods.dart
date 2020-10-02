@@ -12,9 +12,8 @@ class NativeMethods {
 
     try {
       await _platform.invokeMethod('rescan_folder', dir);
-      print("Сканирование успешно завершено");
     } on PlatformException catch (e) {
-      print("Сканирование не удалось. Ошибка: " + e.toString());
+      print('Сканирование не удалось. Ошибка: ' + e.toString());
     }
   }
 }

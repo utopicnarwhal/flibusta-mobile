@@ -83,3 +83,14 @@ class RefreshUserContactDataEvent extends UserContactDataEvent {
     }
   }
 }
+
+class SignOutUserContactDataEvent extends UserContactDataEvent {
+  @override
+  String toString() => 'SignOutUserContactDataEvent';
+
+  @override
+  Future<UserContactDataState> applyAsync(
+      {UserContactDataState currentState, UserContactDataBloc bloc}) async {
+    return UnUserContactDataState();
+  }
+}
