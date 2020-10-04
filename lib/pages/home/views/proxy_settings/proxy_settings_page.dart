@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flibusta/blocs/proxy_list/proxy_list_bloc.dart';
 import 'package:flibusta/blocs/tor_proxy/tor_proxy_bloc.dart';
@@ -15,8 +14,6 @@ import 'package:flibusta/services/server_status_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flibusta/pages/home/views/proxy_settings/components/server_status_checker_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:utopic_toast/utopic_toast.dart';
-import 'package:utopic_tor_onion_proxy/utopic_tor_onion_proxy.dart';
 
 class ProxySettingsPage extends StatelessWidget {
   static const routeName = '/ProxySettings';
@@ -210,25 +207,25 @@ class ProxySettingsPage extends StatelessWidget {
         index: 2,
         selectedNavItemController: selectedNavItemController,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            var nativeDirPath = await UtopicTorOnionProxy.nativeLibraryDir();
-            var nativeDir = Directory(nativeDirPath);
-            ToastManager().showToast('nativeDir = $nativeDirPath');
-            if (nativeDir.listSync().isEmpty) {
-              ToastManager().showToast('empty nativeDir');
-            }
-            nativeDir.list().forEach((element) {
-              print(element.path);
-              ToastManager().showToast(element.path);
-            });
-          } catch (e) {
-            print(e.toString());
-            ToastManager().showToast(e.toString());
-          }
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     try {
+      //       var nativeDirPath = await UtopicTorOnionProxy.nativeLibraryDir();
+      //       var nativeDir = Directory(nativeDirPath);
+      //       ToastManager().showToast('nativeDir = $nativeDirPath');
+      //       if (nativeDir.listSync().isEmpty) {
+      //         ToastManager().showToast('empty nativeDir');
+      //       }
+      //       nativeDir.list().forEach((element) {
+      //         print(element.path);
+      //         ToastManager().showToast(element.path);
+      //       });
+      //     } catch (e) {
+      //       print(e.toString());
+      //       ToastManager().showToast(e.toString());
+      //     }
+      //   },
+      // ),
     );
   }
 }
