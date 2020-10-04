@@ -1,7 +1,7 @@
 name: flibusta
 description: Unofficial mobile application for site https://flibusta.is
 
-version: 0.6.3+38
+version: 0.6.5+40
 
 environment:
   sdk: ">=2.10.0 <3.0.0"
@@ -14,7 +14,9 @@ dependencies:
   dio_cookie_manager: ^1.0.0
   cookie_jar: ^1.0.1
 
-  utopic_tor_onion_proxy: ^0.2.2
+  # utopic_tor_onion_proxy: ^0.2.2
+  utopic_tor_onion_proxy:
+    path: ../utopic_tor_onion_proxy/
 
   flutter_typeahead: ^1.8.8
   mask_text_input_formatter: ^1.1.0

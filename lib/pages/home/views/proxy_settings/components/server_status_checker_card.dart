@@ -57,7 +57,12 @@ class ServerStatusCheckerCard extends StatelessWidget {
                           ? 'Неизвестно'
                           : 'Проверка...'),
                 ),
-                leading: siteStatusIcon,
+                leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    siteStatusIcon,
+                  ],
+                ),
                 trailing: IconButton(
                   icon: Icon(
                     FontAwesomeIcons.redoAlt,

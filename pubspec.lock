@@ -869,9 +869,9 @@ packages:
   utopic_tor_onion_proxy:
     dependency: "direct main"
     description:
-      name: utopic_tor_onion_proxy
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../utopic_tor_onion_proxy"
+      relative: true
+    source: path
     version: "0.2.2"
   vector_math:
     dependency: transitive
