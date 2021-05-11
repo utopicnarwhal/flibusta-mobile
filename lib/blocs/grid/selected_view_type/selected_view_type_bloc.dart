@@ -9,15 +9,14 @@ class SelectedViewTypeBloc {
   Sink<GridViewType> get _sink => _selectedViewTypeController.sink;
 
   changeViewType(GridViewType selectedViewType) {
-    if (selectedViewType == null ||
-        selectedViewType == _selectedViewTypeController.value) {
+    if (selectedViewType == null || selectedViewType == _selectedViewTypeController.valueOrNull) {
       return;
     }
     _sink.add(selectedViewType);
   }
 
   GridViewType get currentViewType {
-    return _selectedViewTypeController.value;
+    return _selectedViewTypeController.valueOrNull;
   }
 
   close() {

@@ -22,16 +22,17 @@ class DsOutlineButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = OutlineButton(
+    final button = OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        padding: padding ?? EdgeInsets.all(8),
+        primary: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
       onPressed: onPressed,
-      padding: padding ?? EdgeInsets.all(8),
       focusNode: focusNode,
       autofocus: autofocus,
-      color: color,
-      splashColor: kSecondaryColor(context).withOpacity(0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
       child: DefaultTextStyle(
         style: Theme.of(context).textTheme.button.copyWith(
               color: kSecondaryColor(context),
@@ -40,7 +41,6 @@ class DsOutlineButton extends StatelessWidget {
             ),
         child: child,
       ),
-      highlightedBorderColor: kSecondaryColor(context),
     );
 
     if (margin != null) {

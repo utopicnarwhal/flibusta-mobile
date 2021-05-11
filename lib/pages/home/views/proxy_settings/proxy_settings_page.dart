@@ -91,7 +91,7 @@ class ProxySettingsPage extends StatelessWidget {
               ),
               SizedBox(height: 8),
               BlocBuilder<TorProxyBloc, TorProxyState>(
-                cubit: TorProxyBloc(),
+                bloc: TorProxyBloc(),
                 builder: (context, torProxyState) {
                   if (torProxyState is InTorProxyState) {
                     return Text(
@@ -207,6 +207,25 @@ class ProxySettingsPage extends StatelessWidget {
         index: 2,
         selectedNavItemController: selectedNavItemController,
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     try {
+      //       var nativeDirPath = await UtopicTorOnionProxy.nativeLibraryDir();
+      //       var nativeDir = Directory(nativeDirPath);
+      //       ToastManager().showToast('nativeDir = $nativeDirPath');
+      //       if (nativeDir.listSync().isEmpty) {
+      //         ToastManager().showToast('empty nativeDir');
+      //       }
+      //       nativeDir.list().forEach((element) {
+      //         print(element.path);
+      //         ToastManager().showToast(element.path);
+      //       });
+      //     } catch (e) {
+      //       print(e.toString());
+      //       ToastManager().showToast(e.toString());
+      //     }
+      //   },
+      // ),
     );
   }
 }

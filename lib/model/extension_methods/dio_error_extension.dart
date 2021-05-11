@@ -10,12 +10,12 @@ class DsError extends DioError {
   DsError.fromDioError({DioError dioError}) {
     var userMessage = '';
     this.error = dioError.error;
-    this.request = dioError.request;
+    this.requestOptions = dioError.requestOptions;
     this.response = dioError.response;
     this.type = dioError.type;
 
     switch (this.type) {
-      case DioErrorType.RESPONSE:
+      case DioErrorType.response:
         switch (this.response.statusCode) {
           case 401:
             userMessage = 'Необходима авторизация';
@@ -37,28 +37,27 @@ class DsError extends DioError {
             break;
         }
         break;
-      case DioErrorType.CONNECT_TIMEOUT:
+      case DioErrorType.connectTimeout:
         userMessage = 'Время подключения истекло';
         break;
-      case DioErrorType.SEND_TIMEOUT:
+      case DioErrorType.sendTimeout:
         userMessage = 'Время ожидания отправки запроса истекло';
         break;
-      case DioErrorType.RECEIVE_TIMEOUT:
-        userMessage = 'Время ожидания отклика сервера истекло';
+      case DioErrorType.receiveTimeout:
+        userMessage = 'Время получения данных от сервера истекло';
         break;
-      case DioErrorType.CANCEL:
+      case DioErrorType.cancel:
         if (this.error != null && this.error is String) {
           userMessage = this.error;
         } else {
           userMessage = 'Запрос отменён';
         }
         break;
-      case DioErrorType.DEFAULT:
+      case DioErrorType.other:
         userMessage = 'Ошибка подключения к серверу';
         break;
     }
     this.userMessage = userMessage;
-    print(this.error);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class NativeMethods {
@@ -13,7 +14,7 @@ class NativeMethods {
     try {
       await _platform.invokeMethod('rescan_folder', dir);
     } on PlatformException catch (e) {
-      print('Сканирование не удалось. Ошибка: ' + e.toString());
+      debugPrint('Сканирование не удалось. Ошибка: ' + e.toString());
     }
   }
 }

@@ -58,12 +58,7 @@ class DirectoryPickerData extends InheritedWidget {
   final ShapeBorder shape;
 
   DirectoryPickerData(
-      {Widget child,
-      this.allowFolderCreation,
-      this.backgroundColor,
-      this.message,
-      this.rootDirectory,
-      this.shape})
+      {Widget child, this.allowFolderCreation, this.backgroundColor, this.message, this.rootDirectory, this.shape})
       : super(child: child);
 
   static DirectoryPickerData of(BuildContext context) {
@@ -81,8 +76,7 @@ class _DirectoryPickerDialog extends StatefulWidget {
   _DirectoryPickerDialogState createState() => _DirectoryPickerDialogState();
 }
 
-class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog>
-    with WidgetsBindingObserver {
+class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog> with WidgetsBindingObserver {
   static final double spacing = 8;
   static final Permission requiredPermission = Permission.storage;
 
@@ -116,8 +110,7 @@ class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog>
   /// if permission is not granter
   Future<void> _getPermissionStatus() async {
     PermissionStatus updatedStatus = await requiredPermission.request();
-    final updatedCanPrompt =
-        await requiredPermission.shouldShowRequestRationale;
+    final updatedCanPrompt = await requiredPermission.shouldShowRequestRationale;
 
     setState(() {
       canPrompt = updatedCanPrompt;
@@ -128,8 +121,7 @@ class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog>
   Future<void> _requestPermission() async {
     if (canPrompt) {
       final updatedStatus = await requiredPermission.request();
-      final updatedCanPrompt =
-          await requiredPermission.shouldShowRequestRationale;
+      final updatedCanPrompt = await requiredPermission.shouldShowRequestRationale;
 
       setState(() {
         status = updatedStatus;
@@ -169,19 +161,21 @@ class _DirectoryPickerDialogState extends State<_DirectoryPickerDialog>
       );
     } else {
       return Padding(
-          padding: EdgeInsets.all(spacing * 2),
-          child: Column(
-            children: <Widget>[
-              Text(message, textAlign: TextAlign.center),
-              SizedBox(height: spacing),
-              RaisedButton(
-                  child: Text('Разрешение предоставлено'),
-                  color: theme.primaryColor,
-                  onPressed: _requestPermission)
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-          ));
+        padding: EdgeInsets.all(spacing * 2),
+        child: Column(
+          children: <Widget>[
+            Text(message, textAlign: TextAlign.center),
+            SizedBox(height: spacing),
+            ElevatedButton(
+              child: Text('Разрешение предоставлено'),
+              style: ElevatedButton.styleFrom(primary: theme.primaryColor),
+              onPressed: _requestPermission,
+            )
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+        ),
+      );
     }
   }
 

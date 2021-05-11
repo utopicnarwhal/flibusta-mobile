@@ -28,19 +28,19 @@ class ServerStatusCheckerCard extends StatelessWidget {
                   width: 32,
                   child: DsCircularProgressIndicator(),
                 );
-              } else if (!statusResult.isDown) {
+              } else if (statusResult.isDown == false) {
                 siteStatusIcon = Icon(
                   FontAwesomeIcons.check,
                   color: Colors.green,
                   size: 34,
                 );
-              } else if (statusResult.isDown) {
+              } else if (statusResult.isDown == true) {
                 siteStatusIcon = Icon(
                   FontAwesomeIcons.ban,
                   color: Colors.red,
                   size: 34,
                 );
-              } else if (statusResult.error != null) {
+              } else if (statusResult.isDown == null || statusResult.error != null) {
                 siteStatusIcon = Icon(
                   FontAwesomeIcons.question,
                   color: Theme.of(context).disabledColor,
@@ -57,7 +57,12 @@ class ServerStatusCheckerCard extends StatelessWidget {
                           ? 'Неизвестно'
                           : 'Проверка...'),
                 ),
-                leading: siteStatusIcon,
+                leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    siteStatusIcon,
+                  ],
+                ),
                 trailing: IconButton(
                   icon: Icon(
                     FontAwesomeIcons.redoAlt,

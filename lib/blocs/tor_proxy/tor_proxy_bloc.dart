@@ -56,7 +56,7 @@ class TorProxyBloc extends Bloc<TorProxyEvent, TorProxyState> {
       }
       yield await event.applyAsync(currentState: state, bloc: this);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       yield ErrorTorProxyState(
         error: DsError(userMessage: 'Необработанная ошибка в mapEventToState'),
       );

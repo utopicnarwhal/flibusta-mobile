@@ -12,10 +12,8 @@ part 'user_contact_data_event.dart';
 part 'user_contact_data_state.dart';
 part 'user_contact_data_repository.dart';
 
-class UserContactDataBloc
-    extends Bloc<UserContactDataEvent, UserContactDataState> {
-  static final UserContactDataBloc _userContactDataBlocSingleton =
-      UserContactDataBloc._internal();
+class UserContactDataBloc extends Bloc<UserContactDataEvent, UserContactDataState> {
+  static final UserContactDataBloc _userContactDataBlocSingleton = UserContactDataBloc._internal();
 
   factory UserContactDataBloc() {
     return _userContactDataBlocSingleton;
@@ -23,16 +21,14 @@ class UserContactDataBloc
   UserContactDataBloc._internal() : super(UnUserContactDataState());
 
   Future<void> fetchUserContactData() async {
-    if (state is LoadingUserContactDataState ||
-        !ProxyHttpClient().isAuthorized()) {
+    if (state is LoadingUserContactDataState || !await ProxyHttpClient().isAuthorized()) {
       return;
     }
     _userContactDataBlocSingleton.add(FetchUserContactDataEvent());
   }
 
-  void refreshUserContactData() {
-    if (state is LoadingUserContactDataState ||
-        !ProxyHttpClient().isAuthorized()) {
+  Future<void> refreshUserContactData() async {
+    if (state is LoadingUserContactDataState || !await ProxyHttpClient().isAuthorized()) {
       return;
     }
     _userContactDataBlocSingleton.add(RefreshUserContactDataEvent());
@@ -55,7 +51,7 @@ class UserContactDataBloc
       );
       yield await event.applyAsync(currentState: state, bloc: this);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       yield ErrorUserContactDataState(
         userContactData: state.userContactData,
         error: DsError(userMessage: 'Необработанная ошибка в mapEventToState'),

@@ -101,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ButtonBar(
                           alignment: MainAxisAlignment.end,
                           children: [
-                            FlatButton(
+                            TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -181,13 +181,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       ButtonBar(
                         alignment: MainAxisAlignment.end,
                         children: [
-                          FlatButton(
+                          TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                             child: Text('Отмена'),
                           ),
-                          FlatButton(
+                          TextButton(
                             child: Text('Применить'),
                             onPressed: () async {
                               var value = hostController.text;
@@ -275,7 +275,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ButtonBar(
                         alignment: MainAxisAlignment.end,
                         children: [
-                          FlatButton(
+                          TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -341,7 +341,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ButtonBar(
                         alignment: MainAxisAlignment.end,
                         children: [
-                          FlatButton(
+                          TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -404,7 +404,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ButtonBar(
                         alignment: MainAxisAlignment.end,
                         children: [
-                          FlatButton(
+                          TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -503,7 +503,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 12.0),
-              child: FlatButton(
+              child: TextButton(
                 child: Text('Понятно'),
                 onPressed: () {
                   Navigator.pop(context);

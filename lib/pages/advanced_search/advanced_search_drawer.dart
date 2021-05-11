@@ -329,7 +329,7 @@ class _AdvancedSearchDrawerState extends State<AdvancedSearchDrawer> {
                 },
               ),
               SizedBox(height: 14),
-              DsRaisedButton(
+              DsElevatedButton(
                 elevation: 4,
                 padding: EdgeInsets.symmetric(vertical: 10.0),
                 child: Text(

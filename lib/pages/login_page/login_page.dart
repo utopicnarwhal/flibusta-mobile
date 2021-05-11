@@ -173,7 +173,7 @@ class LoginPageState extends State<LoginPage> {
                                   ? Center(
                                       child: DsCircularProgressIndicator(),
                                     )
-                                  : DsRaisedButton(
+                                  : DsElevatedButton(
                                       padding:
                                           EdgeInsets.symmetric(vertical: 14),
                                       borderRadius: 20,
@@ -186,7 +186,7 @@ class LoginPageState extends State<LoginPage> {
                                     ),
                             ),
                             SizedBox(height: 40),
-                            FlatButton(
+                            TextButton(
                               child: Text(
                                 'Регистрация',
                               ),

@@ -50,7 +50,7 @@ class _ProfileViewState extends State<ProfileView> {
                     maxWidth: constraints.maxWidth,
                   ),
                   child: BlocBuilder<UserContactDataBloc, UserContactDataState>(
-                    cubit: UserContactDataBloc(),
+                    bloc: UserContactDataBloc(),
                     builder: (context, userContactDataState) {
                       return Column(
                         mainAxisSize: MainAxisSize.max,
@@ -170,7 +170,7 @@ class ProfileScreen extends StatelessWidget {
           index: 0,
           child: Align(
             alignment: Alignment.topRight,
-            child: FlatButton(
+            child: TextButton(
               child: Text('Что позволяет авторизация?'),
               onPressed: () {
                 DialogUtils.simpleAlert(

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flibusta/model/bookCard.dart';
 import 'package:flibusta/model/enums/sortBooksByEnum.dart';
 import 'package:flibusta/model/searchResults.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +24,7 @@ class LocalStorage {
       var previousBookSearches = prefs.getStringList('previousBookSearches');
       return previousBookSearches ?? [];
     } catch (e) {
-      print('getPreviousBookSearches Error: ' + e);
+      debugPrint('getPreviousBookSearches Error: ' + e);
       return [];
     }
   }
@@ -35,7 +36,7 @@ class LocalStorage {
       return await prefs.setStringList(
           'previousBookSearches', previousBookSearches ?? []);
     } catch (e) {
-      print('setPreviousBookSearches Error: ' + e);
+      debugPrint('setPreviousBookSearches Error: ' + e);
       return false;
     }
   }
@@ -85,7 +86,7 @@ class LocalStorage {
       var prefs = await _prefs;
       return await prefs.setInt('latestHomeView', latestHomeView);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return true;
     }
   }
@@ -95,7 +96,7 @@ class LocalStorage {
       var prefs = await _prefs;
       return prefs.getInt('latestHomeView') ?? 0;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return 0;
     }
   }
@@ -105,16 +106,16 @@ class LocalStorage {
     try {
       var lastOpenBooksJsonStrings = prefs.getStringList('LastOpenBooks');
       if (lastOpenBooksJsonStrings?.isEmpty != false) {
-        await prefs.setStringList('LastOpenBooks', List<String>());
-        return List<BookCard>();
+        await prefs.setStringList('LastOpenBooks', []);
+        return [];
       }
       var lastOpenBooks = lastOpenBooksJsonStrings.map((jsonBookString) {
         return BookCard.fromJson(json.decode(jsonBookString));
       }).toList();
       return lastOpenBooks;
     } catch (e) {
-      await prefs.setStringList('LastOpenBooks', List<String>());
-      return List<BookCard>();
+      await prefs.setStringList('LastOpenBooks', []);
+      return [];
     }
   }
 
@@ -154,7 +155,7 @@ class LocalStorage {
       await prefs.setString('PreferredBookExt', preferredBookExt);
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -183,7 +184,7 @@ class LocalStorage {
       );
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -211,7 +212,7 @@ class LocalStorage {
       );
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -241,13 +242,13 @@ class LocalStorage {
     try {
       var proxies = prefs.getStringList('Proxies');
       if (proxies == null) {
-        await prefs.setStringList('Proxies', List<String>());
-        proxies = List<String>();
+        await prefs.setStringList('Proxies', []);
+        proxies = [];
       }
       return proxies;
     } catch (e) {
-      await prefs.setStringList('Proxies', List<String>());
-      return List<String>();
+      await prefs.setStringList('Proxies', []);
+      return [];
     }
   }
 
@@ -310,13 +311,13 @@ class LocalStorage {
     try {
       var favoriteGenreCodes = prefs.getStringList('FavoriteGenreCodes');
       if (favoriteGenreCodes == null) {
-        await prefs.setStringList('FavoriteGenreCodes', List<String>());
-        favoriteGenreCodes = List<String>();
+        await prefs.setStringList('FavoriteGenreCodes', []);
+        favoriteGenreCodes = [];
       }
       return favoriteGenreCodes;
     } catch (e) {
-      await prefs.setStringList('FavoriteGenreCodes', List<String>());
-      return List<String>();
+      await prefs.setStringList('FavoriteGenreCodes', []);
+      return [];
     }
   }
 
@@ -341,7 +342,7 @@ class LocalStorage {
   Future<List<BookCard>> getFavoriteBooks() async {
     var prefs = await _prefs;
     try {
-      var result = List<BookCard>();
+      List<BookCard> result = [];
 
       var favoriteBooksJson = prefs.getStringList('FavoriteBooks');
       if (favoriteBooksJson?.isNotEmpty != true) {
@@ -353,8 +354,8 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('FavoriteBooks', List<String>());
-      return List<BookCard>();
+      await prefs.setStringList('FavoriteBooks', []);
+      return [];
     }
   }
 
@@ -363,7 +364,7 @@ class LocalStorage {
 
     var prefs = await _prefs;
     try {
-      var favoritesBooksJsonStrings = List<String>();
+      List<String> favoritesBooksJsonStrings = [];
       bookCards.forEach((element) {
         favoritesBooksJsonStrings.add(json.encode(element.toJson()));
       });
@@ -372,7 +373,7 @@ class LocalStorage {
         favoritesBooksJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('FavoriteBooks', List<String>());
+      return await prefs.setStringList('FavoriteBooks', []);
     }
   }
 
@@ -388,7 +389,7 @@ class LocalStorage {
         return BookCard.fromJson(json.decode(element)).id == bookId;
       });
     } catch (e) {
-      await prefs.setStringList('FavoriteBooks', List<String>());
+      await prefs.setStringList('FavoriteBooks', []);
       return false;
     }
   }
@@ -412,7 +413,7 @@ class LocalStorage {
   Future<List<BookCard>> getPostponeBooks() async {
     var prefs = await _prefs;
     try {
-      var result = List<BookCard>();
+      List<BookCard> result = [];
 
       var postponeBooksJson = prefs.getStringList('PostponeBooks');
       if (postponeBooksJson?.isNotEmpty != true) {
@@ -424,8 +425,8 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('PostponeBooks', List<String>());
-      return List<BookCard>();
+      await prefs.setStringList('PostponeBooks', []);
+      return [];
     }
   }
 
@@ -434,7 +435,7 @@ class LocalStorage {
 
     var prefs = await _prefs;
     try {
-      var postponesBooksJsonStrings = List<String>();
+      List<String> postponesBooksJsonStrings = [];
       bookCards.forEach((element) {
         postponesBooksJsonStrings.add(json.encode(element.toJson()));
       });
@@ -443,7 +444,7 @@ class LocalStorage {
         postponesBooksJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('PostponeBooks', List<String>());
+      return await prefs.setStringList('PostponeBooks', []);
     }
   }
 
@@ -459,7 +460,7 @@ class LocalStorage {
         return BookCard.fromJson(json.decode(element)).id == bookId;
       });
     } catch (e) {
-      await prefs.setStringList('PostponeBooks', List<String>());
+      await prefs.setStringList('PostponeBooks', []);
       return false;
     }
   }
@@ -483,7 +484,7 @@ class LocalStorage {
   Future<List<AuthorCard>> getFavoriteAuthors() async {
     var prefs = await _prefs;
     try {
-      var result = List<AuthorCard>();
+      var result = [];
 
       var favoriteAuthorsJson = prefs.getStringList('FavoriteAuthors');
       if (favoriteAuthorsJson?.isNotEmpty != true) {
@@ -495,8 +496,8 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('FavoriteAuthors', List<String>());
-      return List<AuthorCard>();
+      await prefs.setStringList('FavoriteAuthors', []);
+      return [];
     }
   }
 
@@ -505,7 +506,7 @@ class LocalStorage {
 
     var prefs = await _prefs;
     try {
-      var favoritesAuthorsJsonStrings = List<String>();
+      List<String> favoritesAuthorsJsonStrings = [];
       authorCards.forEach((element) {
         favoritesAuthorsJsonStrings.add(json.encode(element.toJson()));
       });
@@ -514,7 +515,7 @@ class LocalStorage {
         favoritesAuthorsJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('FavoriteAuthors', List<String>());
+      return await prefs.setStringList('FavoriteAuthors', []);
     }
   }
 
@@ -530,7 +531,7 @@ class LocalStorage {
         return AuthorCard.fromJson(json.decode(element)).id == authorId;
       });
     } catch (e) {
-      await prefs.setStringList('FavoriteAuthors', List<String>());
+      await prefs.setStringList('FavoriteAuthors', []);
       return false;
     }
   }
@@ -555,7 +556,7 @@ class LocalStorage {
   Future<List<SequenceCard>> getFavoriteSequences() async {
     var prefs = await _prefs;
     try {
-      var result = List<SequenceCard>();
+      List<SequenceCard> result = [];
 
       var favoriteSequencesJson = prefs.getStringList('FavoriteSequences');
       if (favoriteSequencesJson?.isNotEmpty != true) {
@@ -567,8 +568,8 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('FavoriteSequences', List<String>());
-      return List<SequenceCard>();
+      await prefs.setStringList('FavoriteSequences', []);
+      return [];
     }
   }
 
@@ -577,7 +578,7 @@ class LocalStorage {
 
     var prefs = await _prefs;
     try {
-      var favoritesSequencesJsonStrings = List<String>();
+      List<String> favoritesSequencesJsonStrings = [];
       sequenceCards.forEach((element) {
         favoritesSequencesJsonStrings.add(json.encode(element.toJson()));
       });
@@ -586,7 +587,7 @@ class LocalStorage {
         favoritesSequencesJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('FavoriteSequences', List<String>());
+      return await prefs.setStringList('FavoriteSequences', []);
     }
   }
 
@@ -602,7 +603,7 @@ class LocalStorage {
         return SequenceCard.fromJson(json.decode(element)).id == sequenceId;
       });
     } catch (e) {
-      await prefs.setStringList('FavoriteSequences', List<String>());
+      await prefs.setStringList('FavoriteSequences', []);
       return false;
     }
   }
@@ -630,16 +631,16 @@ class LocalStorage {
     try {
       var downloadedBooksJsonStrings = prefs.getStringList('DownloadedBooks');
       if (downloadedBooksJsonStrings.isEmpty != false) {
-        await prefs.setStringList('DownloadedBooks', List<String>());
-        return List<BookCard>();
+        await prefs.setStringList('DownloadedBooks', []);
+        return [];
       }
       var downloadedBooks = downloadedBooksJsonStrings.map((jsonBookString) {
         return BookCard.fromJson(json.decode(jsonBookString));
       }).toList();
       return downloadedBooks;
     } catch (e) {
-      await prefs.setStringList('DownloadedBooks', List<String>());
-      return List<BookCard>();
+      await prefs.setStringList('DownloadedBooks', []);
+      return [];
     }
   }
 

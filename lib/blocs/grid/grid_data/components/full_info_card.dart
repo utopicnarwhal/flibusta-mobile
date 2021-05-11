@@ -127,9 +127,7 @@ class _FullInfoCardState extends State<FullInfoCard> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(kCardBorderRadius),
                     child: LinearProgressIndicator(
-                      value: downloadProgressSnapshot.data == 0.0
-                          ? null
-                          : downloadProgressSnapshot.data,
+                      value: downloadProgressSnapshot.data == 0.0 ? null : downloadProgressSnapshot.data,
                       minHeight: 16,
                     ),
                   ),
@@ -174,7 +172,7 @@ class _FullInfoCardState extends State<FullInfoCard> {
                     if (bookFileExistsSnapshot.data == false) {
                       return downloadButton;
                     }
-                    return FlatButton(
+                    return TextButton(
                       child: Text(
                         'ОТКРЫТЬ',
                         style: TextStyle(fontSize: 16.0),
@@ -197,7 +195,7 @@ class _FullInfoCardState extends State<FullInfoCard> {
                     children: [
                       buttonBarChild,
                       if (widget.isDeletable)
-                        FlatButton(
+                        TextButton(
                           child: Text(
                             'УДАЛИТЬ',
                             style: TextStyle(fontSize: 16.0),
@@ -268,8 +266,10 @@ class DownloadBookButton extends StatelessWidget {
       );
     };
 
-    return FlatButton(
-      padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+    return TextButton(
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+      ),
       child: Text(
         'СКАЧАТЬ',
         style: TextStyle(fontSize: 16.0),
@@ -286,11 +286,7 @@ class GridCardRow extends StatelessWidget {
   final Widget customLeading;
 
   const GridCardRow(
-      {Key key,
-      @required this.rowName,
-      @required this.value,
-      this.showCustomLeading = false,
-      this.customLeading})
+      {Key key, @required this.rowName, @required this.value, this.showCustomLeading = false, this.customLeading})
       : super(key: key);
 
   @override
@@ -304,9 +300,7 @@ class GridCardRow extends StatelessWidget {
       preferBelow: false,
       child: ListTile(
         dense: true,
-        leading: showCustomLeading && customLeading != null
-            ? customLeading
-            : Icon(gridRowNameToIcon(rowName)),
+        leading: showCustomLeading && customLeading != null ? customLeading : Icon(gridRowNameToIcon(rowName)),
         title: Text(
           value.toString(),
           style: const TextStyle(fontSize: 18.0),

@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
       _loadingStateController.add(LoadingState.startingTor);
       _torStartupCompleter = Completer<void>();
 
-      _torProxyBlocSubscription = TorProxyBloc().listen((torProxyState) {
+      _torProxyBlocSubscription = TorProxyBloc().stream.listen((torProxyState) {
         if (torProxyState is InTorProxyState) {
           _torStartupCompleter.complete();
         }

@@ -5,6 +5,7 @@
 #### Language: [English](README_en.md) | [Русский](README.md)
 
 ![GitHub repo release](https://img.shields.io/github/v/release/utopicnarwhal/flibusta-mobile)
+[![Codemagic build status](https://api.codemagic.io/apps/5f7894bc21e1c04a4ec9c0a3/5f79eb7121e1c0372b34b27c/status_badge.svg)](https://codemagic.io/apps/5f7894bc21e1c04a4ec9c0a3/5f79eb7121e1c0372b34b27c/latest_build)
 
 <a href='https://play.google.com/store/apps/details?id=ru.utopicnarwhal.flibustabrowser&hl=ru&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Доступно в Google Play' height="78px" src='https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png'/></a>
 

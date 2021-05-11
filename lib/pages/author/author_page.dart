@@ -135,7 +135,6 @@ class _AuthorPageState extends State<AuthorPage> {
           PopupMenuButton<SortAuthorBooksBy>(
             tooltip: 'Сортировать по...',
             icon: Icon(Icons.filter_list),
-            captureInheritedThemes: true,
             onSelected: (newSortBooksBy) {
               if (newSortBooksBy == null || newSortBooksBy == _sortBooksBy) {
                 return;
@@ -237,7 +236,7 @@ class _AuthorPageState extends State<AuthorPage> {
 
       var response = await ProxyHttpClient().getDio().getUri(url);
 
-      result = parseHtmlFromAuthorInfo(response.data, widget.authorId);
+      result = await parseHtmlFromAuthorInfo(response.data, widget.authorId);
 
       setState(() {
         _authorInfo = result;

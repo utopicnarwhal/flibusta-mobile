@@ -20,55 +20,44 @@ class _MessageMap {
 
 class PermissionsUtils {
   static _MessageMap _mapPermissionToMessage(Permission permission) {
-    switch (permission) {
-      case Permission.camera:
-        return _MessageMap(
-          disabled:
-              'На вашем устройстве отключена возможность работы с камерой',
-          noAccess: 'Нет доступа к камере',
-          toSettings:
-              'Перейти в настройки, чтобы предоставить доступ к камере?',
-          fail: 'Доступ к камере не предоставлен',
-        );
-      case Permission.storage:
-        return _MessageMap(
-          disabled:
-              'На вашем устройстве отключена возможность работы с памятью',
-          noAccess: 'Нет доступа к памяти',
-          toSettings:
-              'Перейти в настройки, чтобы предоставить доступ к памяти?',
-          fail: 'Доступ к памяти не предоставлен',
-        );
-      case Permission.photos:
-        return _MessageMap(
-          disabled:
-              'На вашем устройстве отключена возможность работы с галереей',
-          noAccess: 'Нет доступа к галерее',
-          toSettings:
-              'Перейти в настройки, чтобы предоставить доступ к галерее?',
-          fail: 'Доступ к галарее не предоставлен',
-        );
-      case Permission.notification:
-        return _MessageMap(
-          disabled:
-              'На вашем устройстве отключена возможность отправки уведомлений',
-          noAccess: 'Нет доступа к отправке уведомлений',
-          toSettings:
-              'Перейти в настройки, чтобы предоставить доступ к отправке уведомлений?',
-          fail: 'Доступ к отправке уведомлений не предоставлен',
-        );
-      default:
+    if (permission == Permission.camera) {
+      return _MessageMap(
+        disabled: 'На вашем устройстве отключена возможность работы с камерой',
+        noAccess: 'Нет доступа к камере',
+        toSettings: 'Перейти в настройки, чтобы предоставить доступ к камере?',
+        fail: 'Доступ к камере не предоставлен',
+      );
+    } else if (permission == Permission.storage) {
+      return _MessageMap(
+        disabled: 'На вашем устройстве отключена возможность работы с памятью',
+        noAccess: 'Нет доступа к памяти',
+        toSettings: 'Перейти в настройки, чтобы предоставить доступ к памяти?',
+        fail: 'Доступ к памяти не предоставлен',
+      );
+    } else if (permission == Permission.photos) {
+      return _MessageMap(
+        disabled: 'На вашем устройстве отключена возможность работы с галереей',
+        noAccess: 'Нет доступа к галерее',
+        toSettings: 'Перейти в настройки, чтобы предоставить доступ к галерее?',
+        fail: 'Доступ к галарее не предоставлен',
+      );
+    } else if (permission == Permission.notification) {
+      return _MessageMap(
+        disabled: 'На вашем устройстве отключена возможность отправки уведомлений',
+        noAccess: 'Нет доступа к отправке уведомлений',
+        toSettings: 'Перейти в настройки, чтобы предоставить доступ к отправке уведомлений?',
+        fail: 'Доступ к отправке уведомлений не предоставлен',
+      );
     }
     return null;
   }
 
-  static Future<bool> requestAccess(
-      BuildContext context, Permission permission) async {
+  static Future<bool> requestAccess(BuildContext context, Permission permission) async {
     var permissionStatus = await permission.request();
 
     final messageMap = _mapPermissionToMessage(permission);
     if (messageMap.isAnyEmpty) {
-      print('Нужно указать сообщения для данного разрешения');
+      debugPrint('Нужно указать сообщения для данного разрешения');
       return false;
     }
 
@@ -84,7 +73,7 @@ class PermissionsUtils {
         break;
       case PermissionStatus.denied:
       case PermissionStatus.permanentlyDenied:
-      case PermissionStatus.undetermined:
+      case PermissionStatus.limited:
         var permissionNames = await permission.request();
 
         if (permissionNames == PermissionStatus.granted) {
@@ -101,11 +90,11 @@ class PermissionsUtils {
                 title: Text(messageMap.noAccess),
                 content: Text(messageMap.toSettings),
                 actions: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: Text('Нет'),
                     onPressed: () => Navigator.of(context).pop(false),
                   ),
-                  FlatButton(
+                  TextButton(
                     child: Text('Да'),
                     onPressed: () => Navigator.of(context).pop(true),
                   ),

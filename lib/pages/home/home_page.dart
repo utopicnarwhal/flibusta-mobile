@@ -42,9 +42,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _initNavItemController();
     _initGridData();
-    if (ProxyHttpClient().isAuthorized()) {
-      UserContactDataBloc().fetchUserContactData();
-    }
+    ProxyHttpClient().isAuthorized().then((value) {
+      if (value) {
+        UserContactDataBloc().fetchUserContactData();
+      }
+    });
     _favoriteGenreCodesController = BehaviorSubject<List<String>>();
     _proxyListBloc = ProxyListBloc();
     _serverStatusChecker = ServerStatusChecker();
@@ -53,8 +55,7 @@ class _HomePageState extends State<HomePage> {
   void _initNavItemController() async {
     var latestHomeViewNum = await LocalStorage().getLatestHomeViewNum();
     _selectedNavItemController.add(latestHomeViewNum);
-    _selectedNavItemSubscription =
-        _selectedNavItemController.listen((int newHomeViewNum) {
+    _selectedNavItemSubscription = _selectedNavItemController.listen((int newHomeViewNum) {
       LocalStorage().putLatestHomeViewNum(newHomeViewNum);
     });
   }
@@ -71,8 +72,7 @@ class _HomePageState extends State<HomePage> {
       _gridDataBlocsList.add(GridDataBloc(gridViewType));
     }
 
-    _selectedViewTypeSubscription =
-        _selectedViewTypeBloc.stream.listen(_onSelectedViewTypeChange);
+    _selectedViewTypeSubscription = _selectedViewTypeBloc.stream.listen(_onSelectedViewTypeChange);
 
     _selectedViewTypeBloc.changeViewType(GridViewType.newBooks);
 
@@ -82,14 +82,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onSelectedViewTypeChange(GridViewType selectedViewType) async {
-    if ((_gridDataBlocsList[selectedViewType.index]?.state?.searchString ??
-            '') !=
-        _searchTextController.text) {
-      _gridDataBlocsList[selectedViewType.index]
-          ?.searchByString(_searchTextController.text);
+    if ((_gridDataBlocsList[selectedViewType.index]?.state?.searchString ?? '') != _searchTextController.text) {
+      _gridDataBlocsList[selectedViewType.index]?.searchByString(_searchTextController.text);
     }
-    if (_gridDataBlocsList[selectedViewType.index]?.state?.stateCode ==
-        GridDataStateCode.Empty) {
+    if (_gridDataBlocsList[selectedViewType.index]?.state?.stateCode == GridDataStateCode.Empty) {
       _gridDataBlocsList[selectedViewType.index]?.fetchGridData();
       return;
     }

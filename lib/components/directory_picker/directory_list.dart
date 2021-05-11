@@ -166,7 +166,7 @@ class _DirectoryListState extends State<DirectoryList> {
       } catch (e) {
         // Ignore when tried navigating to directory that does not exist
         // or to which user does not have permission to read
-        print(e ?? 'Ошибка чтения: ${directory.path}');
+        debugPrint(e?.toString() ?? 'Ошибка чтения: ${directory.path}');
       }
     });
   }
@@ -232,10 +232,10 @@ class _NewFolderDialogState extends State<_NewFolderDialog> {
         onChanged: _onNameChanged,
       ),
       actions: <Widget>[
-        FlatButton(
+        TextButton(
             child: Text('Отмена'),
             onPressed: isSubmitting ? null : () => Navigator.pop(context)),
-        FlatButton(
+        TextButton(
           child: Text('Создать папку'),
           onPressed: isSubmitting ? null : _createDirectory,
         )

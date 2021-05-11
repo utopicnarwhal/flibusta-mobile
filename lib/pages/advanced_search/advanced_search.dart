@@ -55,7 +55,7 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GridDataBloc, GridDataState>(
-      cubit: _gridDataBloc,
+      bloc: _gridDataBloc,
       builder: (context, gridDataState) {
         Widget body;
 

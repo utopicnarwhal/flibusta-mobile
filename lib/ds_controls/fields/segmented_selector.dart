@@ -250,7 +250,7 @@
 //     items.forEach((value, widget) {
 //       children.add(
 //         Expanded(
-//           child: FlatButton(
+//           child: TextButton(
 //             padding: EdgeInsets.all(0),
 //             shape: RoundedRectangleBorder(
 //               borderRadius: BorderRadius.horizontal(

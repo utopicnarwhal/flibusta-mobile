@@ -125,7 +125,6 @@ class _GenrePageState extends State<GenrePage> {
           PopupMenuButton<SortGenreBooksBy>(
             tooltip: 'Сортировать по...',
             icon: Icon(Icons.filter_list),
-            captureInheritedThemes: true,
             onSelected: (newSortBooksBy) {
               if (newSortBooksBy == null || newSortBooksBy == _sortBooksBy) {
                 return;

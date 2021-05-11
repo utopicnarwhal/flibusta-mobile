@@ -9,17 +9,18 @@ import 'package:flibusta/model/sequenceInfo.dart';
 import 'package:flibusta/model/userContactData.dart';
 import 'package:flibusta/services/http_client/http_client.dart';
 import 'package:flibusta/services/server_status_checker.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as htmldom;
 
-List<BookCard> parseHtmlFromMakeBookList(
+Future<List<BookCard>> parseHtmlFromMakeBookList(
   String htmlString, [
   List<Map<int, String>> lastGenres,
-]) {
+]) async {
   htmldom.Document document = parse(htmlString);
 
-  var result = List<BookCard>();
+  List<BookCard> result = [];
   var form = document.getElementsByTagName('form');
   if (form.isEmpty) {
     return result;
@@ -58,17 +59,10 @@ List<BookCard> parseHtmlFromMakeBookList(
       continue;
     }
 
-    var genres = List<Map<int, String>>();
+    List<Map<int, String>> genres = [];
     if (bookCardDivs[i].getElementsByTagName('p').isNotEmpty) {
-      bookCardDivs[i]
-          .getElementsByTagName('p')
-          ?.first
-          ?.getElementsByTagName('a')
-          ?.forEach((f) {
-        genres.add({
-          int.tryParse(
-              f.attributes['href'].replaceAll('/g/', '')?.split('?')[0]): f.text
-        });
+      bookCardDivs[i].getElementsByTagName('p')?.first?.getElementsByTagName('a')?.forEach((f) {
+        genres.add({int.tryParse(f.attributes['href'].replaceAll('/g/', '')?.split('?')[0]): f.text});
       });
     } else {
       if (result?.isNotEmpty == true) {
@@ -78,61 +72,43 @@ List<BookCard> parseHtmlFromMakeBookList(
       }
     }
 
-    var title = bookCardDivs[i]
-        .getElementsByTagName('a')
-        .where((element) => element.attributes['href'].contains('/b/'))
-        ?.first;
+    var title =
+        bookCardDivs[i].getElementsByTagName('a').where((element) => element.attributes['href'].contains('/b/'))?.first;
 
-    var translators = List<Map<int, String>>();
+    List<Map<int, String>> translators = [];
     htmldom.Element sequence;
 
     var temp = title.nextElementSibling;
     while (temp.localName != 'span') {
-      if (temp.attributes['href'] != null &&
-          temp.attributes['href'].contains('/a/')) {
-        translators.add({
-          int.tryParse(temp?.attributes['href']
-              ?.replaceAll('/a/', '')
-              ?.split('?')[0]): temp.text
-        });
-      } else if (temp.attributes['href'] != null &&
-          temp.attributes['href'].contains('/s/')) {
+      if (temp.attributes['href'] != null && temp.attributes['href'].contains('/a/')) {
+        translators.add({int.tryParse(temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]): temp.text});
+      } else if (temp.attributes['href'] != null && temp.attributes['href'].contains('/s/')) {
         sequence = temp;
       }
       temp = temp.nextElementSibling;
     }
     var size = temp;
 
-    var downloadFormats = List<Map<String, String>>();
+    List<Map<String, String>> downloadFormats = [];
     for (temp = size.nextElementSibling;
-        temp != null &&
-            temp.attributes['href'] != null &&
-            temp.attributes['href'].contains('/b/');
+        temp != null && temp.attributes['href'] != null && temp.attributes['href'].contains('/b/');
         temp = temp.nextElementSibling) {
-      if (!ProxyHttpClient().isAuthorized()) {
+      if (!await ProxyHttpClient().isAuthorized()) {
         var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
         if (downloadFormatName == 'читать' || downloadFormatName == 'mail') {
           continue;
         }
-        downloadFormatName =
-            downloadFormatName.replaceAll('скачать ', '').trim();
-        var downloadFormatType =
-            temp.attributes['href'].split('/').last.split('?')[0];
+        downloadFormatName = downloadFormatName.replaceAll('скачать ', '').trim();
+        var downloadFormatType = temp.attributes['href'].split('/').last.split('?')[0];
         downloadFormats.add({downloadFormatName: downloadFormatType});
       }
     }
 
-    var authors = List<Map<int, String>>();
+    List<Map<int, String>> authors = [];
     for (;
-        temp != null &&
-            temp.attributes['href'] != null &&
-            temp.attributes['href'].contains('/a/');
+        temp != null && temp.attributes['href'] != null && temp.attributes['href'].contains('/a/');
         temp = temp.nextElementSibling) {
-      authors.add({
-        int.tryParse(
-                temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]):
-            temp.text
-      });
+      authors.add({int.tryParse(temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]): temp.text});
     }
 
     result.add(BookCard(
@@ -140,10 +116,8 @@ List<BookCard> parseHtmlFromMakeBookList(
       genres: Genres(genres),
       title: title?.text,
       authors: Authors(authors),
-      sequenceId: sequence != null
-          ? int.tryParse(
-              sequence?.attributes['href'].replaceAll('/s/', '').split('?')[0])
-          : null,
+      sequenceId:
+          sequence != null ? int.tryParse(sequence?.attributes['href'].replaceAll('/s/', '').split('?')[0]) : null,
       sequenceTitle: sequence?.text,
       translators: Translators(translators),
       size: size.text,
@@ -155,12 +129,11 @@ List<BookCard> parseHtmlFromMakeBookList(
   return result;
 }
 
-List<BookCard> parseHtmlFromLatestArrivals(
+Future<List<BookCard>> parseHtmlFromLatestArrivals(
   String htmlString, [
   List<Map<int, String>> lastGenres,
-]) {
-  if (htmlString
-      .contains('<form name="bk" action="/mass/download" target="_blank">')) {
+]) async {
+  if (htmlString.contains('<form name="bk" action="/mass/download" target="_blank">')) {
     htmlString = htmlString.replaceFirst(
       '<form name="bk" action="/mass/download" target="_blank">',
       '<form id="data">',
@@ -170,7 +143,7 @@ List<BookCard> parseHtmlFromLatestArrivals(
   }
   htmldom.Document document = parse(htmlString);
 
-  var result = List<BookCard>();
+  List<BookCard> result = [];
   var form = document.getElementById('data');
   if (form == null) {
     return result;
@@ -217,17 +190,10 @@ List<BookCard> parseHtmlFromLatestArrivals(
       continue;
     }
 
-    var genres = List<Map<int, String>>();
+    List<Map<int, String>> genres = [];
     if (formChildren[i].getElementsByTagName('p').isNotEmpty) {
-      formChildren[i]
-          .getElementsByTagName('p')
-          ?.first
-          ?.getElementsByTagName('a')
-          ?.forEach((f) {
-        genres.add({
-          int.tryParse(
-              f.attributes['href'].replaceAll('/g/', '')?.split('?')[0]): f.text
-        });
+      formChildren[i].getElementsByTagName('p')?.first?.getElementsByTagName('a')?.forEach((f) {
+        genres.add({int.tryParse(f.attributes['href'].replaceAll('/g/', '')?.split('?')[0]): f.text});
       });
     } else {
       if (result?.isNotEmpty == true) {
@@ -237,61 +203,43 @@ List<BookCard> parseHtmlFromLatestArrivals(
       }
     }
 
-    var title = formChildren[i]
-        .getElementsByTagName('a')
-        .where((element) => element.attributes['href'].contains('/b/'))
-        ?.first;
+    var title =
+        formChildren[i].getElementsByTagName('a').where((element) => element.attributes['href'].contains('/b/'))?.first;
 
-    var translators = List<Map<int, String>>();
+    List<Map<int, String>> translators = [];
     htmldom.Element sequence;
 
     var temp = title.nextElementSibling;
     while (temp.localName != 'span') {
-      if (temp.attributes['href'] != null &&
-          temp.attributes['href'].contains('/a/')) {
-        translators.add({
-          int.tryParse(temp?.attributes['href']
-              ?.replaceAll('/a/', '')
-              ?.split('?')[0]): temp.text
-        });
-      } else if (temp.attributes['href'] != null &&
-          temp.attributes['href'].contains('/s/')) {
+      if (temp.attributes['href'] != null && temp.attributes['href'].contains('/a/')) {
+        translators.add({int.tryParse(temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]): temp.text});
+      } else if (temp.attributes['href'] != null && temp.attributes['href'].contains('/s/')) {
         sequence = temp;
       }
       temp = temp.nextElementSibling;
     }
     var size = temp;
 
-    var downloadFormats = List<Map<String, String>>();
+    List<Map<String, String>> downloadFormats = [];
     for (temp = size.nextElementSibling;
-        temp != null &&
-            temp.attributes['href'] != null &&
-            temp.attributes['href'].contains('/b/');
+        temp != null && temp.attributes['href'] != null && temp.attributes['href'].contains('/b/');
         temp = temp.nextElementSibling) {
-      if (!ProxyHttpClient().isAuthorized()) {
+      if (!await ProxyHttpClient().isAuthorized()) {
         var downloadFormatName = temp.text.replaceAll(RegExp(r'(\(|\))'), '');
         if (downloadFormatName == 'читать' || downloadFormatName == 'mail') {
           continue;
         }
-        downloadFormatName =
-            downloadFormatName.replaceAll('скачать ', '').trim();
-        var downloadFormatType =
-            temp.attributes['href'].split('/').last.split('?')[0];
+        downloadFormatName = downloadFormatName.replaceAll('скачать ', '').trim();
+        var downloadFormatType = temp.attributes['href'].split('/').last.split('?')[0];
         downloadFormats.add({downloadFormatName: downloadFormatType});
       }
     }
 
-    var authors = List<Map<int, String>>();
+    List<Map<int, String>> authors = [];
     for (;
-        temp != null &&
-            temp.attributes['href'] != null &&
-            temp.attributes['href'].contains('/a/');
+        temp != null && temp.attributes['href'] != null && temp.attributes['href'].contains('/a/');
         temp = temp.nextElementSibling) {
-      authors.add({
-        int.tryParse(
-                temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]):
-            temp.text
-      });
+      authors.add({int.tryParse(temp?.attributes['href']?.replaceAll('/a/', '')?.split('?')[0]): temp.text});
     }
 
     result.add(BookCard(
@@ -299,10 +247,8 @@ List<BookCard> parseHtmlFromLatestArrivals(
       genres: Genres(genres),
       title: title?.text,
       authors: Authors(authors),
-      sequenceId: sequence != null
-          ? int.tryParse(
-              sequence?.attributes['href'].replaceAll('/s/', '').split('?')[0])
-          : null,
+      sequenceId:
+          sequence != null ? int.tryParse(sequence?.attributes['href'].replaceAll('/s/', '').split('?')[0]) : null,
       sequenceTitle: sequence?.text,
       translators: Translators(translators),
       size: size.text,
@@ -317,9 +263,10 @@ List<BookCard> parseHtmlFromLatestArrivals(
 
 SearchResults parseHtmlFromBookSearch(String htmlString) {
   SearchResults searchResults = SearchResults(
-      books: List<BookCard>(),
-      authors: List<AuthorCard>(),
-      sequences: List<SequenceCard>());
+    books: [],
+    authors: [],
+    sequences: [],
+  );
   htmldom.Document document = parse(htmlString);
 
   var mainIdTag = document.getElementById('main');
@@ -339,15 +286,9 @@ SearchResults parseHtmlFromBookSearch(String htmlString) {
         var bookLis = division.nextElementSibling.getElementsByTagName("li");
         bookLis.forEach((bookLi) {
           var bookAndAuthorTags = bookLi.getElementsByTagName("a");
-          var bookId = int.tryParse(bookAndAuthorTags[0]
-              .attributes['href']
-              .replaceAll('/b/', '')
-              .split('?')[0]);
+          var bookId = int.tryParse(bookAndAuthorTags[0].attributes['href'].replaceAll('/b/', '').split('?')[0]);
           var bookTitle = bookAndAuthorTags[0].text;
-          var authorId = int.tryParse(bookAndAuthorTags[1]
-              .attributes['href']
-              .replaceAll('/a/', '')
-              .split('?')[0]);
+          var authorId = int.tryParse(bookAndAuthorTags[1].attributes['href'].replaceAll('/a/', '').split('?')[0]);
           var authorName = bookAndAuthorTags[1].text;
           searchResults.books.add(BookCard(
               id: bookId,
@@ -361,29 +302,20 @@ SearchResults parseHtmlFromBookSearch(String htmlString) {
         var authorLis = division.nextElementSibling.getElementsByTagName('li');
         authorLis.forEach((authorLi) {
           var authorTag = authorLi.getElementsByTagName('a');
-          var authorId = int.tryParse(authorTag[0]
-              .attributes['href']
-              .replaceAll('/a/', '')
-              .split('?')[0]);
+          var authorId = int.tryParse(authorTag[0].attributes['href'].replaceAll('/a/', '').split('?')[0]);
           var authorName = authorTag[0].text;
           var booksCount = authorLi.nodes[1].text.trim();
-          searchResults.authors.add(AuthorCard(
-              id: authorId, name: authorName, booksCount: booksCount));
+          searchResults.authors.add(AuthorCard(id: authorId, name: authorName, booksCount: booksCount));
         });
         break;
       case 'серии':
-        var sequenceLis =
-            division.nextElementSibling.getElementsByTagName('li');
+        var sequenceLis = division.nextElementSibling.getElementsByTagName('li');
         sequenceLis.forEach((sequenceLi) {
           var sequenceTag = sequenceLi.getElementsByTagName('a');
-          var sequenceId = int.tryParse(sequenceTag[0]
-              .attributes['href']
-              .replaceAll('/sequence/', '')
-              .split('?')[0]);
+          var sequenceId = int.tryParse(sequenceTag[0].attributes['href'].replaceAll('/sequence/', '').split('?')[0]);
           var sequenceTitle = sequenceTag[0].text;
           var booksCount = sequenceLi.nodes[1].text.trim();
-          searchResults.sequences.add(SequenceCard(
-              id: sequenceId, title: sequenceTitle, booksCount: booksCount));
+          searchResults.sequences.add(SequenceCard(id: sequenceId, title: sequenceTitle, booksCount: booksCount));
         });
         break;
     }
@@ -406,22 +338,19 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   var mainNode = titleElement.parentNode;
   var titleNodeIndex = mainNode.nodes.indexOf(titleElement);
 
-  var authorsList = List<Map<int, String>>();
-  var translatorsList = List<Map<int, String>>();
+  List<Map<int, String>> authorsList = [];
+  List<Map<int, String>> translatorsList = [];
   var hasTranslators = false;
 
   for (int i = titleNodeIndex + 1;
       i < mainNode.nodes.length &&
           (mainNode.nodes[i].attributes['href'] == null ||
-              !mainNode.nodes[i].attributes['href']
-                  .contains(RegExp(r'^(/g/)[0-9]*$')));
+              !mainNode.nodes[i].attributes['href'].contains(RegExp(r'^(/g/)[0-9]*$')));
       ++i) {
     var currentNode = mainNode.nodes[i];
 
-    if (currentNode.attributes['href'] != null &&
-        currentNode.attributes['href'].contains(RegExp(r'^(/a/)[0-9]*'))) {
-      var id = int.tryParse(
-          currentNode.attributes['href'].replaceAll('/a/', '').split('?')[0]);
+    if (currentNode.attributes['href'] != null && currentNode.attributes['href'].contains(RegExp(r'^(/a/)[0-9]*'))) {
+      var id = int.tryParse(currentNode.attributes['href'].replaceAll('/a/', '').split('?')[0]);
       var name = currentNode.text;
 
       if (!hasTranslators) {
@@ -439,26 +368,22 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
   bookInfo.translators = Translators(translatorsList);
 
   var genresA = allA.where((a) {
-    return a.attributes['href'] != null &&
-        a.attributes['href'].contains(RegExp(r'^(/g/)[0-9]*'));
+    return a.attributes['href'] != null && a.attributes['href'].contains(RegExp(r'^(/g/)[0-9]*'));
   });
 
-  var genresList = List<Map<int, String>>();
+  List<Map<int, String>> genresList = [];
   genresA.forEach((genreA) {
-    var genreId = int.tryParse(
-        genreA.attributes['href'].replaceAll('/g/', '').split('?')[0]);
+    var genreId = int.tryParse(genreA.attributes['href'].replaceAll('/g/', '').split('?')[0]);
     var genreName = genreA.text;
     genresList.add({genreId: genreName});
   });
   bookInfo.genres = Genres(genresList);
 
-  var downloadFormatsList = List<Map<String, String>>();
+  List<Map<String, String>> downloadFormatsList = [];
 
   var useroptSelector = document.getElementById('useropt');
   if (useroptSelector != null) {
-    var downloadFormatOptions = useroptSelector.children
-        .where((element) => element.localName == 'option')
-        .toList();
+    var downloadFormatOptions = useroptSelector.children.where((element) => element.localName == 'option').toList();
 
     downloadFormatOptions.forEach((option) {
       var downloadFormatName = option.text.trim();
@@ -467,85 +392,72 @@ BookInfo parseHtmlFromBookInfo(String htmlString, int bookId) {
     });
   } else {
     var downloadFormatsA = allA.where((a) {
-      return a.attributes['href'] != null &&
-          a.attributes['href'].contains(RegExp('^(/b/$bookId/)(?!read).*'));
+      return a.attributes['href'] != null && a.attributes['href'].contains(RegExp('^(/b/$bookId/)(?!read).*'));
     });
 
     downloadFormatsA.forEach((downloadFormatA) {
-      var downloadFormatName = downloadFormatA.text
-          .replaceAll(RegExp(r'(\(|\))'), '')
-          .replaceAll('скачать ', '')
-          .trim();
+      var downloadFormatName =
+          downloadFormatA.text.replaceAll(RegExp(r'(\(|\))'), '').replaceAll('скачать ', '').trim();
       if (downloadFormatName == 'mail' ||
           downloadFormatName == 'исправить' ||
           downloadFormatName.contains('пожаловаться')) {
         return;
       }
-      var downloadFormatType =
-          downloadFormatA.attributes['href'].split('/').last.split('?')[0];
+      var downloadFormatType = downloadFormatA.attributes['href'].split('/').last.split('?')[0];
       downloadFormatsList.add({downloadFormatName: downloadFormatType});
     });
   }
   bookInfo.downloadFormats = DownloadFormats(downloadFormatsList);
 
   var sequenceA = allA.where((a) {
-    return a.attributes['href'] != null &&
-        a.attributes['href'].contains(RegExp(r'^(/s/)[0-9]*'));
+    return a.attributes['href'] != null && a.attributes['href'].contains(RegExp(r'^(/s/)[0-9]*'));
   });
 
   if (sequenceA.isNotEmpty) {
-    bookInfo.sequenceId = int.tryParse(
-        sequenceA.first.attributes['href'].replaceAll('/s/', '').split('?')[0]);
+    bookInfo.sequenceId = int.tryParse(sequenceA.first.attributes['href'].replaceAll('/s/', '').split('?')[0]);
     bookInfo.sequenceTitle = sequenceA.first.text;
   }
 
   bookInfo.size = mainElement
       .getElementsByTagName('span')
       .where((span) {
-        return span.attributes['style'] != null &&
-            span.attributes['style'] == 'size';
+        return span.attributes['style'] != null && span.attributes['style'] == 'size';
       })
       ?.first
       ?.text;
 
   var addedToLibraryDateStringStarts = mainNode.text.indexOf('Добавлена:');
-  bookInfo.addedToLibraryDate = mainNode.text.substring(
-      addedToLibraryDateStringStarts, addedToLibraryDateStringStarts + 21);
+  bookInfo.addedToLibraryDate =
+      mainNode.text.substring(addedToLibraryDateStringStarts, addedToLibraryDateStringStarts + 21);
 
   var lemmaStringStarts = mainNode.text.indexOf('Аннотация') + 10;
   var lemmaStringEndsOnComplain = mainNode.text.indexOf('(пожаловаться');
   var lemmaStringEndsOnRecommendations = mainNode.text.indexOf('Рекомендации:');
 
   var lemmaStringEnds = mainNode.text.length;
-  if (lemmaStringEndsOnComplain == -1 &&
-      lemmaStringEndsOnRecommendations != -1) {
+  if (lemmaStringEndsOnComplain == -1 && lemmaStringEndsOnRecommendations != -1) {
     lemmaStringEnds = lemmaStringEndsOnRecommendations;
-  } else if (lemmaStringEndsOnComplain != -1 &&
-      lemmaStringEndsOnRecommendations == -1) {
+  } else if (lemmaStringEndsOnComplain != -1 && lemmaStringEndsOnRecommendations == -1) {
     lemmaStringEnds = lemmaStringEndsOnComplain;
-  } else if (lemmaStringEndsOnComplain != -1 &&
-      lemmaStringEndsOnRecommendations != -1) {
-    lemmaStringEnds =
-        min(lemmaStringEndsOnComplain, lemmaStringEndsOnRecommendations);
+  } else if (lemmaStringEndsOnComplain != -1 && lemmaStringEndsOnRecommendations != -1) {
+    lemmaStringEnds = min(lemmaStringEndsOnComplain, lemmaStringEndsOnRecommendations);
   }
 
-  bookInfo.lemma =
-      mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trim();
+  bookInfo.lemma = mainNode.text.substring(lemmaStringStarts, lemmaStringEnds).trim();
 
   var fb2infoContent = mainElement.getElementsByClassName('fb2info-content');
   if (fb2infoContent.isEmpty) {
     return bookInfo;
   }
 
-  bookInfo.coverImgSrc = fb2infoContent
-      ?.first?.nextElementSibling?.nextElementSibling?.attributes['src'];
+  bookInfo.coverImgSrc = fb2infoContent?.first?.nextElementSibling?.nextElementSibling?.attributes['src'];
   return bookInfo;
 }
 
-AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
+Future<AuthorInfo> parseHtmlFromAuthorInfo(String htmlString, int authorId) async {
   htmldom.Document document = parse(htmlString);
 
-  var authorInfo = AuthorInfo(id: authorId, books: List<BookCard>());
+  var authorInfo = AuthorInfo(id: authorId, books: []);
   var mainElement = document.getElementById('main');
   authorInfo.name = mainElement.getElementsByTagName('h1').first.innerHtml;
 
@@ -564,14 +476,14 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
   var formChildren = form.children;
   int actualSequenceId;
   String actualSequenceTitle;
-  Genres actualGenres = Genres(List());
+  Genres actualGenres = Genres([]);
   Translators actualTranslators;
   BookCard actualBookCard;
   List<Map<String, String>> actualDownloadFormats;
   bool nextGenres = false;
 
   if (formChildren.any((htmldom.Element child) => child.localName == 'div')) {
-    authorInfo.books = parseHtmlFromMakeBookList(form.outerHtml);
+    authorInfo.books = await parseHtmlFromMakeBookList(form.outerHtml);
     return authorInfo;
   }
 
@@ -587,51 +499,41 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.localName == 'br' ||
-        child.localName == 'img' ||
-        child.localName == 'svg' ||
-        child.localName == 'input') {
+    if (child.localName == 'br' || child.localName == 'img' || child.localName == 'svg' || child.localName == 'input') {
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains('/a/')) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains('/a/')) {
       if (actualTranslators == null) {
-        actualTranslators = Translators(List());
+        actualTranslators = Translators([]);
       }
-      var translatorId =
-          int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
+      var translatorId = int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
       var translatorName = child.text;
       actualTranslators.list.add({translatorId: translatorName});
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains('/s/')) {
-      actualSequenceId =
-          int.tryParse(child.attributes['href'].replaceAll("/s/", ''));
+    if (child.attributes['href'] != null && child.attributes['href'].contains('/s/')) {
+      actualSequenceId = int.tryParse(child.attributes['href'].replaceAll("/s/", ''));
       actualSequenceTitle = child.text;
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains('/g/')) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains('/g/')) {
       if (nextGenres) {
         actualSequenceId = null;
         actualSequenceTitle = null;
-        actualGenres = Genres(List());
+        actualGenres = Genres([]);
         nextGenres = false;
       }
 
-      var genreId =
-          int.tryParse(child.attributes['href'].replaceAll('/g/', ''));
+      var genreId = int.tryParse(child.attributes['href'].replaceAll('/g/', ''));
       var genreName = child.text;
       actualGenres.list.add({genreId: genreName});
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
       actualBookCard = BookCard(
         id: int.tryParse(child.attributes['href'].replaceAll('/b/', '')),
         title: child.text,
@@ -642,25 +544,21 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains(RegExp(r'^\/b\/\d*/.*$'))) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains(RegExp(r'^\/b\/\d*/.*$'))) {
       var downloadFormatName = child.text.replaceAll(RegExp(r'(\(|\))'), '');
       if (downloadFormatName == 'читать') {
         return;
       }
       downloadFormatName = downloadFormatName.replaceAll('скачать ', '');
-      var downloadFormatType =
-          child.attributes['href'].split('/').last.split('?')[0];
+      var downloadFormatType = child.attributes['href'].split('/').last.split('?')[0];
       if (actualDownloadFormats == null) {
-        actualDownloadFormats = List<Map<String, String>>();
+        actualDownloadFormats = [];
       }
       actualDownloadFormats.add({downloadFormatName: downloadFormatType});
       return;
     }
 
-    if (child.localName == 'span' &&
-        child.attributes['style'] == 'size' &&
-        actualBookCard != null) {
+    if (child.localName == 'span' && child.attributes['style'] == 'size' && actualBookCard != null) {
       actualBookCard.size = child.text;
       return;
     }
@@ -669,15 +567,15 @@ AuthorInfo parseHtmlFromAuthorInfo(String htmlString, int authorId) {
   return authorInfo;
 }
 
-SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
-  var sequenceInfo = SequenceInfo(id: authorId, books: List<BookCard>());
+Future<SequenceInfo> parseHtmlFromSequenceInfo(String htmlString, int authorId) async {
+  var sequenceInfo = SequenceInfo(id: authorId, books: []);
   htmldom.Document document = parse(htmlString);
 
   var mainElement = document.getElementById('main');
   sequenceInfo.title = mainElement.getElementsByTagName('h1').first.innerHtml;
 
   var mainElementChildren = mainElement.children;
-  if (ProxyHttpClient().isAuthorized()) {
+  if (await ProxyHttpClient().isAuthorized()) {
     var formsInMainElement = mainElement.getElementsByTagName('form');
     for (var form in formsInMainElement) {
       if (form.attributes['name'] == 'bk') {
@@ -687,7 +585,7 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
   }
   int actualSequenceId;
   String actualSequenceTitle;
-  Genres actualGenres = Genres(List());
+  Genres actualGenres = Genres([]);
   Translators actualTranslators;
   Authors actualAuthors;
   BookCard actualBookCard;
@@ -708,62 +606,51 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.localName == 'br' ||
-        child.localName == 'img' ||
-        child.localName == 'svg' ||
-        child.localName == 'input') {
+    if (child.localName == 'br' || child.localName == 'img' || child.localName == 'svg' || child.localName == 'input') {
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains('/a/')) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains('/a/')) {
       if (actualBookCard.size != null) {
         if (actualAuthors == null) {
-          actualAuthors = Authors(List());
+          actualAuthors = Authors([]);
         }
-        var authorId =
-            int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
+        var authorId = int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
         var authorName = child.text;
         actualAuthors.list.add({authorId: authorName});
         return;
       } else {
         if (actualTranslators == null) {
-          actualTranslators = Translators(List());
+          actualTranslators = Translators([]);
         }
-        var translatorId =
-            int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
+        var translatorId = int.tryParse(child.attributes['href'].replaceAll('/a/', ''));
         var translatorName = child.text;
         actualTranslators.list.add({translatorId: translatorName});
         return;
       }
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains('/s/')) {
-      actualSequenceId =
-          int.tryParse(child.attributes['href'].replaceAll('/s/', ''));
+    if (child.attributes['href'] != null && child.attributes['href'].contains('/s/')) {
+      actualSequenceId = int.tryParse(child.attributes['href'].replaceAll('/s/', ''));
       actualSequenceTitle = child.text;
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains('/g/')) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains('/g/')) {
       if (nextGenres) {
         actualSequenceId = null;
         actualSequenceTitle = null;
-        actualGenres = Genres(List());
+        actualGenres = Genres([]);
         nextGenres = false;
       }
 
-      var genreId =
-          int.tryParse(child.attributes['href'].replaceAll('/g/', ''));
+      var genreId = int.tryParse(child.attributes['href'].replaceAll('/g/', ''));
       var genreName = child.text;
       actualGenres.list.add({genreId: genreName});
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains(RegExp(r'^\/b\/\d*[^/]$'))) {
       actualBookCard = BookCard(
         id: int.tryParse(child.attributes['href'].replaceAll('/b/', '')),
         title: child.text,
@@ -774,25 +661,21 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
       return;
     }
 
-    if (child.attributes['href'] != null &&
-        child.attributes['href'].contains(RegExp(r'^\/b\/\d*/.*$'))) {
+    if (child.attributes['href'] != null && child.attributes['href'].contains(RegExp(r'^\/b\/\d*/.*$'))) {
       var downloadFormatName = child.text.replaceAll(RegExp(r'(\(|\))'), '');
       if (downloadFormatName == 'читать') {
         return;
       }
       downloadFormatName = downloadFormatName.replaceAll('скачать ', '');
-      var downloadFormatType =
-          child.attributes['href'].split('/').last.split('?')[0];
+      var downloadFormatType = child.attributes['href'].split('/').last.split('?')[0];
       if (actualDownloadFormats == null) {
-        actualDownloadFormats = List<Map<String, String>>();
+        actualDownloadFormats = [];
       }
       actualDownloadFormats.add({downloadFormatName: downloadFormatType});
       return;
     }
 
-    if (child.localName == 'span' &&
-        child.attributes['style'] == 'size' &&
-        actualBookCard != null) {
+    if (child.localName == 'span' && child.attributes['style'] == 'size' && actualBookCard != null) {
       actualBookCard.size = child.text;
       return;
     }
@@ -802,7 +685,7 @@ SequenceInfo parseHtmlFromSequenceInfo(String htmlString, int authorId) {
 }
 
 List<AuthorCard> parseHtmlFromGetAuthors(String htmlString) {
-  var result = List<AuthorCard>();
+  List<AuthorCard> result = [];
   htmlString =
       '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
@@ -812,12 +695,9 @@ $htmlString
 
   htmldom.Document document = parse(htmlString);
 
-  final authorsAndBookCountNodes =
-      document.getElementById('body').nodes.where((node) {
+  final authorsAndBookCountNodes = document.getElementById('body').nodes.where((node) {
     return (node is htmldom.Text && node.text.trim().isNotEmpty) ||
-        (node is htmldom.Element &&
-            node.localName != 'div' &&
-            node.localName != 'br');
+        (node is htmldom.Element && node.localName != 'div' && node.localName != 'br');
   });
 
   int authorId;
@@ -861,7 +741,7 @@ $htmlString
 }
 
 List<Genre> parseHtmlFromGetGenres(String htmlString) {
-  var result = List<Genre>();
+  List<Genre> result = [];
 
   htmldom.Document document = parse(htmlString);
 
@@ -871,7 +751,7 @@ List<Genre> parseHtmlFromGetGenres(String htmlString) {
 }
 
 List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
-  var result = List<SequenceCard>();
+  List<SequenceCard> result = [];
 
   htmldom.Document document = parse(htmlString);
 
@@ -887,8 +767,7 @@ List<SequenceCard> parseHtmlFromGetSequences(String htmlString) {
     for (var node in li.nodes) {
       if (node is htmldom.Element) {
         sequenceName = node.text.trim();
-        sequenceId =
-            int.tryParse(node.attributes['href'].replaceAll('/sequence/', ''));
+        sequenceId = int.tryParse(node.attributes['href'].replaceAll('/sequence/', ''));
       } else if (node is htmldom.Text) {
         sequenceBookCount = node.text.trim().replaceAll(RegExp(r'(\(|\))'), '');
       }
@@ -965,23 +844,18 @@ UserContactData parseHtmlFromUserMeEdit(String htmlString) {
 
   htmldom.Document document = parse(htmlString);
 
-  result.nickname = document
-      .getElementsByTagName('h1')
-      .firstWhere((element) => element.className == 'title', orElse: null)
-      .innerHtml;
+  result.nickname =
+      document.getElementsByTagName('h1').firstWhere((element) => element.className == 'title', orElse: null).innerHtml;
 
   var editMailElement = document.getElementById('edit-mail');
   if (editMailElement != null) {
     result.email = editMailElement.attributes['value'];
   }
 
-  var elementsClassPicture = document
-      ?.getElementById('user-profile-form')
-      ?.getElementsByClassName('picture');
+  var elementsClassPicture = document?.getElementById('user-profile-form')?.getElementsByClassName('picture');
 
   if (elementsClassPicture?.isNotEmpty == true) {
-    var elementsClassImg =
-        elementsClassPicture.first?.getElementsByTagName('img');
+    var elementsClassImg = elementsClassPicture.first?.getElementsByTagName('img');
 
     if (elementsClassImg?.isNotEmpty == true) {
       result.profileImgSrc = elementsClassImg.first?.attributes['src'];
@@ -1012,9 +886,11 @@ ServerStatusResult parseHtmlFromIsItDownRightNow(String htmlString) {
       result.statusText = 'Работает';
     } else if (engStatusText.contains('is DOWN  for everyone.')) {
       result.statusText = 'Не работает';
+    } else {
+      result.statusText = 'Неизвестно';
     }
   } on StateError catch (error) {
-    print(error);
+    debugPrint(error.toString());
   }
 
   return result;

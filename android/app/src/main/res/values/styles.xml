@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="AppTheme.Splash" parent="Theme.AppCompat.Light">
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="LaunchTheme" parent="Theme.AppCompat.Light">
         <item name="android:windowBackground">@drawable/splash_drawable</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     </style>
 </resources>
