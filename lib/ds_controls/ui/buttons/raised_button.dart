@@ -1,7 +1,7 @@
 import 'package:flibusta/ds_controls/theme.dart';
 import 'package:flutter/material.dart';
 
-class DsRaisedButton extends StatelessWidget {
+class DsElevatedButton extends StatelessWidget {
   final VoidCallback onPressed;
   final EdgeInsetsGeometry padding;
   final FocusNode focusNode;
@@ -11,7 +11,7 @@ class DsRaisedButton extends StatelessWidget {
   final double borderRadius;
   final bool isPrimaryColor;
 
-  DsRaisedButton({
+  DsElevatedButton({
     @required this.onPressed,
     this.padding,
     this.focusNode,
@@ -24,16 +24,18 @@ class DsRaisedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: onPressed,
-      padding: padding ?? EdgeInsets.all(8),
+      style: ElevatedButton.styleFrom(
+        padding: padding ?? EdgeInsets.all(8),
+        elevation: elevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        primary: isPrimaryColor ? null : kSecondaryColor(context),
+      ),
       focusNode: focusNode,
       autofocus: autofocus,
-      elevation: elevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      color: isPrimaryColor ? null : kSecondaryColor(context),
       child: DefaultTextStyle(
         style: Theme.of(context).primaryTextTheme.button.copyWith(
               fontWeight: FontWeight.w600,

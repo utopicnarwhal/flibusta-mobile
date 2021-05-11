@@ -36,8 +36,6 @@ class BookService {
     var response = await ProxyHttpClient().getDio().getUri<List<int>>(
           url,
           options: Options(
-            sendTimeout: 15000,
-            receiveTimeout: 8000,
             responseType: ResponseType.bytes,
           ),
         );
@@ -150,7 +148,7 @@ class BookService {
           cancelToken: cancelToken,
           options: Options(
             sendTimeout: 10000,
-            receiveTimeout: 60000,
+            receiveTimeout: Duration(minutes: 5).inMilliseconds,
             receiveDataWhenStatusError: false,
           ),
           onReceiveProgress: (int count, int total) {
@@ -171,7 +169,7 @@ class BookService {
         .catchError((error) {
       if (cancelToken.isCancelled) {
         ToastManager().showToast(cancelToken.cancelError.message);
-        return;
+        return null;
       }
       ToastManager().hideToast(prepareToDownloadToastFuture);
       if (error is DsError) {

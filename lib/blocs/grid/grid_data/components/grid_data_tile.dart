@@ -131,7 +131,6 @@ class GridDataTile extends StatelessWidget {
       child: ShaderMask(
         shaderCallback: (Rect bounds) {
           return LinearGradient(
-            tileMode: TileMode.clamp,
             colors: [
               Theme.of(context).cardColor,
               Theme.of(context).cardColor.withOpacity(0),

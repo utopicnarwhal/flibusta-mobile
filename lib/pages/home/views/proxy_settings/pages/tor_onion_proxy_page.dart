@@ -57,7 +57,7 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: BlocBuilder<TorProxyBloc, TorProxyState>(
-                  cubit: TorProxyBloc(),
+                  bloc: TorProxyBloc(),
                   builder: (context, torProxyState) {
                     if (torProxyState is UnTorProxyState) {
                       return Center(
@@ -138,7 +138,7 @@ class _TorOnionProxyPageState extends State<TorOnionProxyPage> {
                 type: MaterialType.card,
                 borderRadius: BorderRadius.zero,
                 child: BlocBuilder<TorProxyBloc, TorProxyState>(
-                  cubit: TorProxyBloc(),
+                  bloc: TorProxyBloc(),
                   builder: (context, torProxyState) {
                     return FutureBuilder<bool>(
                       future: LocalStorage().getUseOnionSiteWithTor(),

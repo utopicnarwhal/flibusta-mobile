@@ -73,11 +73,15 @@ class DialogUtils {
           ),
           content: content,
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(
                 confirmText.toUpperCase(),
               ),
-              textColor: kSecondaryColor(context),
+              style: TextButton.styleFrom(
+                textStyle: TextStyle(
+                  color: kSecondaryColor(context),
+                ),
+              ),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
@@ -143,14 +147,22 @@ class DialogUtils {
                 ),
           content: builder != null ? builder(context) : null,
           actions: [
-            FlatButton(
+            TextButton(
               child: Text(rejectString.toUpperCase()),
-              textColor: kSecondaryColor(context),
+              style: TextButton.styleFrom(
+                textStyle: TextStyle(
+                  color: kSecondaryColor(context),
+                ),
+              ),
               onPressed: () => Navigator.of(context).pop(false),
             ),
-            FlatButton(
+            TextButton(
               child: Text(confirmString.toUpperCase()),
-              textColor: kSecondaryColor(context),
+              style: TextButton.styleFrom(
+                textStyle: TextStyle(
+                  color: kSecondaryColor(context),
+                ),
+              ),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],

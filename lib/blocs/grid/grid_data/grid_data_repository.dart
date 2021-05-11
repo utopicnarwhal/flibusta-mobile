@@ -166,7 +166,7 @@ class GridDataRepository {
   }
 
   Future<List<AuthorCard>> getAuthors(int page) async {
-    var result = List<AuthorCard>();
+    List<AuthorCard> result = [];
 
     Map<String, String> queryParams = {'ab': 'ab2', 'sort': 'sln1'};
 
@@ -191,7 +191,7 @@ class GridDataRepository {
   }
 
   Future<List<SequenceCard>> getSequences(int page) async {
-    var result = List<SequenceCard>();
+    List<SequenceCard> result = [];
 
     Map<String, String> queryParams;
 
@@ -232,7 +232,7 @@ class GridDataRepository {
 
     var response = await ProxyHttpClient().getDio().getUri(url);
 
-    result = parseHtmlFromSequenceInfo(response.data, sequenceId);
+    result = await parseHtmlFromSequenceInfo(response.data, sequenceId);
 
     return result;
   }
@@ -259,7 +259,7 @@ class GridDataRepository {
       return result;
     }
 
-    var result = List<Genre>();
+    List<Genre> result = [];
     Map<String, String> queryParams = {
       'op': 'getList',
     };

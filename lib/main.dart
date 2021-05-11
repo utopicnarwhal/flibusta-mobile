@@ -38,16 +38,13 @@ Future<void> initialization() async {
       ),
     );
   }
-  var preparationFutures = List<Future>();
+  List<Future> preparationFutures = [];
   preparationFutures.add(LocalStorage().checkVersion());
 
-  preparationFutures.add(LocalStorage()
-      .getActualProxy()
-      .then((actualProxy) => ProxyHttpClient().setProxy(actualProxy)));
+  preparationFutures
+      .add(LocalStorage().getActualProxy().then((actualProxy) => ProxyHttpClient().setProxy(actualProxy)));
 
-  preparationFutures.add(LocalStorage()
-      .getHostAddress()
-      .then((url) => ProxyHttpClient().setHostAddress(url, false)));
+  preparationFutures.add(LocalStorage().getHostAddress().then((url) => ProxyHttpClient().setHostAddress(url, false)));
 
   preparationFutures.add(LocalStorage().getBooksDirectory().then((dir) async {
     var externalStorageDownloadDirectories = await FileUtils.getStorageDir();
@@ -88,31 +85,23 @@ class FlibustaApp extends StatelessWidget {
           builder: (context, child) {
             statusBarHeight = MediaQuery.of(context).padding.top;
             currentTheme = Theme.of(context);
-
+            Brightness reversedBrightness = Brightness.dark;
             if (Theme.of(context).brightness == Brightness.dark) {
-              SystemChrome.setSystemUIOverlayStyle(
-                SystemUiOverlayStyle(
-                  statusBarColor: Colors.transparent,
-                  statusBarBrightness: Brightness.dark,
-                  statusBarIconBrightness: Brightness.light,
-                  systemNavigationBarDividerColor: Colors.white,
-                  systemNavigationBarColor:
-                      Theme.of(context).scaffoldBackgroundColor,
-                  systemNavigationBarIconBrightness: Brightness.light,
-                ),
-              );
-            } else {
-              SystemChrome.setSystemUIOverlayStyle(
-                SystemUiOverlayStyle(
-                  statusBarColor: Colors.transparent,
-                  statusBarBrightness: Brightness.light,
-                  statusBarIconBrightness: Brightness.dark,
-                  systemNavigationBarDividerColor: Colors.black,
-                  systemNavigationBarColor: Theme.of(context).cardColor,
-                  systemNavigationBarIconBrightness: Brightness.dark,
-                ),
-              );
+              reversedBrightness = Brightness.light;
             }
+
+            SystemChrome.setSystemUIOverlayStyle(
+              SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarBrightness: Theme.of(context).brightness,
+                statusBarIconBrightness: reversedBrightness,
+                systemNavigationBarDividerColor: Theme.of(context).dividerColor,
+                systemNavigationBarColor: reversedBrightness == Brightness.light
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : Theme.of(context).cardColor,
+                systemNavigationBarIconBrightness: reversedBrightness,
+              ),
+            );
             return ToastOverlay(
               child: InternetChecker(child: child),
             );

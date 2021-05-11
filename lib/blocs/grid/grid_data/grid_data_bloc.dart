@@ -10,9 +10,9 @@ import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flibusta/blocs/grid/grid_data/components/grid_tiles_builder.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:utopic_toast/utopic_toast.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:utopic_toast/utopic_toast.dart';
 
 part 'grid_data_event.dart';
 part 'grid_data_screen.dart';

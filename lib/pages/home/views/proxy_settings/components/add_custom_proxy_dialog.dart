@@ -28,7 +28,7 @@ class AddCustomProxyDialog {
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: DsRaisedButton(
+                child: DsElevatedButton(
                   child: Text('Добавить'),
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   onPressed: () {

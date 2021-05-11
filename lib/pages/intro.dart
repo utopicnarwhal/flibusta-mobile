@@ -97,7 +97,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
         SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: RaisedButton(
+          child: ElevatedButton(
             child: Text('Открыть сайт'),
             onPressed: _onSubmit,
           ),
@@ -177,7 +177,7 @@ class _OpenSiteBlockState extends State<_OpenSiteBlock> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 12.0),
-                  child: FlatButton(
+                  child: TextButton(
                     child: Text('Понятно'),
                     onPressed: () {
                       Navigator.pop(context);

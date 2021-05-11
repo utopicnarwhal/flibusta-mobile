@@ -334,7 +334,6 @@ class _HttpClientResponse extends _HttpInboundMessageListInt
   String get reasonPhrase => _incoming.reasonPhrase;
 
   X509Certificate get certificate {
-    // ignore: close_sinks
     var socket = _httpRequest._httpClientConnection._socket;
     if (socket is SecureSocket) return socket.peerCertificate;
     return null;
@@ -342,7 +341,7 @@ class _HttpClientResponse extends _HttpInboundMessageListInt
 
   List<Cookie> get cookies {
     if (_cookies != null) return _cookies;
-    _cookies = new List<Cookie>();
+    _cookies = [];
     List<String> values = headers[HttpHeaders.setCookieHeader];
     if (values != null) {
       values.forEach((value) {
@@ -850,7 +849,7 @@ class _HttpResponse extends _HttpOutboundMessage<HttpResponse>
   bool get _isConnectionClosed => _httpRequest._httpConnection._isClosing;
 
   List<Cookie> get cookies {
-    if (_cookies == null) _cookies = new List<Cookie>();
+    if (_cookies == null) _cookies = [];
     return _cookies;
   }
 
@@ -1059,7 +1058,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
     implements HttpClientRequest {
   final String method;
   final Uri uri;
-  final List<Cookie> cookies = new List<Cookie>();
+  final List<Cookie> cookies = [];
 
   // The HttpClient this request belongs to.
   final _HttpClient _httpClient;
@@ -3011,7 +3010,7 @@ class _ProxyConfiguration {
   static const String PROXY_PREFIX = "PROXY ";
   static const String DIRECT_PREFIX = "DIRECT";
 
-  _ProxyConfiguration(String configuration) : proxies = new List<_Proxy>() {
+  _ProxyConfiguration(String configuration) : proxies = [] {
     if (configuration == null) {
       throw new HttpException("Invalid proxy configuration $configuration");
     }
@@ -3530,7 +3529,7 @@ class _CryptoUtils {
     if (addLineSeparator) {
       outputLen += ((outputLen - 1) ~/ LINE_LENGTH) << 1;
     }
-    List<int> out = new List<int>(outputLen);
+    List<int> out = []..length = outputLen;
 
     // Encode 24 bit chunks.
     int j = 0, i = 0, c = 0;
@@ -3574,7 +3573,7 @@ class _CryptoUtils {
       [bool ignoreInvalidCharacters = true]) {
     int len = input.length;
     if (len == 0) {
-      return new List<int>(0);
+      return []..length = 0;
     }
 
     // Count '\r', '\n' and illegal characters, For illegal characters,
@@ -3603,7 +3602,7 @@ class _CryptoUtils {
       if (currentCodeUnit == PAD) padLength++;
     }
     int outputLen = (((len - extrasLen) * 6) >> 3) - padLength;
-    List<int> out = new List<int>(outputLen);
+    List<int> out = []..length = outputLen;
 
     for (int i = 0, o = 0; o < outputLen;) {
       // Accumulate 4 valid 6 bit Base 64 characters into an int.
@@ -3647,8 +3646,8 @@ abstract class _HashBase {
   _HashBase(
       this._chunkSizeInWords, this._digestSizeInWords, this._bigEndianWords)
       : _pendingData = [] {
-    _currentChunk = new List(_chunkSizeInWords);
-    _h = new List(_digestSizeInWords);
+    _currentChunk = []..length = _chunkSizeInWords;
+    _h = []..length = _digestSizeInWords;
   }
 
   // Update the hasher with more data.
@@ -3725,7 +3724,7 @@ abstract class _HashBase {
 
   // Convert a 32-bit word to four bytes.
   List<int> _wordToBytes(int word) {
-    List<int> bytes = new List(_BYTES_PER_WORD);
+    List<int> bytes = []..length = _BYTES_PER_WORD;
     bytes[0] = (word >> (_bigEndianWords ? 24 : 0)) & _MASK_8;
     bytes[1] = (word >> (_bigEndianWords ? 16 : 8)) & _MASK_8;
     bytes[2] = (word >> (_bigEndianWords ? 8 : 16)) & _MASK_8;
@@ -3853,7 +3852,7 @@ class _MD5 extends _HashBase {
 class _SHA1 extends _HashBase {
   // Construct a SHA1 hasher object.
   _SHA1()
-      : _w = new List(80),
+      : _w = []..length = 80,
         super(16, 5, true) {
     _h[0] = 0x67452301;
     _h[1] = 0xEFCDAB89;
@@ -4899,7 +4898,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
   }
 
   static List<String> _tokenizeFieldValue(String headerValue) {
-    List<String> tokens = new List<String>();
+    List<String> tokens = [];
     int start = 0;
     int index = 0;
     while (index < headerValue.length) {
@@ -5199,7 +5198,7 @@ class _HttpHeaders implements HttpHeaders {
 
   void noFolding(String name) {
     name = _validateField(name);
-    if (_noFoldingHeaders == null) _noFoldingHeaders = new List<String>();
+    if (_noFoldingHeaders == null) _noFoldingHeaders = [];
     _noFoldingHeaders.add(name);
   }
 
@@ -5519,7 +5518,7 @@ class _HttpHeaders implements HttpHeaders {
   void _addValue(String name, Object value) {
     List<String> values = _headers[name];
     if (values == null) {
-      values = new List<String>();
+      values = [];
       _headers[name] = values;
     }
     if (value is DateTime) {
@@ -5533,7 +5532,7 @@ class _HttpHeaders implements HttpHeaders {
 
   void _set(String name, String value) {
     assert(name == _validateField(name));
-    List<String> values = new List<String>();
+    List<String> values = [];
     _headers[name] = values;
     values.add(value);
   }
@@ -5610,7 +5609,7 @@ class _HttpHeaders implements HttpHeaders {
 
   List<Cookie> _parseCookies() {
     // Parse a Cookie header value according to the rules in RFC 6265.
-    var cookies = new List<Cookie>();
+    List<Cookie> cookies = [];
     void parseCookieString(String s) {
       int index = 0;
 

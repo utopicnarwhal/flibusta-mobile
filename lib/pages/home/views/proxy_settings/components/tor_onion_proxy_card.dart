@@ -36,7 +36,7 @@ class _TorOnionProxyCardState extends State<TorOnionProxyCard> {
             ),
             title: Text('Onion Proxy'),
             subtitle: BlocBuilder<TorProxyBloc, TorProxyState>(
-              cubit: TorProxyBloc(),
+              bloc: TorProxyBloc(),
               builder: (context, torProxyState) {
                 Widget stateWidget = Text('Неизвестно');
 

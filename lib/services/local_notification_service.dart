@@ -13,8 +13,8 @@ class NotificationService {
 
   void init() {
     var initializationSettings = InitializationSettings(
-      AndroidInitializationSettings('app_icon'),
-      IOSInitializationSettings(),
+      android: AndroidInitializationSettings('app_icon'),
+      iOS: IOSInitializationSettings(),
     );
 
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -49,8 +49,8 @@ class NotificationService {
     );
 
     var platformChannelSpecifics = NotificationDetails(
-      androidPlatformChannelSpecifics,
-      iOSPlatformChannelSpecifics,
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
     );
 
     await flutterLocalNotificationsPlugin.show(

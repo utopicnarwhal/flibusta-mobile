@@ -18,8 +18,8 @@ class GridDataScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<GridDataBloc>.value(
       value: gridDataBloc,
-      child: BlocListener<Cubit<GridDataState>, GridDataState>(
-        cubit: gridDataBloc,
+      child: BlocListener<GridDataBloc, GridDataState>(
+        bloc: gridDataBloc,
         listener: (context, gridDataState) {
           if (gridDataState?.message?.isEmpty != false) {
             return;
@@ -36,7 +36,7 @@ class GridDataScreen extends StatelessWidget {
           );
         },
         child: BlocBuilder<GridDataBloc, GridDataState>(
-          cubit: gridDataBloc,
+          bloc: gridDataBloc,
           builder: (context, gridDataState) {
             return GridTilesBuilder(
               gridViewType: gridDataBloc.gridViewType,

@@ -91,7 +91,7 @@ class ProxySettingsPage extends StatelessWidget {
               ),
               SizedBox(height: 8),
               BlocBuilder<TorProxyBloc, TorProxyState>(
-                cubit: TorProxyBloc(),
+                bloc: TorProxyBloc(),
                 builder: (context, torProxyState) {
                   if (torProxyState is InTorProxyState) {
                     return Text(

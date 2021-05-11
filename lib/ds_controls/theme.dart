@@ -173,8 +173,8 @@ final _bottomSheetTheme = BottomSheetThemeData(
 final _buttonBarTheme = ButtonBarThemeData();
 const _pageTransitionTheme = PageTransitionsTheme(
   builders: <TargetPlatform, PageTransitionsBuilder>{
-    TargetPlatform.android: ZoomPageTransitionsBuilder(),
-    TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
   },
 );
 
