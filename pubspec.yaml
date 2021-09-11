@@ -1,7 +1,7 @@
 name: flibusta
 description: Unofficial mobile application for site https://flibusta.is
 
-version: 0.7.0+41
+version: 0.7.1+42
 
 environment:
   sdk: ">=2.10.0 <3.0.0"
@@ -14,7 +14,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0
   cookie_jar: ^3.0.1
 
-  utopic_tor_onion_proxy: ^0.3.0
+  utopic_tor_onion_proxy: ^0.3.1
 
   flutter_typeahead: ^3.1.3
   mask_text_input_formatter: ^1.2.1
@@ -74,6 +74,7 @@ flutter:
     - assets/img/4pda_logo.svg
     - assets/img/tor_logo.svg
     - assets/img/onion_services.svg
+    - assets/animations/like.flr
     - assets/animations/empty_state.flr
     - assets/animations/books_placeholder.flr
     - assets/animations/long_tap.flr

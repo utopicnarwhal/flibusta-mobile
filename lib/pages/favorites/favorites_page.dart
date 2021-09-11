@@ -107,13 +107,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
         gridViewType: GridViewType.suquence,
       );
     } else if (_favoritesList.isEmpty) {
-      body = Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body = ListView(
+        physics: kBouncingAlwaysScrollableScrollPhysics,
         children: <Widget>[
-          SizedBox(
-            height: 230,
-            width: 300,
+          SizedBox(height: 40),
+          LimitedBox(
+            maxHeight: 150,
+            maxWidth: 150,
             child: FlareActor(
               'assets/animations/like.flr',
               alignment: Alignment.topCenter,
@@ -121,8 +121,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
               animation: 'Animations',
             ),
           ),
+          SizedBox(height: 40),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Text(
               _favoriteTypeToNoResultMessage(widget.favoritesType),
               textAlign: TextAlign.center,
@@ -153,10 +154,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
             int score;
 
             if (_favoritesList[index] is BookCard) {
-              genresStrings = (_favoritesList[index] as BookCard)
-                  ?.genres
-                  ?.list
-                  ?.map((genre) {
+              genresStrings = (_favoritesList[index] as BookCard)?.genres?.list?.map((genre) {
                 return genre.values?.first;
               })?.toList();
               score = (_favoritesList[index] as BookCard)?.fileScore;
@@ -180,20 +178,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 onDismissed: () async {
                   switch (widget.favoritesType) {
                     case FavoritesType.Author:
-                      await LocalStorage()
-                          .deleteFavoriteAuthor(_favoritesList[index].id);
+                      await LocalStorage().deleteFavoriteAuthor(_favoritesList[index].id);
                       break;
                     case FavoritesType.Book:
-                      await LocalStorage()
-                          .deleteFavoriteBook(_favoritesList[index].id);
+                      await LocalStorage().deleteFavoriteBook(_favoritesList[index].id);
                       break;
                     case FavoritesType.Sequence:
-                      await LocalStorage()
-                          .deleteFavoriteSequence(_favoritesList[index].id);
+                      await LocalStorage().deleteFavoriteSequence(_favoritesList[index].id);
                       break;
                     case FavoritesType.Postpone:
-                      await LocalStorage()
-                          .deletePostponeBook(_favoritesList[index].id);
+                      await LocalStorage().deletePostponeBook(_favoritesList[index].id);
                       break;
                   }
                   _getFavoritesList();

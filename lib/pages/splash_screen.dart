@@ -18,6 +18,7 @@ const _filesToWarmup = [
   'assets/animations/empty_state.flr',
   'assets/animations/books_placeholder.flr',
   'assets/animations/long_tap.flr',
+  'assets/animations/like.flr',
 ];
 
 enum LoadingState {

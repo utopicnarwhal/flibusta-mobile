@@ -51,7 +51,7 @@ class LocalStorage {
       }
       return introCompleted;
     } catch (e) {
-      await prefs.setBool('Intro2Completed', false);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -71,7 +71,7 @@ class LocalStorage {
       }
       return longTapTutorialCompleted;
     } catch (e) {
-      await prefs.setBool('LongTapTutorialCompleted', false);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -114,7 +114,7 @@ class LocalStorage {
       }).toList();
       return lastOpenBooks;
     } catch (e) {
-      await prefs.setStringList('LastOpenBooks', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -145,6 +145,7 @@ class LocalStorage {
       var preferredBookExt = prefs.getString('PreferredBookExt');
       return preferredBookExt;
     } catch (e) {
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -170,6 +171,7 @@ class LocalStorage {
       }
       return SortAuthorBooksBy.values[0];
     } catch (e) {
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -198,6 +200,7 @@ class LocalStorage {
       }
       return SortGenreBooksBy.values[0];
     } catch (e) {
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -227,7 +230,7 @@ class LocalStorage {
       }
       return actualProxy;
     } catch (e) {
-      await prefs.setString('ActualProxy', '');
+      debugPrint(e.toString());
       return '';
     }
   }
@@ -247,7 +250,7 @@ class LocalStorage {
       }
       return proxies;
     } catch (e) {
-      await prefs.setStringList('Proxies', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -280,7 +283,7 @@ class LocalStorage {
       }
       return flibustaHostAddress;
     } catch (e) {
-      await prefs.setString('FlibustaHostAddress', '');
+      debugPrint(e.toString());
       return '';
     }
   }
@@ -297,6 +300,7 @@ class LocalStorage {
       var booksDirectory = Directory(booksDirectoryPath);
       return booksDirectory;
     } catch (e) {
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -316,7 +320,7 @@ class LocalStorage {
       }
       return favoriteGenreCodes;
     } catch (e) {
-      await prefs.setStringList('FavoriteGenreCodes', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -354,7 +358,7 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('FavoriteBooks', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -373,7 +377,8 @@ class LocalStorage {
         favoritesBooksJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('FavoriteBooks', []);
+      debugPrint(e.toString());
+      return false;
     }
   }
 
@@ -389,7 +394,7 @@ class LocalStorage {
         return BookCard.fromJson(json.decode(element)).id == bookId;
       });
     } catch (e) {
-      await prefs.setStringList('FavoriteBooks', []);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -425,7 +430,7 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('PostponeBooks', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -444,7 +449,8 @@ class LocalStorage {
         postponesBooksJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('PostponeBooks', []);
+      debugPrint(e.toString());
+      return false;
     }
   }
 
@@ -460,7 +466,7 @@ class LocalStorage {
         return BookCard.fromJson(json.decode(element)).id == bookId;
       });
     } catch (e) {
-      await prefs.setStringList('PostponeBooks', []);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -484,7 +490,7 @@ class LocalStorage {
   Future<List<AuthorCard>> getFavoriteAuthors() async {
     var prefs = await _prefs;
     try {
-      var result = [];
+      List<AuthorCard> result = [];
 
       var favoriteAuthorsJson = prefs.getStringList('FavoriteAuthors');
       if (favoriteAuthorsJson?.isNotEmpty != true) {
@@ -496,7 +502,7 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('FavoriteAuthors', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -515,7 +521,8 @@ class LocalStorage {
         favoritesAuthorsJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('FavoriteAuthors', []);
+      debugPrint(e.toString());
+      return false;
     }
   }
 
@@ -531,7 +538,7 @@ class LocalStorage {
         return AuthorCard.fromJson(json.decode(element)).id == authorId;
       });
     } catch (e) {
-      await prefs.setStringList('FavoriteAuthors', []);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -568,7 +575,7 @@ class LocalStorage {
       });
       return result;
     } catch (e) {
-      await prefs.setStringList('FavoriteSequences', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -587,7 +594,8 @@ class LocalStorage {
         favoritesSequencesJsonStrings,
       );
     } catch (e) {
-      return await prefs.setStringList('FavoriteSequences', []);
+      debugPrint(e.toString());
+      return false;
     }
   }
 
@@ -603,7 +611,7 @@ class LocalStorage {
         return SequenceCard.fromJson(json.decode(element)).id == sequenceId;
       });
     } catch (e) {
-      await prefs.setStringList('FavoriteSequences', []);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -639,7 +647,7 @@ class LocalStorage {
       }).toList();
       return downloadedBooks;
     } catch (e) {
-      await prefs.setStringList('DownloadedBooks', []);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -685,8 +693,8 @@ class LocalStorage {
       }
       return useOnionSiteWithTor;
     } catch (e) {
-      await prefs.setBool('UseOnionSiteWithTor', true);
-      return true;
+      debugPrint(e.toString());
+      return false;
     }
   }
 
@@ -705,7 +713,7 @@ class LocalStorage {
       }
       return startUpTor;
     } catch (e) {
-      await prefs.setBool('StartUpTor', false);
+      debugPrint(e.toString());
       return false;
     }
   }
