@@ -1,5 +1,6 @@
 import 'package:flibusta/ds_controls/ui/app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BookAppBar extends StatefulWidget {
   final Widget coverImg;
@@ -17,8 +18,7 @@ class _BookAppBarState extends State<BookAppBar> {
   void didUpdateWidget(BookAppBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.coverImg != widget.coverImg && widget.coverImg is Image) {
-      coverImageStream =
-          (widget.coverImg as Image).image.resolve(new ImageConfiguration());
+      coverImageStream = (widget.coverImg as Image).image.resolve(new ImageConfiguration());
       coverImageStream.addListener(ImageStreamListener(imageStreamListener));
     }
   }
@@ -26,10 +26,8 @@ class _BookAppBarState extends State<BookAppBar> {
   void imageStreamListener(ImageInfo info, bool _) {
     if (mounted) {
       setState(() {
-        coverImgHeight = (info.image.height.toDouble() *
-                (MediaQuery.of(context).size.width /
-                    info.image.width.toDouble()) -
-            24);
+        coverImgHeight =
+            (info.image.height.toDouble() * (MediaQuery.of(context).size.width / info.image.width.toDouble()) - 24);
       });
     }
   }
@@ -37,24 +35,20 @@ class _BookAppBarState extends State<BookAppBar> {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: Theme.of(context).brightness == Brightness.light
-          ? Theme.of(context).cardColor
-          : null,
+      backgroundColor: Theme.of(context).brightness == Brightness.light ? Theme.of(context).cardColor : null,
       pinned: true,
       snap: false,
       floating: false,
       expandedHeight: coverImgHeight ?? 150,
-      title: widget.coverImg == null
-          ? Text('Нет обложки')
-          : Text(''),
+      title: widget.coverImg == null ? Text('Нет обложки') : Text(''),
       flexibleSpace: FlexibleSpaceBar(
         background: widget.coverImg,
       ),
       elevation: 0,
-      textTheme: Theme.of(context).textTheme,
       iconTheme: Theme.of(context).iconTheme,
       actionsIconTheme: Theme.of(context).iconTheme,
-      brightness: Theme.of(context).brightness,
+      systemOverlayStyle:
+          Theme.of(context).brightness == Brightness.light ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light,
       bottom: DsAppBarBottomDivider(),
     );
   }

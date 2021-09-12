@@ -54,7 +54,7 @@ abstract class DsProgressIndicator extends StatefulWidget {
   /// To specify a constant color use: `AlwaysStoppedAnimation<Color>(color)`.
   ///
   /// If null, the progress indicator is rendered with the current theme's
-  /// [ThemeData.accentColor].
+  /// [ThemeData.colorScheme.secondary].
   final Animation<Color> valueColor;
 
   /// {@template flutter.material.progressIndicator.semanticsLabel}
@@ -79,7 +79,7 @@ abstract class DsProgressIndicator extends StatefulWidget {
   /// {@endtemplate}
   final String semanticsValue;
 
-  Color _getValueColor(BuildContext context) => valueColor?.value ?? Theme.of(context).accentColor;
+  Color _getValueColor(BuildContext context) => valueColor?.value ?? Theme.of(context).colorScheme.secondary;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -188,12 +188,10 @@ class _DsLinearProgressIndicatorPainter extends CustomPainter {
       drawBar(0.0, value.clamp(0.0, 1.0) * size.width);
     } else {
       final double x1 = size.width * line1Tail.transform(animationValue);
-      final double width1 =
-          size.width * line1Head.transform(animationValue) - x1;
+      final double width1 = size.width * line1Head.transform(animationValue) - x1;
 
       final double x2 = size.width * line2Tail.transform(animationValue);
-      final double width2 =
-          size.width * line2Head.transform(animationValue) - x2;
+      final double width2 = size.width * line2Head.transform(animationValue) - x2;
 
       drawBar(x1, width1);
       drawBar(x2, width2);
@@ -254,12 +252,10 @@ class DsLinearProgressIndicator extends ProgressIndicator {
         );
 
   @override
-  _DsLinearProgressIndicatorState createState() =>
-      _DsLinearProgressIndicatorState();
+  _DsLinearProgressIndicatorState createState() => _DsLinearProgressIndicatorState();
 }
 
-class _DsLinearProgressIndicatorState extends State<DsLinearProgressIndicator>
-    with SingleTickerProviderStateMixin {
+class _DsLinearProgressIndicatorState extends State<DsLinearProgressIndicator> with SingleTickerProviderStateMixin {
   AnimationController _controller;
 
   @override
@@ -277,8 +273,7 @@ class _DsLinearProgressIndicatorState extends State<DsLinearProgressIndicator>
     super.didUpdateWidget(oldWidget);
     if (widget.value == null && !_controller.isAnimating)
       _controller.repeat();
-    else if (widget.value != null && _controller.isAnimating)
-      _controller.stop();
+    else if (widget.value != null && _controller.isAnimating) _controller.stop();
   }
 
   @override
@@ -287,13 +282,10 @@ class _DsLinearProgressIndicatorState extends State<DsLinearProgressIndicator>
     super.dispose();
   }
 
-  Color _getBackgroundColor(BuildContext context) =>
-      widget.backgroundColor ?? Theme.of(context).backgroundColor;
-  Color _getValueColor(BuildContext context) =>
-      widget.valueColor?.value ?? Theme.of(context).accentColor;
+  Color _getBackgroundColor(BuildContext context) => widget.backgroundColor ?? Theme.of(context).backgroundColor;
+  Color _getValueColor(BuildContext context) => widget.valueColor?.value ?? Theme.of(context).colorScheme.secondary;
 
-  Widget _buildIndicator(BuildContext context, double animationValue,
-      TextDirection textDirection) {
+  Widget _buildIndicator(BuildContext context, double animationValue, TextDirection textDirection) {
     return Container(
       constraints: const BoxConstraints(
         minWidth: double.infinity,
@@ -315,8 +307,7 @@ class _DsLinearProgressIndicatorState extends State<DsLinearProgressIndicator>
   Widget build(BuildContext context) {
     final TextDirection textDirection = Directionality.of(context);
 
-    if (widget.value != null)
-      return _buildIndicator(context, _controller.value, textDirection);
+    if (widget.value != null) return _buildIndicator(context, _controller.value, textDirection);
 
     return AnimatedBuilder(
       animation: _controller.view,
@@ -337,12 +328,12 @@ class _DsCircularProgressIndicatorPainter extends CustomPainter {
     this.stepValue,
     this.rotationValue,
     this.strokeWidth,
-  }) : arcStart = value != null
-         ? _startAngle
-         : _startAngle + tailValue * 3 / 2 * math.pi + rotationValue * math.pi * 1.7 - stepValue * 0.8 * math.pi,
-       arcSweep = value != null
-         ? value.clamp(0.0, 1.0) * _sweep
-         : math.max(headValue * 3 / 2 * math.pi - tailValue * 3 / 2 * math.pi, _epsilon);
+  })  : arcStart = value != null
+            ? _startAngle
+            : _startAngle + tailValue * 3 / 2 * math.pi + rotationValue * math.pi * 1.7 - stepValue * 0.8 * math.pi,
+        arcSweep = value != null
+            ? value.clamp(0.0, 1.0) * _sweep
+            : math.max(headValue * 3 / 2 * math.pi - tailValue * 3 / 2 * math.pi, _epsilon);
 
   final Color backgroundColor;
   final Color valueColor;
@@ -384,14 +375,14 @@ class _DsCircularProgressIndicatorPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DsCircularProgressIndicatorPainter oldPainter) {
-    return oldPainter.backgroundColor != backgroundColor
-        || oldPainter.valueColor != valueColor
-        || oldPainter.value != value
-        || oldPainter.headValue != headValue
-        || oldPainter.tailValue != tailValue
-        || oldPainter.stepValue != stepValue
-        || oldPainter.rotationValue != rotationValue
-        || oldPainter.strokeWidth != strokeWidth;
+    return oldPainter.backgroundColor != backgroundColor ||
+        oldPainter.valueColor != valueColor ||
+        oldPainter.value != value ||
+        oldPainter.headValue != headValue ||
+        oldPainter.tailValue != tailValue ||
+        oldPainter.stepValue != stepValue ||
+        oldPainter.rotationValue != rotationValue ||
+        oldPainter.strokeWidth != strokeWidth;
   }
 }
 
@@ -432,13 +423,13 @@ class DsCircularProgressIndicator extends DsProgressIndicator {
     String semanticsLabel,
     String semanticsValue,
   }) : super(
-         key: key,
-         value: value,
-         backgroundColor: backgroundColor,
-         valueColor: valueColor,
-         semanticsLabel: semanticsLabel,
-         semanticsValue: semanticsValue,
-       );
+          key: key,
+          value: value,
+          backgroundColor: backgroundColor,
+          valueColor: valueColor,
+          semanticsLabel: semanticsLabel,
+          semanticsValue: semanticsValue,
+        );
 
   /// The width of the line used to draw the circle.
   final double strokeWidth;
@@ -474,8 +465,7 @@ class _CircularProgressIndicatorState extends State<DsCircularProgressIndicator>
       duration: const Duration(seconds: 8),
       vsync: this,
     );
-    if (widget.value == null)
-      _controller.repeat();
+    if (widget.value == null) _controller.repeat();
   }
 
   @override
@@ -483,8 +473,7 @@ class _CircularProgressIndicatorState extends State<DsCircularProgressIndicator>
     super.didUpdateWidget(oldWidget);
     if (widget.value == null && !_controller.isAnimating)
       _controller.repeat();
-    else if (widget.value != null && _controller.isAnimating)
-      _controller.stop();
+    else if (widget.value != null && _controller.isAnimating) _controller.stop();
   }
 
   @override
@@ -493,7 +482,8 @@ class _CircularProgressIndicatorState extends State<DsCircularProgressIndicator>
     super.dispose();
   }
 
-  Widget _buildIndicator(BuildContext context, double headValue, double tailValue, int stepValue, double rotationValue) {
+  Widget _buildIndicator(
+      BuildContext context, double headValue, double tailValue, int stepValue, double rotationValue) {
     return widget._buildSemanticsWrapper(
       context: context,
       child: Container(
@@ -534,8 +524,7 @@ class _CircularProgressIndicatorState extends State<DsCircularProgressIndicator>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.value != null)
-      return _buildIndicator(context, 0.0, 0.0, 0, 0.0);
+    if (widget.value != null) return _buildIndicator(context, 0.0, 0.0, 0, 0.0);
     return _buildAnimation();
   }
 }

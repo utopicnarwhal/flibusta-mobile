@@ -202,11 +202,9 @@ final ThemeData kFlibustaLightTheme = ThemeData(
 
 final ThemeData kFlibustaDarkTheme = ThemeData(
   brightness: Brightness.dark,
-  primarySwatch: kFlibustaLightBlueColor,
   fontFamily: 'Inter',
   primaryColorDark: kFlibustaLightBlueColor,
   iconTheme: IconThemeData(color: Color(0xFFDDDDDD)),
-  accentColor: kFlibustaLightBlueColor,
   toggleableActiveColor: kFlibustaLightBlueColor,
   inputDecorationTheme: _inputDecorationDarkTheme,
   buttonTheme: _buttonTheme,
@@ -222,5 +220,5 @@ final ThemeData kFlibustaDarkTheme = ThemeData(
     primaryColor: CupertinoColors.systemBlue,
     brightness: Brightness.dark,
   ),
-  pageTransitionsTheme: _pageTransitionTheme,
+  pageTransitionsTheme: _pageTransitionTheme, colorScheme: ColorScheme.fromSwatch(primarySwatch: kFlibustaLightBlueColor).copyWith(secondary: kFlibustaLightBlueColor),
 );

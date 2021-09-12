@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class DsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
@@ -15,8 +16,7 @@ class DsAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBottomDivider = true,
     this.actions,
     this.isTransparent = false,
-  })  : preferredSize =
-            Size.fromHeight(kToolbarHeight + (showBottomDivider ? 0.5 : 0.0)),
+  })  : preferredSize = Size.fromHeight(kToolbarHeight + (showBottomDivider ? 0.5 : 0.0)),
         super(key: key);
 
   @override
@@ -34,17 +34,16 @@ class DsAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: actions,
       bottom: showBottomDivider ? DsAppBarBottomDivider() : null,
       elevation: 0,
-      textTheme: Theme.of(context).textTheme,
       iconTheme: Theme.of(context).iconTheme,
       actionsIconTheme: Theme.of(context).iconTheme,
-      brightness: Theme.of(context).brightness,
+      systemOverlayStyle:
+          Theme.of(context).brightness == Brightness.light ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light,
       backgroundColor: backgroundColor,
     );
   }
 }
 
-class DsAppBarBottomDivider extends StatelessWidget
-    implements PreferredSizeWidget {
+class DsAppBarBottomDivider extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(

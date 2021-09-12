@@ -743,7 +743,7 @@ $htmlString
 List<Genre> parseHtmlFromGetGenres(String htmlString) {
   List<Genre> result = [];
 
-  htmldom.Document document = parse(htmlString);
+  // htmldom.Document document = parse(htmlString);
 
   // TODO: add implimentation
 

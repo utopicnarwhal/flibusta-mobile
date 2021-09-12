@@ -175,7 +175,7 @@ class ProxySettingsPage extends StatelessWidget {
                                   padding: EdgeInsets.only(left: 8.0),
                                   child: Icon(
                                     Icons.add,
-                                    color: Theme.of(context).accentColor,
+                                    color: Theme.of(context).colorScheme.secondary,
                                   ),
                                 ),
                                 title: Text('Добавить свой HTTP-прокси'),

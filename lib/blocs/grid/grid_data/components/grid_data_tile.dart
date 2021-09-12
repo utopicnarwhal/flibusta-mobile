@@ -66,7 +66,7 @@ class GridDataTile extends StatelessWidget {
               IconSlideAction(
                 caption: 'Убрать',
                 color: Theme.of(context).scaffoldBackgroundColor,
-                foregroundColor: Theme.of(context).accentColor,
+                foregroundColor: Theme.of(context).colorScheme.secondary,
                 icon: Icons.delete,
                 onTap: onDismissed,
               ),

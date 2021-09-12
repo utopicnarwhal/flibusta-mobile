@@ -17,13 +17,10 @@ class FirstGridTile extends StatelessWidget {
     var result = Material(
       type: MaterialType.canvas,
       child: ListTileTheme(
-        selectedColor:
-            Theme.of(context).textTheme.subtitle1.color.withOpacity(0.5),
+        selectedColor: Theme.of(context).textTheme.subtitle1.color.withOpacity(0.5),
         child: child,
       ),
-      color: isSelected
-          ? Theme.of(context).accentColor.withOpacity(0.09)
-          : Colors.transparent,
+      color: isSelected ? Theme.of(context).colorScheme.secondary.withOpacity(0.09) : Colors.transparent,
     );
 
     if (!isFirst) {

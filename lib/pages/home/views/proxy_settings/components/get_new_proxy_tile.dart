@@ -34,7 +34,7 @@ class _GetNewProxyTileState extends State<GetNewProxyTile> {
               )
             : Icon(
                 Icons.add,
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
               ),
       ),
       title: Text('Добавить прокси с сайта http://pubproxy.com'),
